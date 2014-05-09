@@ -81,7 +81,7 @@ namespace Elarion {
 			return Object.FindObjectsOfType(type);
 		}
 
-		public T[] FindObjectsOfType<T>() {
+		public new T[] FindObjectsOfType<T>() where T : Object {
 			return Object.FindObjectsOfType(typeof(T)).Cast<T>().ToArray();
 		}
 
