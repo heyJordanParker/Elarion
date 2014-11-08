@@ -1,63 +1,43 @@
-﻿using UnityEngine;
+﻿using System;
+using Elarion.Managers;
+using UnityEngine;
 using Object = UnityEngine.Object;
 
 namespace Elarion {
 	public static class ObjectExtensions {
-
-		//Instantiates which accept an Object parameter and automatically get a component game object or w/e possible
-		//Instantiates which define a spawn layer || or delete that functionality entirely, because the original game object layer is restored
-
-		public static T Instantiate<T>(this T spawn) where T : Component {
-			return Managers.Pooling.Instantiate(spawn, Vector3.zero, Quaternion.identity) as T;
-		}
-		public static GameObject Instantiate(this GameObject go) {
-			return Managers.Pooling.Instantiate(go, Vector3.zero, Quaternion.identity);
-		}
-		public static T Instantiate<T>(this T component, Transform t) where T : Component {
-			return Managers.Pooling.Instantiate(component, t.position, t.rotation) as T;
-		}
-		public static GameObject Instantiate(this GameObject go, Transform t) {
-			return Managers.Pooling.Instantiate(go, t.position, t.rotation);
-		}
-		public static T Instantiate<T>(this T componenet, Vector3 position, Quaternion rotation) where T : Component {
-			return Managers.Pooling.Instantiate(componenet, position, rotation) as T;
-		}
-		public static T Instantiate<T>(this T componenet, Vector3 position, Quaternion rotation, int layer) where T : Component {
-			return Managers.Pooling.Instantiate(componenet, position, rotation, layer) as T;
-		}
-		public static GameObject Instantiate(this GameObject go, Vector3 position, Quaternion rotation) {
-			Debug.Log("used");
-			return Managers.Pooling.Instantiate(go);
+		public static void Destroy(this Object obj, float time = 0.0f) {
+#if UNITY_EDITOR
+			if(Application.isPlaying) {
+				Object.Destroy(obj, time);
+			} else {
+				if(time > 0.0f)
+					Debug.LogException(new Exception("Cannot use delayed destroy in edit mode. Using ImmediateDestroy instead."));
+				Object.DestroyImmediate(obj);
+			}
+#else
+			Object.Destroy(obj, time);
+#endif
 		}
 
-		//layer, position, rotation
-		public static void Spawn(this GameObject gameObject, int layer) {
-			Managers.Pooling.Spawn(gameObject, layer);
+		public static T Instantiate<T>(this T component, Transform transform, int layer = -1) where T : Component {
+			if(component == null) throw new ArgumentNullException("component");
+			if(transform == null) throw new ArgumentNullException("transform");
+			return InstantiateOrSpawnFromPool(component.gameObject, transform.position, transform.rotation, layer).GetComponent<T>();
 		}
 
-		public static void Spawn(this GameObject gameObject) {
-			Managers.Pooling.Spawn(gameObject);
+		private static GameObject InstantiateOrSpawnFromPool(GameObject gameObject, Vector3 position, Quaternion rotation, int layer = -1) {
+			//instantiate or spawn from pool
+			return Singleton.Get<PoolingManager>().Instantiate(gameObject, position, rotation, layer);
 		}
 
-		public static void Destroy(this GameObject gameObject) {
-			Managers.Pooling.Destroy(gameObject);
+		public static T Instantiate<T>(this T component, Vector3 position = new Vector3(), Quaternion rotation = new Quaternion(), int layer = - 1) where T : Component {
+			if(component == null) throw new ArgumentNullException("component");
+			return InstantiateOrSpawnFromPool(component.gameObject, position, rotation, layer).GetComponent<T>();
 		}
 
-		public static void EmptyPool(this GameObject gameObject) {
-			Managers.Pooling.EmptyPool(gameObject);
+		public static GameObject Instantiate(this GameObject gameObject, Vector3 position, Quaternion rotation, int layer = -1) {
+			if(gameObject == null) throw new ArgumentNullException("gameObject");
+			return InstantiateOrSpawnFromPool(gameObject, position, rotation, layer);
 		}
-
-		public static void EmptyPool(this Component component) {
-			Managers.Pooling.EmptyPool(component.gameObject);
-		}
-
-		public static void Pool(GameObject gameObject, uint amount) {
-			Managers.Pooling.Pool(gameObject, amount);
-		}
-
-		public static void Pool(this Component component, uint amount) {
-			Managers.Pooling.Pool(component.gameObject, amount);
-		}
-
 	}
 }

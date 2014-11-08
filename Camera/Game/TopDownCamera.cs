@@ -15,14 +15,13 @@ namespace Elarion {
 		public float distance;
 		public Vector2 distanceBounds;
 
-		protected new Vector2 position;
+		protected Vector2 position;
 		protected Vector2 targetPosition;
 		protected float targetDistance;
 
 		private Vector2 _moveDelta;
 
-		protected override void Initialize() {
-			base.Initialize();
+		protected void Awake() {
 			targetDistance = distance = distanceBounds.y;
 			position = targetPosition = startingPosition;
 		}

@@ -6,8 +6,7 @@ namespace Elarion {
 
 		public int originatingLevel = -1;
 
-		protected override void Initialize() {
-			base.Initialize();
+		protected void Awake() {
 			originatingLevel = Application.loadedLevel;
 			DontDestroyOnLoad(gameObject);
 		}

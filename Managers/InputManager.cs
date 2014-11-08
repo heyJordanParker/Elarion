@@ -7,12 +7,6 @@ namespace Elarion {
 	//TODO Android KeyCode.Escape == "Back" Button ( handler )
 	//TODO Android When the menu key is pressed OnApplicationPause(true) is broadcasted, when the application is back to front - OnApplicationPause(false) is sent
 
-	public class InputManager : ExtendedBehaviour {
-
-		protected override void Initialize() {
-
-		}
-
-	}
+	public class InputManager : ExtendedBehaviour {}
 
 }

@@ -1,4 +1,5 @@
 ﻿using System.Collections;
+using Elarion.Managers;
 using Elarion.StateMachine;
 using UnityEngine;
 
@@ -9,26 +10,24 @@ namespace Elarion {
 		public Database[] databases;
 		
 		//TODO game state loading should go as follows : Exit Old State, Enter New State, Fire(Initialize) on New State, Start Loading Coroutine on new state
-		//	( intended behavior - an empty scene for initialization than loading of the starting level etc )
+		//	( intended behavior - an empty scene for initialization than loading of the starting level etc ) 
 
 		//data for following of previous levels is stored in the Session
 
 		//TODO subscribe to a change level event - push the loading etc
 
-		protected override void Initialize() {
+		private void Awake() {
 			foreach(var database in databases) {
 				database.Initialize();
-				Managers.Resources.Add(database);
+//				Session.Add(database);
 			}
-			base.Initialize();
 			Subscribe("Change Game State", "GoToGameState");
 		}
 
-		protected override void Deinitialize() {
-			base.Deinitialize();
+		private void OnDestroy() {
 			foreach(var database in databases) {
 				database.Deinitialize();
-				Managers.Resources.Remove(database);
+//				Session.Remove(database);
 			}
 		}
 

@@ -3,7 +3,7 @@ using UnityEngine;
 
 namespace Elarion {
 
-	internal class EventManager : ExtendedBehaviour {
+	internal class EventManager : Singleton {
 		
 		private struct Event {
 			private string _name;

@@ -1,6 +1,4 @@
-﻿using UnityEngine;
-
-namespace Elarion {
+﻿namespace Elarion {
 
 	/// <summary>
 	/// Initializer base class - its used for initialization of
@@ -8,13 +6,9 @@ namespace Elarion {
 	/// </summary>
 	public class Initializer : ExtendedBehaviour {
 
-		protected override void Initialize() {
 
-			Application.runInBackground = true;
-			Screen.sleepTimeout = SleepTimeout.NeverSleep;
+		//TODO generic Initializer which runs once per application run
 
-//			Shader.WarmupAllShaders();
-		}
 
 	}
 

@@ -1,4 +1,5 @@
 ﻿using System;
+using Elarion.Managers;
 using UnityEngine;
 
 namespace Elarion {
@@ -11,8 +12,9 @@ namespace Elarion {
 		public string uncompiledFormula;
 		public Func<float[], float> dDelegate;
 
+		//enable global access to resources
 		public static float Apply(string formulaName, params float[] arguments) {
-			return Managers.Resources.Get<FormulaDatabase>().ApplyFormula(formulaName, arguments);
+			return 0.0f; //Session.Get<FormulaDatabase>().ApplyFormula(formulaName, arguments);
 		}
 
 		private static FormulaParser _parser;

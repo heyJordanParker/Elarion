@@ -12,10 +12,9 @@ namespace Elarion {
 
 		private AudioSource _audioSource;
 
-		protected override void Initialize() {
-			base.Initialize();
+		protected void Awake() {
 			if(string.IsNullOrEmpty(eventName)) return;
-			_audioSource = Component<AudioSource>();
+			_audioSource = GetComponent<AudioSource>();
 			Subscribe(eventName, "StartSound");
 		}
 

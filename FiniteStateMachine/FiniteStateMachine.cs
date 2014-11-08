@@ -12,13 +12,6 @@ namespace Elarion.StateMachine {
 
 		private Stack<State> _stateStack;
 
-		protected override void Initialize() {
-			foreach(var state in GetComponentsInChildren<State>()) {
-				state.SetActive(false);
-			}
-			GoTo(initialState);
-		}
-
 		public void GoTo(State state) {
 			if(StateStack.Count > 0)
 				Debug.LogException(new Exception("Cannot switch states while the state stack is not empty."), this);
@@ -72,8 +65,8 @@ namespace Elarion.StateMachine {
 		}
 
 		public new void Fire(string firedEvent) {
-			CurrentState.Fire(firedEvent);
-			base.Fire(firedEvent);
+//			CurrentState.Fire(firedEvent);
+//			base.Fire(firedEvent);
 		}
 
 		public new void Fire(string firedEvent, object parameter) {
