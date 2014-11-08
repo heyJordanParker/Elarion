@@ -2,8 +2,8 @@
 using UnityEngine;
 
 namespace Elarion {
-	
-	public class TopDownCamera : CameraController {
+
+	public class TopDownCamera : ExtendedBehaviour {
 
 		public Ease easeType;
 		public float smoothing;
@@ -20,6 +20,8 @@ namespace Elarion {
 		protected float targetDistance;
 
 		private Vector2 _moveDelta;
+		private Camera _camera;
+		protected Camera Camera { get { return _camera == null ? (_camera = GetComponent<Camera>()) : _camera; } }
 
 		protected void Awake() {
 			targetDistance = distance = distanceBounds.y;
@@ -63,7 +65,7 @@ namespace Elarion {
 			startingPosition.y = Mathf.Clamp(startingPosition.y, cameraBounds.yMin, cameraBounds.yMax);
 			distance = Mathf.Clamp(distance, distanceBounds.x, distanceBounds.y);
 			Camera.transform.position = new Vector3(startingPosition.x, 0, startingPosition.y) -
-			                            (Camera.transform.rotation * Vector3.forward * distance);
+										(Camera.transform.rotation * Vector3.forward * distance);
 			Gizmos.color = Color.red;
 			Gizmos.DrawWireSphere(Camera.transform.position, 0.7f);
 		}

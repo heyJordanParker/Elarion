@@ -1,9 +1,5 @@
-using System;
 using System.Collections;
-using System.Linq;
-using Livity.Features.LiveCoding;
 using UnityEngine;
-using Object = UnityEngine.Object;
 
 namespace Elarion {
 	public class ExtendedBehaviour : MonoBehaviour {
