@@ -1,6 +1,8 @@
-﻿namespace Elarion {
+﻿using UnityEngine;
 
-	public class LoadingProgress : Resource {
+namespace Elarion {
+
+	public class LoadingProgress : MonoBehaviour {
 
 		public float progress;
 

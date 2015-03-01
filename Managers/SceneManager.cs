@@ -7,7 +7,7 @@ namespace Elarion {
 	//gameFSM subscribes to FinishedLoading event and pops the state
 
 	[RequireComponent(typeof(LoadingProgress))]
-	public class SceneManager : ExtendedBehaviour {
+	public class SceneManager : MonoBehaviour {
 
 		public float preLoadingDelay = 0.5f;
 		public float postLoadingDelay = 1f;
@@ -25,7 +25,7 @@ namespace Elarion {
 		public IEnumerator LoadingCoroutine() {
 
 			if(AsyncLoad.AsyncLoadIndex.Count > 0)
-				Broadcast("Started Loading");
+				gameObject.Broadcast("Started Loading");
 			else yield break;
 
 			yield return new WaitForSeconds(preLoadingDelay);
@@ -43,7 +43,7 @@ namespace Elarion {
 
 			yield return new WaitForSeconds(postLoadingDelay);
 
-			Broadcast("Finished Loading");
+			gameObject.Broadcast("Finished Loading");
 		}
 
 	}

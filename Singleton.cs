@@ -4,7 +4,7 @@ using UnityEngine;
 
 namespace Elarion {
 
-	public abstract class Singleton : ExtendedBehaviour {
+	public abstract class Singleton : MonoBehaviour {
 
 		private static Dictionary<Type, Singleton> _instances;
 

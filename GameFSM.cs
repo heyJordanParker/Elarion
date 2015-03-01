@@ -21,7 +21,7 @@ namespace Elarion {
 				database.Initialize();
 //				Session.Add(database);
 			}
-			Subscribe("Change Game State", "GoToGameState");
+			gameObject.Subscribe("Change Game State", "GoToGameState");
 		}
 
 		private void OnDestroy() {

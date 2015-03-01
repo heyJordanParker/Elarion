@@ -4,7 +4,7 @@ using UnityEngine;
 namespace Elarion {
 
 	[Serializable]
-	public class CameraInfo : ExtendedBehaviour {
+	public class CameraInfo : MonoBehaviour {
 		public Vector2 startingPosition;
 		public Vector2 distanceBounds;
 		public Vector2 xBounds;

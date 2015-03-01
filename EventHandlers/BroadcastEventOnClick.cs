@@ -1,12 +1,14 @@
-﻿namespace Elarion {
+﻿using UnityEngine;
 
-	public class BroadcastEventOnClick : ExtendedBehaviour {
+namespace Elarion {
+
+	public class BroadcastEventOnClick : MonoBehaviour {
 		 
 		public string firedEvent;
 
 		void OnClick() {
 			if(string.IsNullOrEmpty(firedEvent)) return;
-			Broadcast(firedEvent);
+			gameObject.Broadcast(firedEvent);
 		}
 
 	}

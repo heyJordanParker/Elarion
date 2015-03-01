@@ -1,9 +1,10 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
+using UnityEngine;
 
 namespace Elarion {
 
-	public class AsyncLoad : ExtendedBehaviour {
+	public class AsyncLoad : MonoBehaviour {
 
 		//set this to true when the loading has finished
 		private bool _isDone;
@@ -38,7 +39,6 @@ namespace Elarion {
 		public bool IsDone { get { return _isDone; } }
 		public bool Started { get { return _started; } }
 		internal static List<AsyncLoad> AsyncLoadIndex { get { return _asyncLoadIndex == null ? (_asyncLoadIndex = new List<AsyncLoad>()) : _asyncLoadIndex; } }
-
 	}
 
 }

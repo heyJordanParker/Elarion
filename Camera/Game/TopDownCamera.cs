@@ -3,7 +3,7 @@ using UnityEngine;
 
 namespace Elarion {
 
-	public class TopDownCamera : ExtendedBehaviour {
+	public class TopDownCamera : MonoBehaviour {
 
 		public Ease easeType;
 		public float smoothing;

@@ -2,72 +2,62 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-namespace Elarion {
+namespace Elarion.EventSystem {
+	public sealed class EventHandler : MonoBehaviour {
 
-	internal sealed class EventHandler {
-		private bool Equals(EventHandler other) {
-			return GameObject.Equals(other.GameObject);
+		private Dictionary<string, List<string>> _events;
+
+		public void Awake() {
+			EventManager.Register(this);
 		}
 
-		//events & list of methods to call on every event
-		private Dictionary<string, List<string>> _events;
-		private List<ExtendedBehaviour> _subscribersIndex; 
+		public void OnDestroy() {
+			EventManager.Unregister(this);
+		}
 
-		private readonly GameObject _gameObject;
+		private static EventManager EventManager { get { return Singleton.Get<EventManager>(); } }
 
-		public EventHandler(GameObject gameObject) { _gameObject = gameObject; }
-
-		public void Subscribe(ExtendedBehaviour behaviour, string toEvent, string messageToSend) {
-			SubscribersIndex.Add(behaviour);
+		public void Subscribe(string toEvent, string message) {
 			if(!Events.ContainsKey(toEvent))
 				Events.Add(toEvent, new List<string>());
-			Events[toEvent].Add(messageToSend);
+			Events[toEvent].Add(message);
 		}
 
-		public void Unsubscribe(ExtendedBehaviour behaviour) { SubscribersIndex.Remove(behaviour); }
+		public void Unsubscribe(string fromEvent) {
+			if(Events.ContainsKey(fromEvent))
+				Events.Remove(fromEvent);
+		}
+
+		public void Broadcast(string firedEvent, GameObject sender) {
+			Broadcast(firedEvent, new EventArguments(sender));
+		}
+
+		public void Broadcast(string firedEvent, EventArguments eventArguments) {
+			EventManager.Broadcast(firedEvent, eventArguments);
+		}
+
+		public void Fire(string firedEvent, GameObject sender) {
+			Fire(firedEvent, new EventArguments(sender));
+		}
+
+		public void Fire(string firedEvent, EventArguments eventArguments) {
+			List<string> messagesToSend;
+			if(!Events.TryGetValue(firedEvent, out messagesToSend))
+				return;
+			foreach(var message in messagesToSend)
+				gameObject.SendMessage(message, eventArguments, SendMessageOptions.RequireReceiver);
+		}
 
 		internal void FireInternal(string firedEvent, object parameter) {
-			List<string> messagesToSend;
-			if(!Events.TryGetValue(firedEvent, out messagesToSend)) return;
-			foreach(var message in messagesToSend)
-				GameObject.SendMessage(message, parameter, SendMessageOptions.RequireReceiver);
+			
 		}
-
 		private Dictionary<string, List<string>> Events {
 			get {
-				if(_events == null) 
-					_events = new Dictionary<string, List<string>>(); 
+				if(_events == null)
+					_events = new Dictionary<string, List<string>>();
 				return _events;
 			}
 		}
-
-		private List<ExtendedBehaviour> SubscribersIndex {
-			get {
-				if(_subscribersIndex == null)
-					_subscribersIndex = new List<ExtendedBehaviour>();
-				return _subscribersIndex;
-			}
-		}
-
-		public GameObject GameObject { get { return _gameObject; } }
-
-		public int Subscribers { get { return SubscribersIndex.Count; } }
-
-		public override bool Equals(object obj) {
-			if(ReferenceEquals(null, obj))
-				return false;
-			if(ReferenceEquals(this, obj))
-				return true;
-			return obj is EventHandler && Equals((EventHandler)obj);
-		}
-
-		public override int GetHashCode() {
-			return GameObject.GetHashCode();
-		}
-
-		public static bool operator ==(EventHandler left, EventHandler right) { return Equals(left, right); }
-		public static bool operator !=(EventHandler left, EventHandler right) { return !Equals(left, right); }
-
 	}
 
 }

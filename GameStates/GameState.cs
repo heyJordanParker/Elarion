@@ -9,7 +9,7 @@ namespace Elarion {
 
 		public override void OnEntry() {
 			if(startLoading)
-				Broadcast("Start Loading");
+				gameObject.Broadcast("Start Loading");
 		}
 
 	}

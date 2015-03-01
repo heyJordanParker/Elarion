@@ -3,7 +3,7 @@ using UnityEngine;
 
 namespace Elarion {
 	[RequireComponent(typeof(AudioSource))]
-	public class PlaySoundOnEvent : ExtendedBehaviour {
+	public class PlaySoundOnEvent : MonoBehaviour {
 
 		public string eventName;
 		public float delay = 0;
@@ -15,7 +15,7 @@ namespace Elarion {
 		protected void Awake() {
 			if(string.IsNullOrEmpty(eventName)) return;
 			_audioSource = GetComponent<AudioSource>();
-			Subscribe(eventName, "StartSound");
+			gameObject.Subscribe(eventName, "StartSound");
 		}
 
 		private void StartSound() { StartCoroutine(PlaySound()); }

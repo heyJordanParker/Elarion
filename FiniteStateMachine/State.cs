@@ -4,7 +4,7 @@ using UnityEngine;
 namespace Elarion.StateMachine {
 
 	[Serializable]
-	public class State : ExtendedBehaviour {
+	public class State : MonoBehaviour {
 
 		public virtual void OnEntry() { }
 

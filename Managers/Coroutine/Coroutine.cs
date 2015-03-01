@@ -9,7 +9,7 @@ namespace Elarion {
 	/// Coroutine class. Wrapper class for managed coroutines.
 	/// Provides an easy interface for creation and management of coroutines.
 	/// </summary>
-	public class Coroutine : ExtendedBehaviour {
+	public class Coroutine : MonoBehaviour {
 
 		public event Action<bool> OnFinished;
 		public new string name;
@@ -19,20 +19,20 @@ namespace Elarion {
 		public bool Running { get { return _coroutine.Running; } }
 		public bool Paused { get { return _coroutine.Paused; } set { _coroutine.Paused = value; } }
 
-		public static Coroutine Create(GameObject gameObject, IEnumerator iEnumerator) { return Create(gameObject, iEnumerator, null); }
+		public static Coroutine Create(GameObject owner, IEnumerator iEnumerator) { return Create(owner, iEnumerator, null); }
 
-		public static Coroutine Create(GameObject gameObject, IEnumerator iEnumerator, string name) { return Create(gameObject, iEnumerator, name, true); }
+		public static Coroutine Create(GameObject owner, IEnumerator iEnumerator, string name) { return Create(owner, iEnumerator, name, true); }
 
-		public static Coroutine Create(GameObject gameObject, IEnumerator iEnumerator, string name, bool start) {
-			if(gameObject == null) {
+		public static Coroutine Create(GameObject owner, IEnumerator iEnumerator, string name, bool start) {
+			if(owner == null) {
 				if(string.IsNullOrEmpty(name)) name = "The Coroutine who must not be named.";
-				gameObject = Singleton.Get<CoroutineSchedule>().gameObject; 
+				owner = Singleton.Get<CoroutineSchedule>().gameObject; 
 			}
 
-			var coroutine = gameObject.AddComponent<Coroutine>();
-			coroutine._coroutine = Singleton.Get<CoroutineSchedule>().CreateCoroutine(iEnumerator, gameObject);
+			var coroutine = owner.AddComponent<Coroutine>();
+			coroutine._coroutine = Singleton.Get<CoroutineSchedule>().CreateCoroutine(iEnumerator, owner);
 			coroutine._coroutine.Finished += coroutine.OnCoroutineFinished;
-			coroutine.name = string.IsNullOrEmpty(name) ? gameObject.name : name;
+			coroutine.name = string.IsNullOrEmpty(name) ? owner.name : name;
 
 			if(start) coroutine.Run();
 			return coroutine;

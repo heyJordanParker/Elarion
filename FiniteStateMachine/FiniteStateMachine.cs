@@ -4,7 +4,7 @@ using UnityEngine;
 
 namespace Elarion.StateMachine {
 	[Serializable]
-	public class FiniteStateMachine : ExtendedBehaviour {
+	public class FiniteStateMachine : MonoBehaviour {
 
 		public State initialState;
 
@@ -62,16 +62,6 @@ namespace Elarion.StateMachine {
 			StateStack.Peek().OnExit();
 			StateStack.Peek().gameObject.SetActive(false);
 			StateStack.Pop();
-		}
-
-		public new void Fire(string firedEvent) {
-//			CurrentState.Fire(firedEvent);
-//			base.Fire(firedEvent);
-		}
-
-		public new void Fire(string firedEvent, object parameter) {
-			CurrentState.Fire(firedEvent, parameter);
-			base.Fire(firedEvent, parameter);
 		}
 
 		private Stack<State> StateStack {

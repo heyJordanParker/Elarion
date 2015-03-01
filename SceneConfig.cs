@@ -7,7 +7,7 @@ namespace Elarion {
 	/// <summary>
 	/// Class used to store scene specific configurations
 	/// </summary>
-	public class SceneConfig : ExtendedBehaviour {
+	public class SceneConfig : MonoBehaviour {
 
 		public virtual void ConfigureScene(GameState gameState) { }
 

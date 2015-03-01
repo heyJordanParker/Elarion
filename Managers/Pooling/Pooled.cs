@@ -5,7 +5,7 @@ using System.Text;
 using UnityEngine;
 
 namespace Elarion.Managers {
-	public class Pooled : ExtendedBehaviour {
+	public class Pooled : MonoBehaviour {
 
 		public const string OnSpawnMethod = "OnSpawn";
 		public const string OnDespawnMethod = "OnDespawn";

@@ -1,7 +1,9 @@
 ﻿
+using UnityEngine;
+
 namespace Elarion {
 
-	public class LevelData : ExtendedBehaviour {
+	public class LevelData : MonoBehaviour {
 
 		public string scene; 
 

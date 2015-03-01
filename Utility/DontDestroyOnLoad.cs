@@ -2,7 +2,7 @@
 
 namespace Elarion {
 
-	public class DontDestroyOnLoad : ExtendedBehaviour {
+	public class DontDestroyOnLoad : MonoBehaviour {
 
 		public int originatingLevel = -1;
 
