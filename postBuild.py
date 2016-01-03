@@ -11,13 +11,13 @@ dllPath = argv[1]
 
 fileName = os.path.basename(dllPath)
 
-filePattern = '*/Assets/**/%s' % fileName
-fileDirPattern = '*/Assets/*/**/%s' % fileName
+basePath = '*/Assets/**/'
 
+if 'Editor' in fileName:
+    basePath += 'Editor/'
 
-projectRootFolder = 'D:/Programs/Unity3d/Workspace/'
-
-destinationProjects = [ 'Game Portal' ]
+filePattern = basePath + fileName
+fileDirPattern = basePath + '*/%s' % fileName
 
 deployedDlls = []
 
