@@ -38,5 +38,13 @@ namespace Elarion.Editor {
 		public static bool CheckAddChildAtOrigin() {
 			return Selection.activeGameObject != null;
 		}
+
+		public static void DisplayAsyncProgressBar(string loadingText, float progress) {
+			AsyncProgressBar.Display(loadingText, progress);
+		}
+
+		public static void ClearProgressBar() {
+			AsyncProgressBar.Clear();
+		}
 	}
 }
