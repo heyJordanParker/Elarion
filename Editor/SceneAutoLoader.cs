@@ -1,5 +1,7 @@
-﻿using UnityEngine;
+﻿using System;
+using UnityEngine;
 using UnityEditor;
+using UnityEditor.SceneManagement;
 
 namespace Elarion.Editor {
 
@@ -59,9 +61,11 @@ namespace Elarion.Editor {
 
 			if(!EditorApplication.isPlaying && EditorApplication.isPlayingOrWillChangePlaymode) {
 				// User pressed play -- autoload master scene.
-				PreviousScene = EditorApplication.currentScene;
-				if(EditorApplication.SaveCurrentSceneIfUserWantsTo()) {
-					if(!EditorApplication.OpenScene(MasterScene)) {
+				PreviousScene = EditorSceneManager.GetActiveScene().name;
+				if(EditorSceneManager.SaveCurrentModifiedScenesIfUserWantsTo()) {
+					try {
+						EditorSceneManager.OpenScene(MasterScene);
+					} catch(Exception) {
 						Debug.LogError(string.Format("error: scene not found: {0}", MasterScene));
 						EditorApplication.isPlaying = false;
 					}
@@ -72,7 +76,9 @@ namespace Elarion.Editor {
 			}
 			if(EditorApplication.isPlaying && !EditorApplication.isPlayingOrWillChangePlaymode) {
 				// User pressed stop -- reload previous scene.
-				if(!EditorApplication.OpenScene(PreviousScene)) {
+				try {
+					EditorSceneManager.OpenScene(PreviousScene);
+;                } catch(Exception) {
 					Debug.LogError(string.Format("error: scene not found: {0}", PreviousScene));
 				}
 			}
@@ -94,7 +100,7 @@ namespace Elarion.Editor {
 		}
 
 		private static string PreviousScene {
-			get { return EditorPrefs.GetString(cEditorPrefPreviousScene, EditorApplication.currentScene); }
+			get { return EditorPrefs.GetString(cEditorPrefPreviousScene, EditorSceneManager.GetActiveScene().name); }
 			set { EditorPrefs.SetString(cEditorPrefPreviousScene, value); }
 		}
 	}

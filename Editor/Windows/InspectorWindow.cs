@@ -4,9 +4,9 @@
 
 	public class InspectorWindow : EditorWindow {
 
-//		[MenuItem("Window/Test")]
+		[MenuItem("Window/Test")]
 		public static void Test() {
-			EditorWindow.GetWindow<InspectorWindow>("Test");
+			GetWindow<InspectorWindow>("Test");
 		}
 
 		GameObject activeGO;

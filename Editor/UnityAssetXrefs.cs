@@ -29,10 +29,7 @@ namespace Elarion.Editor {
 				return false; // if there's only one, it's us.
 			//Debug.Log(obj.name + " has " + dependencies.Length + " dependencies", obj);
 
-			foreach(UnityEngine.Object dep in dependencies)
-				if(dep == selectedObj)
-					return true;
-			return false;
+			return dependencies.Any(dep => dep == selectedObj);
 		}
 
 		[MenuItem("Assets/What objects in scene use this?", false, 20)]

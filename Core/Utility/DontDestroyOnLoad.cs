@@ -7,7 +7,7 @@ namespace Elarion {
 		public int originatingLevel = -1;
 
 		protected void Awake() {
-			originatingLevel = Application.loadedLevel;
+			originatingLevel = UnityEngine.SceneManagement.SceneManager.GetActiveScene().buildIndex;
 			DontDestroyOnLoad(gameObject);
 		}
 
