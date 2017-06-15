@@ -49,7 +49,7 @@ namespace Elarion {
 		}
 
 		public static Coroutine StartCoroutine(this GameObject go, IEnumerator coroutine) {
-			return Coroutine.Create(go, coroutine);
+			return Coroutine.Create(coroutine, go);
 		}
 
 

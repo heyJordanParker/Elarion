@@ -19,11 +19,7 @@ namespace Elarion {
 		public bool Running { get { return _coroutine.Running; } }
 		public bool Paused { get { return _coroutine.Paused; } set { _coroutine.Paused = value; } }
 
-		public static Coroutine Create(GameObject owner, IEnumerator iEnumerator) { return Create(owner, iEnumerator, null); }
-
-		public static Coroutine Create(GameObject owner, IEnumerator iEnumerator, string name) { return Create(owner, iEnumerator, name, true); }
-
-		public static Coroutine Create(GameObject owner, IEnumerator iEnumerator, string name, bool start) {
+		public static Coroutine Create(IEnumerator iEnumerator, GameObject owner = null, string name = null, bool start = true) {
 			if(owner == null) {
 				if(string.IsNullOrEmpty(name)) name = "The Coroutine who must not be named.";
 				owner = Singleton.Get<CoroutineSchedule>().gameObject; 
