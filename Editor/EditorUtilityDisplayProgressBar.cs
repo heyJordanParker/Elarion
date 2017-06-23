@@ -25,9 +25,9 @@ namespace Elarion.Editor {
 
 		}
 
-		public static Action Clear { get; }
+		public static Action Clear { get; set; }
 
-		public static Action<string, float> Display { get; }
+		public static Action<string, float> Display { get; set; }
 
 	}
 

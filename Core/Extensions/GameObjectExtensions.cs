@@ -3,7 +3,7 @@ using Elarion.EventSystem;
 using Elarion.Managers;
 using UnityEngine;
 
-namespace Elarion {
+namespace Elarion.Extensions {
 	public static class GameObjectExtensions {
 
 		public static T Component<T>(this GameObject go) where T : Component {

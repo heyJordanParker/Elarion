@@ -1,9 +1,10 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using Elarion;
+using Elarion.Extensions;
 using UnityEditor;
 using UnityEngine;
 

@@ -40,7 +40,6 @@ namespace Elarion.Editor {
 			Debug.Log("You have asked which of " + sceneObjects.Length + " assets make use of " + cur.name + ", a " + cur.GetType().ToString() + ".", cur);
 
 			List<Object> results = CollectReverseDependenciesInCurrentScene(cur);
-			//TODO get only main assets of above
 			Debug.Log(results.Count() + " uses in scene found for this asset.", cur);
 			//printAssetPaths(results);
 			foreach(Object result in results)

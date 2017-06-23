@@ -1,6 +1,6 @@
 ﻿using UnityEngine;
 
-namespace Elarion {
+namespace Elarion.Extensions {
 	public static class ColorExtensions {
 		public static Color EaseTo(this Color start, Color end, float value, Ease easeType = Ease.Linear) {
 			return new Color(start.r.EaseTo(end.r, value, easeType), start.g.EaseTo(end.g, value, easeType),

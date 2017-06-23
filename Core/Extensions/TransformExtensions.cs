@@ -1,6 +1,6 @@
 ﻿using UnityEngine;
 
-namespace Elarion {
+namespace Elarion.Extensions {
 	public static class TransformExtensions {
 
 		public static void ResetPosition(this Transform transform) { transform.localPosition = Vector3.zero; }

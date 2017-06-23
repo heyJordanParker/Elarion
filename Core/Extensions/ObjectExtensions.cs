@@ -3,7 +3,7 @@ using Elarion.Managers;
 using UnityEngine;
 using Object = UnityEngine.Object;
 
-namespace Elarion {
+namespace Elarion.Extensions {
 	public static class ObjectExtensions {
 		public static void Destroy(this Object obj, float time = 0.0f) {
 #if UNITY_EDITOR

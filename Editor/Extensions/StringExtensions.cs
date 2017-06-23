@@ -2,7 +2,7 @@
 using UnityEditor;
 using UnityEngine;
 
-namespace Elarion.Editor {
+namespace Elarion.Editor.Extensions {
 	public static class StringExtensions {
 
 		/// <summary>
