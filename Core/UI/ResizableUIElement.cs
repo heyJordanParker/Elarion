@@ -14,10 +14,6 @@ namespace Elarion.UI {
         private RectTransform.Edge? _horizontalEdge;
         private RectTransform.Edge? _verticalEdge;
 
-        private Vector2 _initialAnchorMin;
-        private Vector2 _initialAnchorMax;
-        private Vector2 _initialPivot;
-
         public bool Resizing { get; private set; }
 
         protected override void Awake() {
@@ -41,11 +37,6 @@ namespace Elarion.UI {
 
         protected virtual void OnBeginDrag(BaseEventData data) {
             Resizing = true;
-
-            // Cache original anchors, the resize method changes it
-            _initialAnchorMin = Transform.anchorMin;
-            _initialAnchorMax = Transform.anchorMax;
-            _initialPivot = Transform.pivot;
 
             // Update Edges
             _horizontalEdge = null;
@@ -74,9 +65,6 @@ namespace Elarion.UI {
 
         protected virtual void OnEndDrag(BaseEventData data) {
             Resizing = false;
-            Transform.anchorMin = _initialAnchorMin;
-            Transform.anchorMax = _initialAnchorMax;
-            Transform.pivot = _initialPivot;
         }
 
         public void Resize(Vector2 amount) {
