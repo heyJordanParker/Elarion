@@ -12,7 +12,7 @@ namespace Elarion.UI {
                 }
                 return _transform;
             }
-            private set { _transform = value; }
+            protected set { _transform = value; }
         }
 
         protected virtual void Awake() {
