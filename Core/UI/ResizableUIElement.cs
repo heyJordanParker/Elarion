@@ -1,13 +1,14 @@
 using Elarion.Extensions;
 using UnityEngine;
 using UnityEngine.EventSystems;
+using UnityEngine.UI;
 
 namespace Elarion.UI {
     public class ResizableUIElement : BasicUIElement {
         public ResizeHandle[] resizeHandles;
 
-        public Vector2 minimumDimmensions = new Vector2(50, 50);
-        public Vector2 maximumDimmensions = new Vector2(500, 500);
+//        public Vector2 minimumDimmensions = new Vector2(50, 50);
+//        public Vector2 maximumDimmensions = new Vector2(500, 500);
 
         private ResizeDirection _resizeDirection;
 
@@ -68,26 +69,31 @@ namespace Elarion.UI {
         }
 
         public void Resize(Vector2 amount) {
+
             if(_horizontalEdge != null) {
                 if(_horizontalEdge == RectTransform.Edge.Right)
-                    Transform.SetInsetAndSizeFromParentEdge((RectTransform.Edge)_horizontalEdge,
-                        Screen.width - Transform.position.x - Transform.pivot.x * Transform.rect.width,
-                        Mathf.Clamp(Transform.rect.width - amount.x, minimumDimmensions.x, maximumDimmensions.x));
+                    Transform.SetInsetAndSizeFromParentEdge((RectTransform.Edge) _horizontalEdge,
+                        Screen.width - Transform.position.x - Transform.pivot.x*Transform.rect.width,
+                        Transform.rect.width - amount.x);
+//                        Mathf.Clamp(Transform.rect.width - amount.x, minimumDimmensions.x, maximumDimmensions.x));
                 else
-                    Transform.SetInsetAndSizeFromParentEdge((RectTransform.Edge)_horizontalEdge,
-                        Transform.position.x - Transform.pivot.x * Transform.rect.width,
-                        Mathf.Clamp(Transform.rect.width + amount.x, minimumDimmensions.x, maximumDimmensions.x));
+                    Transform.SetInsetAndSizeFromParentEdge((RectTransform.Edge) _horizontalEdge,
+                        Transform.position.x - Transform.pivot.x*Transform.rect.width,
+                        Transform.rect.width + amount.x);
+//                        Mathf.Clamp(Transform.rect.width + amount.x, minimumDimmensions.x, maximumDimmensions.x));
             }
 
             if(_verticalEdge != null) {
                 if(_verticalEdge == RectTransform.Edge.Top)
-                    Transform.SetInsetAndSizeFromParentEdge((RectTransform.Edge)_verticalEdge,
-                        Screen.height - Transform.position.y - Transform.pivot.y * Transform.rect.height,
-                        Mathf.Clamp(Transform.rect.height - amount.y, minimumDimmensions.y, maximumDimmensions.y));
+                    Transform.SetInsetAndSizeFromParentEdge((RectTransform.Edge) _verticalEdge,
+                        Screen.height - Transform.position.y - Transform.pivot.y*Transform.rect.height,
+                        Transform.rect.height - amount.y);
+//                        Mathf.Clamp(Transform.rect.height - amount.y, minimumDimmensions.y, maximumDimmensions.y));
                 else
-                    Transform.SetInsetAndSizeFromParentEdge((RectTransform.Edge)_verticalEdge,
-                        Transform.position.y - Transform.pivot.y * Transform.rect.height,
-                        Mathf.Clamp(Transform.rect.height + amount.y, minimumDimmensions.y, maximumDimmensions.y));
+                    Transform.SetInsetAndSizeFromParentEdge((RectTransform.Edge) _verticalEdge,
+                        Transform.position.y - Transform.pivot.y*Transform.rect.height,
+                        Transform.rect.height + amount.y);
+//                        Mathf.Clamp(Transform.rect.height + amount.y, minimumDimmensions.y, maximumDimmensions.y));
             }
         }
     }
