@@ -1,9 +1,12 @@
-﻿using Elarion.Extensions;
+﻿#if TMP_ENABLED
+
+using Elarion.Extensions;
 using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
 
 namespace Elarion.UI.TMP {
+    
     [RequireComponent(typeof(TextMeshProUGUI))]
     public class TextDuplicator : BasicUIElement {
 
@@ -27,5 +30,7 @@ namespace Elarion.UI.TMP {
         public void Update() {
             _tmpText.text = targetText.text;
         }
-    }
+    } 
 }
+
+#endif
