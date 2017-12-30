@@ -3,7 +3,6 @@
 using System.Runtime.Serialization;
 #endif
 using System.Collections.Generic;
-using System.Text;
 using System.Diagnostics;
 
 namespace Elarion {

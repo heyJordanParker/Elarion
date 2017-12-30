@@ -169,6 +169,56 @@ namespace Elarion {
 					return LinearD(start, end, value);
 			}
 		}
+		
+		/// <summary>
+		/// Mirrors the ease function if possible. In functions become out functions and out functions become in functions. Everything else remains unchanged.
+		/// </summary>
+		public static Ease Mirror(this Ease ease) {
+			switch(ease) {
+				case Elarion.Ease.InQuad:
+					return Elarion.Ease.OutQuad;
+				case Elarion.Ease.OutQuad:
+					return Elarion.Ease.InQuad;
+				case Elarion.Ease.InCubic:
+					return Elarion.Ease.OutCubic;
+				case Elarion.Ease.OutCubic:
+					return Elarion.Ease.InCubic;
+				case Elarion.Ease.InQuart:
+					return Elarion.Ease.OutQuart;
+				case Elarion.Ease.OutQuart:
+					return Elarion.Ease.InQuart;
+				case Elarion.Ease.InQuint:
+					return Elarion.Ease.OutQuint;
+				case Elarion.Ease.OutQuint:
+					return Elarion.Ease.InQuint;
+				case Elarion.Ease.InSine:
+					return Elarion.Ease.OutSine;
+				case Elarion.Ease.OutSine:
+					return Elarion.Ease.InSine;
+				case Elarion.Ease.InExpo:
+					return Elarion.Ease.OutExpo;
+				case Elarion.Ease.OutExpo:
+					return Elarion.Ease.InExpo;
+				case Elarion.Ease.InCirc:
+					return Elarion.Ease.OutCirc;
+				case Elarion.Ease.OutCirc:
+					return Elarion.Ease.InCirc;
+				case Elarion.Ease.InBounce:
+					return Elarion.Ease.OutBounce;
+				case Elarion.Ease.OutBounce:
+					return Elarion.Ease.InBounce;
+				case Elarion.Ease.InBack:
+					return Elarion.Ease.OutBack;
+				case Elarion.Ease.OutBack:
+					return Elarion.Ease.InBack;
+				case Elarion.Ease.InElastic:
+					return Elarion.Ease.OutElastic;
+				case Elarion.Ease.OutElastic:
+					return Elarion.Ease.InElastic;
+				default:
+					return ease;
+			}
+		}
 
 		private const float NATURAL_LOG_OF_2 = 0.693147181f;
 

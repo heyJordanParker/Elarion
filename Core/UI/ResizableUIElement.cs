@@ -1,7 +1,6 @@
 using Elarion.Extensions;
 using UnityEngine;
 using UnityEngine.EventSystems;
-using UnityEngine.UI;
 
 namespace Elarion.UI {
     public class ResizableUIElement : BasicUIElement {

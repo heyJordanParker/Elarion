@@ -1,9 +1,4 @@
-﻿using System.Collections;
-using Elarion;
-using Elarion.Attributes;
-using ScrumBob;
-using UnityEngine;
-using UnityEngine.Events;
+﻿using UnityEngine;
 using UnityEngine.EventSystems;
 
 namespace Elarion.UI {

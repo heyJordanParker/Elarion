@@ -1,8 +1,5 @@
-﻿using System.Collections;
-using Elarion.Extensions;
-using Elarion.Managers;
+﻿using Elarion.Extensions;
 using Elarion.StateMachine;
-using UnityEngine;
 
 namespace Elarion {
 

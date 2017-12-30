@@ -18,6 +18,5 @@ namespace Elarion.Editor.Inspectors {
 		public override bool HasPreviewGUI() { return Target.HasPreviewGUI(); }
 
 		InspectorDrawer Target { get { return target as InspectorDrawer; } }
-
 	}
 }

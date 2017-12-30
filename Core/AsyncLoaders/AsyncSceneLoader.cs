@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections;
-using UnityEngine;
 using USceneManager = UnityEngine.SceneManagement.SceneManager;
 
 namespace Elarion {

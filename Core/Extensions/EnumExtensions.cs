@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
 
 namespace Elarion.Extensions {
     public static class EnumExtensions {

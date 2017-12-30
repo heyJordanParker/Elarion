@@ -23,7 +23,7 @@ namespace Elarion {
             return (T) singleton;
         }
 
-        protected void Awake() {
+        protected virtual void Awake() {
             var type = GetType();
             Singleton instance;
             if(!Instances.TryGetValue(type, out instance)) {

@@ -48,11 +48,6 @@ namespace Elarion.Extensions {
 			eventHandler.Broadcast(firedEvent, eventArguments);
 		}
 
-		public static Coroutine StartCoroutine(this GameObject go, IEnumerator coroutine) {
-			return Coroutine.Create(coroutine, go);
-		}
-
-
 		public static void SetLayer(this GameObject go, int layer, bool recursive = true) {
 			go.layer = layer;
 			if(!recursive) return;

@@ -3,7 +3,6 @@ using UnityEngine;
 
 namespace Elarion.Attributes {
     public class EnumDropdownAttribute : PropertyAttribute {
-
         public readonly Type type;
         public readonly string name;
 
@@ -20,6 +19,5 @@ namespace Elarion.Attributes {
             }
             this.name = name;
         }
-
     }
 }

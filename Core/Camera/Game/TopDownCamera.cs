@@ -1,5 +1,4 @@
-﻿using Elarion;
-using Elarion.Extensions;
+﻿using Elarion.Extensions;
 using UnityEngine;
 
 namespace Elarion {

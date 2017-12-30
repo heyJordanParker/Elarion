@@ -1,5 +1,4 @@
-﻿using System;
-using UnityEngine;
+﻿using UnityEngine;
 
 namespace Elarion.Attributes {
     public class EnumMultipleDropdownAttribute : PropertyAttribute {

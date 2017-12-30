@@ -25,7 +25,7 @@ namespace Elarion {
 
 		internal void StartLoading() {
 			_started = true;
-			gameObject.StartCoroutine(LoadWrapper());
+			this.CreateCoroutine(LoadWrapper());
 		}
 
 		private IEnumerator LoadWrapper() {
