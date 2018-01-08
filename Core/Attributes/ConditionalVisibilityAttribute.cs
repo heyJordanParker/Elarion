@@ -4,7 +4,7 @@ using System.Linq;
 using UnityEngine;
 
 namespace Elarion.Attributes {
-    [AttributeUsage(AttributeTargets.Field | AttributeTargets.Property)]
+    [AttributeUsage(AttributeTargets.Field)]
     public class ConditionalVisibilityAttribute : PropertyAttribute {
         public readonly VisibilityCondition[] visibilityConditions;
         public readonly bool needsAllConditions;

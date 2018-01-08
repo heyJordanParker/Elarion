@@ -9,12 +9,12 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 4ab013877c59463d99bed13bed482803, type: 3}
-  m_Name: Default UIAnimation
+  m_Name: Default UI Animation
   m_EditorClassIdentifier: 
   type: 4
   slideDirection: 0
   colorFadeColor: {r: 1, g: 1, b: 1, a: 1}
-  defaultDuration: 0
-  duration: 0.75
+  duration: 51
+  _customDuration: 0.5
   defaultEaseFunction: 0
   easeFunction: 0

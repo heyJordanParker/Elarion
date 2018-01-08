@@ -50,8 +50,8 @@ namespace Elarion.UI {
             }
         }
 
-        public override void Show() {
-            base.Show();
+        public override void Close() {
+            base.Close();
             InTransition = true;
             
             
@@ -61,8 +61,8 @@ namespace Elarion.UI {
             // if screensize changes -> update size (if it's not fixed)
         }
 
-        public override void Hide() {
-            base.Hide();
+        public override void Open() {
+            base.Open();
             InTransition = true;
         }
     }

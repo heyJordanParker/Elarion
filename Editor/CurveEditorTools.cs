@@ -132,7 +132,7 @@ namespace Elarion.Editor {
 
 
 	public class CurveEditorTools : EditorWindow {
-		[MenuItem("Tools/CurveEditorTools")]
+//		[MenuItem("Tools/CurveEditorTools")]
 		public static void Init() {
 			var win = GetWindow<CurveEditorTools>();
 			try {

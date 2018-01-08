@@ -1,14 +1,38 @@
 using System;
 
 namespace Elarion.UI {
+    
+    public enum UIAnimationType {
+        Open = 1,
+        Close = -1,
+        Focus = 2,
+        Blur = -2,
+        Move = 3,
+        
+    }
+
+    [Serializable]
+    public enum UIAnimationDuration {
+        Instant = 20,
+        Fast = 25,
+        Normal = 34,
+        Smooth = 40,
+        Slow = 50,
+        Custom,
+    }
 
     [Serializable]
     public enum UIEffectType {
         Overlay,
         Blur,
         Shadow
+        // TODO fade effect (make semi-transparent for the duration)
+        // show something effect (spawn a prefab)
+        // move, resize, rotate effects 
     }
     
+    
+    // loading state?
     [Serializable, Flags]
     public enum UIState {
         Disabled = 0 << 0, // the element is off (in the hierarchy)
@@ -16,21 +40,25 @@ namespace Elarion.UI {
         Fullscreen = 1 << 1, // is this element fullscreen
         InTransition = 1 << 2, // is this element in transition (maybe rename to InAnimation)
         HasFocus = 1 << 3, // is this element focused - usually yes, but might not be if there's an edgemenu for example
+        // Hovered
+        // Clicked
     }
 
     [Serializable]
-    public enum UITransitionDirection {
+    public enum UIAnimationDirection {
         From,
-        To
+        To,
+        RelativeFrom,
+        RelativeTo
     }
     
+    // likely not needed
     [Serializable]
     public enum UITransitionType {
-        Inherit = 0,
-        None = 1 << 0,
-        Slide = 1 << 1,
-        AplhaFade = 1 << 2,
-        ColorFade = 1 << 3,
+        Inherit = 0, // not needed - just set to null animation
+        None = 0 << 0,
+        Slide = 1 << 0,
+        AplhaFade = 1 << 1,
         // TODO maximize
         // maybe zoom
     }

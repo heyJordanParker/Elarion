@@ -10,15 +10,11 @@ using UnityEngine.UI;
 namespace Elarion.UI {
     [Serializable]
     public class UIEffect {
-        [Serializable]
-        public enum UIEffectFade {
-            Instant = 0,
-            Fast = 10,
-            Normal = 25,
-            Slow = 50,
-            Custom
-        }
         // TODO FadeIn & FadeOut effects (play with the panel's alpha)
+        
+        // Move/MoveAnchor, Scale, and Rotate effects - e.g. a note can scale down while moving
+        
+        // TODO show/hide something effect (show loaders & such)
 
         // TODO flags attribute (so that multiple states can be selected from the inspector); make sure it works with the conditional visibility
         [Header("In which UIState should the effect activate")]
@@ -32,6 +28,8 @@ namespace Elarion.UI {
 
         [ConditionalVisibility("type == UIEffectType.Overlay")]
         public Sprite overlayImage;
+        
+        // overlay prefab?
 
         [ConditionalVisibility("type == UIEffectType.Blur")]
         public int blurIntensity = 10;
@@ -40,7 +38,7 @@ namespace Elarion.UI {
         public Color shadowColor = Color.black;
 
         [Tooltip("How long would the effect fade in and fade out of view")]
-        public UIEffectFade fadeDuration = UIEffectFade.Normal;
+        public UIAnimationDuration fadeDuration = UIAnimationDuration.Normal;
 
         [ConditionalVisibility("fadeDuration == UIEffectFade.Custom")]
         public float customFadeDuration = 0.5f;
@@ -56,7 +54,10 @@ namespace Elarion.UI {
 
         public float FadeDuration {
             get {
-                if(fadeDuration == UIEffectFade.Custom)
+                if(fadeDuration == UIAnimationDuration.Instant)
+                    // override the instant duration; some fades make sense to be instantenious
+                    return 0;
+                if(fadeDuration == UIAnimationDuration.Custom)
                     return customFadeDuration;
                 return (int) fadeDuration / 100f;
             }
@@ -100,23 +101,23 @@ namespace Elarion.UI {
             }
         }
 
-        public void Start(UIPanel panel, Transform parent) {
+        public void Start(UIPanel panel) {
             if(_stopCoroutine != null && _stopCoroutine.Running) {
                 _stopCoroutine.Stop();
             }
             
-            CurrentEffect.rectTransform.SetParent(parent, false);
+            CurrentEffect.rectTransform.SetParent(panel.AnimationTarget, false);
             CurrentEffect.enabled = true;
 
             _startCoroutine = panel.CreateCoroutine(GradualTransition(FadeDuration, false));
         }
 
-        public void Stop(UIPanel panel, Transform parent) {
+        public void Stop(UIPanel panel) {
             if(_startCoroutine != null && _startCoroutine.Running) {
                 _startCoroutine.Stop();
             }
 
-            CurrentEffect.rectTransform.SetParent(parent, false);
+            CurrentEffect.rectTransform.SetParent(panel.AnimationTarget, false);
 
             _stopCoroutine = panel.CreateCoroutine(GradualTransition(FadeDuration, true));
         }

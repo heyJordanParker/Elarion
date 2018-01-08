@@ -1,15 +1,16 @@
 using System;
+using System.Collections;
+using System.Collections.Generic;
 using Elarion.Extensions;
 using Elarion.Managers;
+using Elarion.UI.Animations;
 using Elarion.Utility;
 using Microsoft.Win32;
 using UnityEngine;
 using UnityEngine.UI;
 
 namespace Elarion.UI {
-    // TODO check for nesting; display an error if UIScreens are nested (can mess up cameras)
-    
-    // TODO rename to UIScene (similar to android hierarchy)
+    // TODO check for nesting; display an error if UIScreens are nested (can mess up cameras); shouldn't be an issue if I remove cameras
     
     public class UIScreen : UIPanel {
         [SerializeField, Tooltip("Transition effect to show while this screen is going out of view.")]
@@ -18,16 +19,13 @@ namespace Elarion.UI {
         [SerializeField, Tooltip("Transition effect to show while this screen is coming into view.")]
         protected UIAnimation toAnimation;
         
-        // TODO a single transition - openTransition (or openAnimation when I refactor)
-        // TODO also have another enum dropdown - closeTransitionType - what should happen to the screen during transition (Inherit, Mirror, Custom); this structure will move the inherit transition type one level up - it should be removed from the original enum 
-
         private Camera _camera;
 
-        private UITransitionDirection _activeTransitionDirection;
+        private UIAnimationDirection _activeTransitionDirection;
 
         private UIAnimation ActiveAnimation {
             get {
-                if(_activeTransitionDirection == UITransitionDirection.From) {
+                if(_activeTransitionDirection == UIAnimationDirection.From) {
                     if(fromAnimation == null) {
                         return UIManager.defaultAnimation;
                     }
@@ -41,18 +39,18 @@ namespace Elarion.UI {
             }
         }
 
+        // TODO make the cameras optional
+        // TODO test if render images are necessary with the new approach to movement (they might not be); make them optional if they aren't needed
         protected RawImage RenderImage { get; private set; }
 
-        protected override Transform EffectAnimationTarget {
+        public override RectTransform AnimationTarget {
             get {
                 if(InTransition) {
-                    return RenderImage.transform;
+                    return RenderImage.GetComponent<RectTransform>();
                 }
-                return base.EffectAnimationTarget;
+                return base.AnimationTarget;
             }
         }
-
-        private Image ColorOverlay { get; set; }
 
         protected override void Awake() {
             base.Awake();
@@ -64,8 +62,7 @@ namespace Elarion.UI {
             RenderImage = UIHelper.Create<RawImage>(gameObject.name + " Render", _camera.transform);
             RenderImage.SetActive(false);
             
-            ColorOverlay = UIHelper.CreateOverlayImage(gameObject.name + " Transition Color", RenderImage.transform);
-            ColorOverlay.enabled = false;
+            // TODO make sure this is fullscreen
             
             UpdateTexture();
         }
@@ -85,8 +82,8 @@ namespace Elarion.UI {
         protected override void OnStateChanged(UIState oldState, UIState newState) {
             base.OnStateChanged(oldState, newState);
             
-            _camera.SetActive(Active);
-            RenderImage.SetActive(Active);
+            _camera.SetActive(InTransition);
+            RenderImage.SetActive(InTransition);
 
             if(!Active) {
                 return;
@@ -111,18 +108,28 @@ namespace Elarion.UI {
             RenderImage.rectTransform.sizeDelta = new Vector2(Width, Height);
         }
 
-        public override void Show() {
-            base.Show();
-            
-        }
+        public override void Open() {
+            base.Open();
+            Fullscreen = true;
 
-        public override void Hide() {
-            base.Hide();
+            if(animator != null) {
+                animator.Play(UIAnimationType.Open);
+            }
+        }
+        
+        public override void Close() {
+            base.Close();
             
+            if(animator != null) {
+                animator.Play(UIAnimationType.Close);
+            }
+            
+            // Put everything below in the animation callback
+            Fullscreen = false;
         }
 
         // TODO use show/hide methods (parameterless) instead of start/stop transition
-        public UIAnimation StartTransition(UITransitionDirection transitionDirection) {
+        public UIAnimation StartTransition(UIAnimationDirection transitionDirection) {
             _activeTransitionDirection = transitionDirection;
 
             InTransition = true;
@@ -139,7 +146,6 @@ namespace Elarion.UI {
             return ActiveAnimation;
         }
 
-        // TODO move this (and similar methods) to a common ancestor to the UIScreen & UIEdgeMenu (maybe make it abstract)
         public void UpdateTransition(float transitionProgress) {
             if(!InTransition) {
                 return;
@@ -149,9 +155,9 @@ namespace Elarion.UI {
                 return;
             }
 
-            bool isFromTransition = _activeTransitionDirection == UITransitionDirection.From;
+            bool isFromTransition = _activeTransitionDirection == UIAnimationDirection.From;
 
-            var easeFunction = ActiveAnimation.defaultEaseFunction ? UIManager.defaultAnimationEaseFunction : ActiveAnimation.easeFunction;
+            var easeFunction = ActiveAnimation.easeFunction;
 
             switch(ActiveAnimation.type) {
                 case UITransitionType.None:
@@ -187,19 +193,6 @@ namespace Elarion.UI {
                             offsetPosition.EaseTo(cameraPosition, transitionProgress, easeFunction);
                     }
                     break;
-                case UITransitionType.ColorFade:
-                    var color = ActiveAnimation.colorFadeColor;
-                    ColorOverlay.enabled = Math.Abs(transitionProgress - 1) > Mathf.Epsilon;
-                    if(isFromTransition) {
-                        color.a = Easing.Ease(0, ActiveAnimation.colorFadeColor.a, transitionProgress, easeFunction);
-                    } else {
-                        if(RenderImage.transform.GetSiblingIndex() != RenderImage.transform.parent.childCount - 1) {
-                            RenderImage.transform.SetAsLastSibling();
-                        }
-                        color.a = Easing.Ease(ActiveAnimation.colorFadeColor.a, 0, transitionProgress, easeFunction);
-                    }
-                    ColorOverlay.color = color;
-                    break;
                 case UITransitionType.AplhaFade:
                     if(isFromTransition) {
                         Alpha = Easing.Ease(1, 0, transitionProgress, easeFunction);
@@ -215,14 +208,10 @@ namespace Elarion.UI {
             
             InTransition = false;
 
-            if(_activeTransitionDirection == UITransitionDirection.To) {
-                Fullscreen = true;
-            } else {
-                Fullscreen = false;
-            }
-
+            Fullscreen = _activeTransitionDirection == UIAnimationDirection.To;
+            Visible = Fullscreen;
+            
             Alpha = 1;
-            ColorOverlay.enabled = false;
         }
     }
 }

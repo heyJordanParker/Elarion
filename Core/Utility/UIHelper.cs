@@ -82,5 +82,10 @@ namespace Elarion.Utility {
             
             blurImage.material.SetFloat("_Radius", intensity);
         }
+
+        public static Canvas CreateCanvas(string name = null, Transform parent = null) {
+            var canvas = CreateGO(name, parent).AddComponent<Canvas>();
+            return canvas;
+        }
     }
 }

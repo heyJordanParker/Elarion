@@ -3,6 +3,7 @@ using System.Collections;
 using System.Linq;
 using Elarion.Extensions;
 using Elarion.UI;
+using Elarion.UI.Animations;
 using Elarion.Utility;
 using UnityEngine;
 using UnityEngine.UI;
@@ -12,20 +13,16 @@ namespace Elarion.Managers {
         // TODO block inputs during transitions/animations
         
         // TODO screen history - to support back actions
-
-        private enum TransitionMode {
-            None,
-            Simultaneous,
-            Sequential
-        }
+        
+        // TODO loading screen - an intermediary screen that'll show between transitions and will stay open until a WaitFor function returns true (make a simple UIScreen inherit)
 
         public UIScreen initialScreen;
 
         // TODO dynamically register panels in the UIManager
         public UIScreen[] uiScreens;
 
+        // TODO remove default animations and durations; it's easy enough to mass set those via the inspector
         public UIAnimation defaultAnimation;
-        public float defaultAnimationDuration = .75f;
         public Ease defaultAnimationEaseFunction = Ease.Linear;
         public Color transitionBackground = Color.white;
 
@@ -39,10 +36,8 @@ namespace Elarion.Managers {
         private int _lastScreenHeight;
         
         public bool InTransition {
-            get { return CurrentTransitionMode != TransitionMode.None; }
+            get { return CurrentScreen.InTransition; }
         }
-
-        private TransitionMode CurrentTransitionMode { get; set; }
 
         private UIScreen TransitionToScreen { get; set; }
 
@@ -98,37 +93,48 @@ namespace Elarion.Managers {
         
         // TODO properties to keep track of visible and fullscreen elements; maybe handle making panels fullscreen here (and blur everything else); possibly handle all panel state changes here
 
-        public void Show(UIPanel uiPanel, UIScriptedAnimation animation = null) {
+        public void Open(UIPanel uiPanel, UIAnimation animationOverride = null) {
             if(uiPanel.Visible) {
+                Debug.LogWarning("Trying to open a visible panel.", uiPanel);
                 return;
             }
 
-            if(uiPanel is UIScreen) {
-                uiPanel.Fullscreen = true;
-                // transition to the screen
-                // hide all other elements (unless the other screen has them as well)
+            var uiScreen = uiPanel as UIScreen;
+            
+            if(uiScreen != null) {
+                uiScreen.Open();
+                _currentScreen.Close();
+
+                CurrentScreen = uiScreen;
+                
+                // close all other elements (unless the other screen has them as well)
             } else {
                 // ui elements should always live inside another canvas - move it to the main canvas/screen canvas before showing; main canvas during transitions, screen canvas by any other time
 
-                if(uiPanel is UIElement) {
+                // fullscreen popups and menus
+                if(!uiPanel.Fullscreen) {
                     // do not blur the rest of the screen
                 } else {
-                    // set the current screen focused to false (blur it)
+                    // blur all other fullscreen elements
                 }
                 // animate the panel into view; 
                 // show it alongside the current screen
             }
         }
 
-        public void Hide(UIPanel uiPanel) {
+        // do not close uiscreens (uiscenes) from here - the game shouldn't be left without an active screen/scene  
+        public void Close(UIPanel uiPanel) {
+            var uiScreen = uiPanel as UIScreen;
             
+            if(uiScreen != null) {
+                Debug.LogWarning("Cannot manually close a UIScreen. If you want an empty UI Open a blank UIScreen instead.");
+                return;
+            }
+            
+            uiPanel.Close();   
         }
 
-        // TODO delete after testing 
-        public UIEdgeMenu edgeMenu;
-
-        public void Test(float f) {
-        }
+        public UIPanel panel;
         
         public void Update() {
             if(_lastScreenWidth != Screen.width || _lastScreenHeight != Screen.height) {
@@ -138,16 +144,23 @@ namespace Elarion.Managers {
                     uiScreen.UpdateTexture();
                 }
             }
+
+            if(Input.GetKeyDown(KeyCode.O)) {
+                panel.Close();
+                panel.Open();
+            }
+
+            if(Input.GetKeyDown(KeyCode.I)) {
+                panel.Close();
+                panel.Open();
+                panel.Animator.Move(new Vector3(50, 50), UIAnimationDirection.RelativeFrom);
+            }
             
             if(Input.GetKeyDown(KeyCode.J)) {
                 CurrentScreen = uiScreens.First(s => s != CurrentScreen);
             }
             if(Input.GetKeyDown(KeyCode.K)) {
-                if(edgeMenu.Visible) {
-                    edgeMenu.Hide();
-                } else {
-                    edgeMenu.Show();
-                }
+                Open(uiScreens.First(s => s != CurrentScreen));
             }
             if(Input.GetKeyDown(KeyCode.L)) {
                 StartTransition(uiScreens.First(s => s != CurrentScreen));
@@ -161,21 +174,12 @@ namespace Elarion.Managers {
             
             TransitionToScreen = toScreen;
                         
-            var fromTransition = CurrentScreen.StartTransition(UITransitionDirection.From);
-            var toTransition = TransitionToScreen.StartTransition(UITransitionDirection.To);
+            // if autoUpdate == false - pause both animations
+            var fromTransition = CurrentScreen.StartTransition(UIAnimationDirection.From);
+            var toTransition = TransitionToScreen.StartTransition(UIAnimationDirection.To);
             
             var animationType = (fromTransition.type | toTransition.type);
-                        
-            var isAlphaFade = animationType == UITransitionType.AplhaFade;
 
-            var isSlide = (animationType & UITransitionType.Slide) == UITransitionType.Slide;
-
-            if(isAlphaFade || isSlide) {
-                CurrentTransitionMode = TransitionMode.Simultaneous;
-            } else {
-                CurrentTransitionMode = TransitionMode.Sequential;
-            }
-            
             var noTransition = animationType == UITransitionType.None;
 
             if(noTransition) {
@@ -184,11 +188,7 @@ namespace Elarion.Managers {
             }
 
             if(autoUpdate) {
-                var transition = toTransition;
-
-                var transitionDuration = transition.defaultDuration ? defaultAnimationDuration : transition.duration;
-                
-                this.CreateCoroutine(TransitionCoroutine(transitionDuration));
+                this.CreateCoroutine(TransitionCoroutine(toTransition.Duration));
             }
         }
         
@@ -209,25 +209,16 @@ namespace Elarion.Managers {
         /// </summary>
         /// <param name="transitionProgress">Progress in percent</param>
         public void UpdateTransition(float transitionProgress) {
-            var fromProgress = transitionProgress;
-            var toProgress = transitionProgress;
-
-            if(CurrentTransitionMode == TransitionMode.Sequential) {
-                fromProgress = transitionProgress * 2;
-                toProgress = (transitionProgress - 0.5f) * 2;
-            }
-
-            CurrentScreen.UpdateTransition(fromProgress);
-            TransitionToScreen.UpdateTransition(toProgress);
+            CurrentScreen.UpdateTransition(transitionProgress);
+            TransitionToScreen.UpdateTransition(transitionProgress);
         }
 
         public void EndTransition() {
             CurrentScreen.EndTransition();
             TransitionToScreen.EndTransition();
-
+            
             CurrentScreen = TransitionToScreen;
-
-            CurrentTransitionMode = TransitionMode.None;
+            
             TransitionToScreen = null;
         }
 
@@ -239,7 +230,7 @@ namespace Elarion.Managers {
 
         private void OnValidate() {
             if(defaultAnimation == null) {
-                defaultAnimation = Resources.Load<UIAnimation>("UIAnimations/Default UIAnimation");
+                defaultAnimation = Resources.Load<UIAnimation>("UI Animations/Default UI Animation");
             }
         }
         

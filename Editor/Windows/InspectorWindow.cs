@@ -4,7 +4,6 @@
 
 	public class InspectorWindow : EditorWindow {
 
-		[MenuItem("Window/Test")]
 		public static void Test() {
 			GetWindow<InspectorWindow>("Test");
 		}

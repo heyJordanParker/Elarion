@@ -1,11 +1,25 @@
-﻿using UnityEditor;
+﻿using Elarion.Managers;
+using Elarion.UI;
+using Elarion.UI.Animations;
+using UnityEditor;
 
 namespace Elarion.Editor {
-    static class EditorMenus {
+    internal static class EditorMenus {
         [MenuItem("Tools/Elarion/Toggle Inspector Lock %l")] // Ctrl + L
-        static void ToggleInspectorLock() {
+        private static void ToggleInspectorLock() {
             ActiveEditorTracker.sharedTracker.isLocked = !ActiveEditorTracker.sharedTracker.isLocked;
             ActiveEditorTracker.sharedTracker.ForceRebuild();
         }
+
+        [MenuItem("GameObject/UI/UI Manager")]
+        private static void CreateUIManager() {
+            Utils.Create<UIManager>();
+        }
+
+        [MenuItem("Assets/Create/UI Animation")]
+        private static void SaveUIAnimation() {
+            Utils.CreateScriptableObject<UIAnimation>();
+        }
+        
     }
 }

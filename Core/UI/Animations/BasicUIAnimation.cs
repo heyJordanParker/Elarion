@@ -1,10 +1,9 @@
 using System;
-using Elarion.Attributes;
 using Elarion.Extensions;
 using UnityEngine;
 
-namespace Elarion.UI {
-    public abstract class UIScriptedAnimation : MonoBehaviour {
+namespace Elarion.UI.Animations {
+    public abstract class BasicUIAnimation : MonoBehaviour {
         [Flags]
         public enum AnimationTrigger {
             Manual = 0 << 0,

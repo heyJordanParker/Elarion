@@ -3,6 +3,7 @@
 namespace Elarion {
 	[Serializable]
 	public enum Ease {
+		None = -1,
 		Linear = 0,
 		Spring = 1,
 		InQuad = 2,
