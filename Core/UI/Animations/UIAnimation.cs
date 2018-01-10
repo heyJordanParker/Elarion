@@ -39,6 +39,9 @@ namespace Elarion.UI.Animations {
                 return (int) _duration / 100f;
             }
         }
+        
+        // TODO use properties below to run any combination of animations in the UIAnimator
+        // TODO create preset animations that set those properties to specific values
 
         public int animationPriority = 1;
         
@@ -61,13 +64,11 @@ namespace Elarion.UI.Animations {
 
         // animation priority - render static elements and then animation elements based on priority; control this in the UIManager, maybe use the panels priority to achieve that
 
-        // remove color fade - do that by fading to a black/white scene and then to the other
-
         // preset animations (slides and similar)
         // custom animation (whatever the user sets)
         
         public void Animate(UIAnimator animator, RectTransform target) {
-            // towards screen (aka should it be reversed)
+            
         }
     }
 }

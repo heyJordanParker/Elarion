@@ -148,6 +148,7 @@ namespace Elarion.Managers {
             if(Input.GetKeyDown(KeyCode.O)) {
                 panel.Close();
                 panel.Open();
+                panel.Animator.MoveAnchors(Vector2.zero, Vector2.zero);
             }
 
             if(Input.GetKeyDown(KeyCode.I)) {

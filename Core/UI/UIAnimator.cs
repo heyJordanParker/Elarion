@@ -38,7 +38,11 @@ namespace Elarion.UI {
         }
 
         public bool Moving {
-            get; set;
+            get; protected set;
+        }
+        
+        public bool MovingAnchors {
+            get; protected set;
         }
 
         protected override void Awake() {
@@ -109,21 +113,33 @@ namespace Elarion.UI {
             return UIManager.defaultAnimation;
         }
         
-        // set CurrentPosition = SavedPosition every time the element is opened (maybe with other actions too?)
         public Vector3 SavedPosition { get; protected set; }
+        public Vector4 SavedAnchors { get; protected set; }
 
         public Vector3 CurrentPosition {
             get { return Target.anchoredPosition; }
             protected set { Target.anchoredPosition = value; }
         }
         
+        public Vector4 CurrentAnchors {
+            get {
+                return new Vector4(Target.anchorMin.x, Target.anchorMin.y, Target.anchorMax.x, Target.anchorMax.y);
+            }
+            protected set {
+                Target.anchorMin = new Vector2(value.x, value.y);
+                Target.anchorMax = new Vector2(value.z, value.w);
+            }
+        }
+        
         public Vector3 TargetPosition { get; protected set; }
+        public Vector4 TargetAnchors { get; protected set; }
         
         public RectTransform Target {
             get { return _target; }
             set {
                 _target = value;
                 SavedPosition = TargetPosition = _target.anchoredPosition;
+                SavedAnchors = TargetAnchors = new Vector4(Target.anchorMin.x, Target.anchorMin.y, Target.anchorMax.x, Target.anchorMax.y);
             }
         }
         
@@ -133,6 +149,7 @@ namespace Elarion.UI {
         // TODO make other animations simply call those methods (and chain them)
         // UIAnimations should have fields to configure movement, size, and rotation; do they need effects or keep them here (hooked with a panel's onStateChanged event)
         private ECoroutine _moveCoroutine;
+        private ECoroutine _moveAnchorsCoroutine;
 
         // Maybe this below can be moved to a separate class (Interpolator, which is inherited by MoveInterpolator, MoveAnchorInterpolator, and so on)
         public void Move(Vector3 position, UIAnimationDirection animationDirection = UIAnimationDirection.To, bool savePosition = false, bool instant = false,
@@ -147,8 +164,6 @@ namespace Elarion.UI {
             }
             
             Moving = true;
-            // TODO canvas needs to be positioned unparented before the reposition below
-            // TODO the reposition below uses local coordinates and bugs if it's inside the temp canvas
 
             if(animationDirection == UIAnimationDirection.RelativeTo || animationDirection == UIAnimationDirection.RelativeFrom) {
                 position += TargetPosition;
@@ -199,6 +214,69 @@ namespace Elarion.UI {
             }
         }
         
+        public void MoveAnchors(Vector2 anchorMin, Vector2 anchorMax, UIAnimationDirection animationDirection = UIAnimationDirection.From, bool savePosition = false, bool instant = false,
+            Action callback = null) {
+            
+            var anchors = new Vector4(anchorMin.x, anchorMin.y, anchorMax.x, anchorMax.y);
+
+            if(_moveAnchorsCoroutine != null && _moveAnchorsCoroutine.Running) {
+                _moveAnchorsCoroutine.Stop();
+                _moveAnchorsCoroutine.OnFinished += b => {
+                    MoveAnchors(anchorMin, anchorMax, animationDirection, savePosition, instant, callback);
+                };
+                return;
+            }
+            
+            MovingAnchors = true;
+            
+            if(animationDirection == UIAnimationDirection.RelativeTo || animationDirection == UIAnimationDirection.RelativeFrom) {
+                anchors += TargetAnchors;
+            }
+            
+            if(animationDirection == UIAnimationDirection.To || animationDirection == UIAnimationDirection.RelativeTo) {
+                TargetAnchors = anchors;
+            } else {
+                TargetAnchors = CurrentAnchors;
+                CurrentAnchors = anchors;
+            }
+            
+            if(savePosition) {
+                SavedAnchors = TargetAnchors;
+            }
+            
+            if(instant) {
+                CurrentAnchors = TargetAnchors;
+                MovingAnchors = false;
+                return;
+            }
+
+            var animation = GetAnimation(UIAnimationType.Move);
+            
+            _moveAnchorsCoroutine = this.CreateCoroutine(MoveAnchorsCoroutine(animation));
+            _moveAnchorsCoroutine.OnFinished += stopped => {
+                if(!stopped) {
+                    CurrentAnchors = TargetAnchors;
+                }
+                
+                MovingAnchors = false;
+
+                if(callback != null) {
+                    callback();
+                }
+            };
+        }
+        
+        protected IEnumerator MoveAnchorsCoroutine(UIAnimation animation) {
+            var movementProgress = 0.0f;
+            var startingAnchors = CurrentAnchors;
+            
+            while(movementProgress <= 1) {
+                CurrentAnchors = startingAnchors.EaseTo(TargetAnchors, movementProgress, animation.easeFunction);
+                
+                movementProgress += Time.deltaTime / animation.Duration;
+                yield return null;
+            }
+        }
         
         // Resize - similar to the resizable window - pick an edge and resize from there
         
@@ -211,7 +289,12 @@ namespace Elarion.UI {
                 _moveCoroutine.Stop();
             }
 
-            CurrentPosition = SavedPosition;
+            if(_moveAnchorsCoroutine != null && _moveAnchorsCoroutine.Running) {
+                _moveAnchorsCoroutine.Stop();
+            }
+
+            TargetPosition = CurrentPosition = SavedPosition;
+            TargetAnchors = CurrentAnchors = SavedAnchors;
         }
         
         protected static UIManager UIManager {
