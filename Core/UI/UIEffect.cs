@@ -8,8 +8,13 @@ using UnityEngine;
 using UnityEngine.UI;
 
 namespace Elarion.UI {
+    // Effects do not modify the properties of the original object - they use helper textures instead
     [Serializable]
     public class UIEffect {
+        // TODO UIEffect runner (similar to the UIAnimator)
+        // TODO UIEffects for animations
+        // you can have effects tied to UIStates or to animations (the effect can show up while something is animating or when something is in a certain state)
+        
         // TODO FadeIn & FadeOut effects (play with the panel's alpha)
         
         // Move/MoveAnchor, Scale, and Rotate effects - e.g. a note can scale down while moving

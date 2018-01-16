@@ -1,8 +1,10 @@
 using System;
 using System.Collections;
 using System.Linq;
+using Elarion.Attributes;
 using Elarion.Extensions;
 using Elarion.UI;
+using Elarion.UI.Animation;
 using Elarion.UI.Animations;
 using Elarion.Utility;
 using UnityEngine;
@@ -10,22 +12,42 @@ using UnityEngine.UI;
 
 namespace Elarion.Managers {
     public class UIManager : Singleton {
+        // TODO make sure that all UIScreens/all fullscreen elements live under a canvas; animations won't properly work if they don't
+        
         // TODO block inputs during transitions/animations
         
         // TODO screen history - to support back actions
         
-        // TODO loading screen - an intermediary screen that'll show between transitions and will stay open until a WaitFor function returns true (make a simple UIScreen inherit)
-
+        // TODO basic loading screen - an intermediary screen that'll show between transitions and will stay open until a WaitFor function returns true (make it easily customizeable)
+        
         public UIScreen initialScreen;
 
         // TODO dynamically register panels in the UIManager
         public UIScreen[] uiScreens;
-
+        
         // TODO remove default animations and durations; it's easy enough to mass set those via the inspector
         public UIAnimation defaultAnimation;
+
+        [SerializeField]
+        private UIAnimationDuration _defaultAnimationDuration = UIAnimationDuration.Smooth;
+        
+        [SerializeField, ConditionalVisibility("_defaultAnimationDuration == UIAnimationDuration.Custom")]
+        private float _defaultAnimationCustomDuration = .75f;
+        
         public Ease defaultAnimationEaseFunction = Ease.Linear;
+        
         public Color transitionBackground = Color.white;
 
+        public float DefaultAnimationDuration {
+            get {
+                if(_defaultAnimationDuration == UIAnimationDuration.Custom) {
+                    return _defaultAnimationCustomDuration;
+                }
+
+                return (int) _defaultAnimationDuration / 100f;
+            }
+        }
+        
         private Canvas _mainCanvas;
         // Blur effects can't operate with the main render texture - they need a camera
         private Camera _uiCamera;
@@ -54,6 +76,8 @@ namespace Elarion.Managers {
             }
         }
 
+        // TODO open the screen and all child components
+        // Option to wait for animations before closing?
         public UIScreen CurrentScreen {
             get { return _currentScreen; }
             private set {
@@ -91,9 +115,11 @@ namespace Elarion.Managers {
             _lastScreenHeight = Screen.height;
         }
         
+        // TODO buttons that change screens with the option to set open & close animations for both screens being changed
+        
         // TODO properties to keep track of visible and fullscreen elements; maybe handle making panels fullscreen here (and blur everything else); possibly handle all panel state changes here
 
-        public void Open(UIPanel uiPanel, UIAnimation animationOverride = null) {
+        public void Open(UIPanel uiPanel, UIAnimation overrideAnimation = null) {
             if(uiPanel.Visible) {
                 Debug.LogWarning("Trying to open a visible panel.", uiPanel);
                 return;
@@ -122,8 +148,7 @@ namespace Elarion.Managers {
             }
         }
 
-        // do not close uiscreens (uiscenes) from here - the game shouldn't be left without an active screen/scene  
-        public void Close(UIPanel uiPanel) {
+        public void Close(UIPanel uiPanel, UIAnimation overrideAnimation = null) {
             var uiScreen = uiPanel as UIScreen;
             
             if(uiScreen != null) {
@@ -146,15 +171,19 @@ namespace Elarion.Managers {
             }
 
             if(Input.GetKeyDown(KeyCode.O)) {
-                panel.Close();
-                panel.Open();
-                panel.Animator.MoveAnchors(Vector2.zero, Vector2.zero);
+                if(panel.Active) {
+                    panel.Close();
+                } else {
+                    panel.Open();
+                }
             }
 
+//            if(Input.GetKeyUp(KeyCode.O)) {
+//                panel.Animator.Resize(new Vector2(-50, -50));
+//            }
+
             if(Input.GetKeyDown(KeyCode.I)) {
-                panel.Close();
-                panel.Open();
-                panel.Animator.Move(new Vector3(50, 50), UIAnimationDirection.RelativeFrom);
+                panel.Animator.Fade(0, UIAnimationDirection.From);
             }
             
             if(Input.GetKeyDown(KeyCode.J)) {

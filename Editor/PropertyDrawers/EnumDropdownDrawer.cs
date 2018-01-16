@@ -1,7 +1,5 @@
 ﻿using System;
-using System.Linq;
 using Elarion.Attributes;
-using Elarion.Editor.Extensions;
 using UnityEditor;
 using UnityEngine;
 

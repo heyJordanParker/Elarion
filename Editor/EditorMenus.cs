@@ -1,5 +1,6 @@
 ﻿using Elarion.Managers;
 using Elarion.UI;
+using Elarion.UI.Animation;
 using Elarion.UI.Animations;
 using UnityEditor;
 
@@ -16,6 +17,7 @@ namespace Elarion.Editor {
             Utils.Create<UIManager>();
         }
 
+        // TODO use CreateAssetMenuAttribute
         [MenuItem("Assets/Create/UI Animation")]
         private static void SaveUIAnimation() {
             Utils.CreateScriptableObject<UIAnimation>();

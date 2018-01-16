@@ -1,6 +1,8 @@
 using System;
 using Elarion.Extensions;
 using Elarion.Managers;
+using Elarion.UI.Animation;
+using Microsoft.Win32;
 using UnityEngine;
 using UnityEngine.UI;
 
@@ -8,7 +10,6 @@ namespace Elarion.UI {
     [RequireComponent(typeof(Canvas))]
     [RequireComponent(typeof(CanvasGroup))]
     [RequireComponent(typeof(GraphicRaycaster))]
-    [RequireComponent(typeof(UIAnimator))]
     public class UIPanel : BasicUIElement {
         
         // TODO UIForm inheritor - add error checking submitting and so on builtin
@@ -18,6 +19,9 @@ namespace Elarion.UI {
         // TODO more generic UI states - focused, in transition, full screen, compound screen, disabled (panels can be visible and disabled)
         
         // TODO remove the canvas
+        
+        // if it has a parent - let the user select AppearWithParent, ApearAfterParent, Manual
+        // to achieve that create a hidden variable (has parent) and update it with the OnValidate method - don't include it outside the editor
 
         public UIEffect[] effects;
 
@@ -32,10 +36,8 @@ namespace Elarion.UI {
             set {
                 var oldState = _state;
                 
-                if(oldState != value) {
-                    _state = value;
-                    OnStateChanged(oldState, _state);
-                }
+                _state = value;
+                OnStateChanged(oldState, _state);
             }
         }
         
@@ -75,16 +77,27 @@ namespace Elarion.UI {
             get { return animator; }
         }
 
+        public CanvasGroup CanvasGroup {
+            get { return canvasGroup; }
+        }
+
         public float Alpha {
             get { return canvasGroup.alpha; }
             set { canvasGroup.alpha = Mathf.Clamp01(value); }
+        }
+
+        public UIPanel Parent {
+            get {
+                // check if cached parent is still valid (check for null and traverse parent hierarchy and compare gameobjects with cached parent's gameobject)
+                // if not - find the new parent
+                return null;
+            }
         }
 
         protected override void Awake() {
             base.Awake();
             
             animator = GetComponent<UIAnimator>();
-            animator.Target = Transform;
 
             canvas = GetComponent<Canvas>();
             canvas.enabled = false;
@@ -101,20 +114,53 @@ namespace Elarion.UI {
             // TODO unregister on destroy
         }
 
-        public virtual void Close() {
-            Visible = false;
+        // TODO option to override animation
+        public void Open(UIAnimation overrideAnimation = null) {
+            if(animator == null) {
+                OnOpen();
+                return;
+            }
+
+            if(overrideAnimation != null) {
+                animator.Play(overrideAnimation, true, OnOpen);
+            }
             
+            animator.Play(UIAnimationType.OnOpen, true, OnOpen);
+            
+            // TODO handle child elements
+            // turn the element off after animations, effects and child elements' effects and animations
+        }
+
+        public void Close(UIAnimation overrideAnimation = null) {
+            if(animator == null) {
+                OnClose();
+                return;
+            }
+
+            if(overrideAnimation != null) {
+                animator.Play(overrideAnimation, false, OnClose);
+            }
+            
+            animator.Play(UIAnimationType.OnClose, false, OnClose);
+
             // after all the effects
             // Unblur screen only after the elements have finished their animations; don't blur the screen if the elements haven't changed
         }
 
-        public virtual void Open() {
+        protected virtual void OnOpen() {
             Visible = true;
-            // start hide transition
-            // turn the element off after animations, effects and child elements' effects and animations
         }
-        
+
+        protected virtual void OnClose() {
+            Visible = false;
+        }
+
+
         protected virtual void OnStateChanged(UIState oldState, UIState newState) {
+            if(oldState == newState) {
+                return;
+            }
+            
             canvas.enabled = Active;
             
             foreach(var effect in effects) {
@@ -128,10 +174,6 @@ namespace Elarion.UI {
                     
                     effect.Start(this);
                 }
-            }
-
-            if(oldState == UIState.Disabled && Active) {
-                animator.Reset();
             }
         }
         

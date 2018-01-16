@@ -3,6 +3,7 @@ using System.Collections;
 using System.Collections.Generic;
 using Elarion.Extensions;
 using Elarion.Managers;
+using Elarion.UI.Animation;
 using Elarion.UI.Animations;
 using Elarion.Utility;
 using Microsoft.Win32;
@@ -10,7 +11,9 @@ using UnityEngine;
 using UnityEngine.UI;
 
 namespace Elarion.UI {
-    // TODO check for nesting; display an error if UIScreens are nested (can mess up cameras); shouldn't be an issue if I remove cameras
+    
+    // TODO make this a generic fullscreen element
+    // TODO Add a canvas to the fullscreen element; they need to display properly over other things 
     
     public class UIScreen : UIPanel {
         [SerializeField, Tooltip("Transition effect to show while this screen is going out of view.")]
@@ -108,23 +111,13 @@ namespace Elarion.UI {
             RenderImage.rectTransform.sizeDelta = new Vector2(Width, Height);
         }
 
-        public override void Open() {
-            base.Open();
+        protected override void OnOpen() {
+            base.OnOpen();
             Fullscreen = true;
-
-            if(animator != null) {
-                animator.Play(UIAnimationType.Open);
-            }
         }
-        
-        public override void Close() {
-            base.Close();
-            
-            if(animator != null) {
-                animator.Play(UIAnimationType.Close);
-            }
-            
-            // Put everything below in the animation callback
+
+        protected override void OnClose() {
+            base.OnClose();
             Fullscreen = false;
         }
 
@@ -157,7 +150,7 @@ namespace Elarion.UI {
 
             bool isFromTransition = _activeTransitionDirection == UIAnimationDirection.From;
 
-            var easeFunction = ActiveAnimation.easeFunction;
+            var easeFunction = ActiveAnimation.Ease;
 
             switch(ActiveAnimation.type) {
                 case UITransitionType.None:

@@ -3,8 +3,10 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using Elarion.Extensions;
+using Elarion.Managers;
 using UnityEditor;
 using UnityEngine;
+using Object = UnityEngine.Object;
 
 namespace Elarion.Editor {
     public static class Utils {
@@ -77,7 +79,23 @@ namespace Elarion.Editor {
         }
 
         public static T Create<T>() where T : MonoBehaviour {
-            var go = new GameObject("New " + ObjectNames.NicifyVariableName(typeof(T).Name));
+            var niceTypeName = ObjectNames.NicifyVariableName(typeof(T).Name);
+            
+            if(typeof(T).IsSubclassOf(typeof(Singleton))) {
+                
+                var scene = UnityEngine.SceneManagement.SceneManager.GetActiveScene();
+
+                var rootGameObjects = scene.GetRootGameObjects();
+
+                foreach(var gameObject in rootGameObjects) {
+                    if(gameObject.GetComponent<T>() || gameObject.GetComponentInChildren<T>(true) != null) {
+                        Debug.Log("Trying to create a second instance of the " + niceTypeName + " (Singleton). Aborting.");
+                        return null;
+                    }
+                }
+            }
+            
+            var go = new GameObject("New " + niceTypeName);
 
             if(Selection.activeGameObject != null) {
                 go.transform.SetParent(Selection.activeGameObject.transform);

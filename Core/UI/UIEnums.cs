@@ -2,13 +2,24 @@ using System;
 
 namespace Elarion.UI {
     
+    [Serializable]
     public enum UIAnimationType {
-        Open = 1,
-        Close = -1,
-        Focus = 2,
-        Blur = -2,
-        Move = 3,
-        
+        OnOpen,
+        OnClose,
+        OnFocus,
+        OnBlur,
+        OnHover,
+        OnUnhover,
+    }
+
+    [Serializable]
+    public enum UIAnimationEase {
+        Linear = Ease.Linear,
+        Smooth = Ease.InOutCubic,
+        Fast = Ease.OutExpo,
+        Slow = Ease.InExpo,
+        Bounce = Ease.InOutBack,
+        Custom = int.MaxValue
     }
 
     [Serializable]
@@ -18,7 +29,7 @@ namespace Elarion.UI {
         Normal = 34,
         Smooth = 40,
         Slow = 50,
-        Custom,
+        Custom = 0,
     }
 
     [Serializable]
