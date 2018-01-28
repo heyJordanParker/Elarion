@@ -1,7 +1,5 @@
-using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
-using Elarion.Attributes;
 using Elarion.Extensions;
 using Elarion.UI;
 using Elarion.UI.Animation;
@@ -11,6 +9,9 @@ using UnityEngine.UI;
 
 namespace Elarion.Managers {
     public class UIManager : Singleton {
+        
+        // TODO a small button component that triggers a screen transition on click; it has fields to override both the opening and the closing animations of the current/next screen
+        
         // TODO make sure that all UIScreens/all fullscreen elements live under a canvas; animations won't properly work if they don't
         
         // TODO block inputs during transitions/animations
@@ -25,33 +26,12 @@ namespace Elarion.Managers {
         
         public UIScreen initialScreen;
 
-        // TODO dynamically register elements in the UIManager
         public UIScreen[] uiScreens;
-        
-        // TODO remove default animations and durations; it's easy enough to mass set those via the inspector
-        public UIAnimation defaultAnimation;
 
-        [SerializeField]
-        private UIAnimationDuration _defaultAnimationDuration = UIAnimationDuration.Smooth;
-        
-        [SerializeField, ConditionalVisibility("_defaultAnimationDuration == UIAnimationDuration.Custom")]
-        private float _defaultAnimationCustomDuration = .75f;
-        
-        public Ease defaultAnimationEaseFunction = Ease.Linear;
-        
         public Color transitionBackground = Color.white;
 
-        public float DefaultAnimationDuration {
-            get {
-                if(_defaultAnimationDuration == UIAnimationDuration.Custom) {
-                    return _defaultAnimationCustomDuration;
-                }
-
-                return (int) _defaultAnimationDuration / 100f;
-            }
-        }
-        
         private Canvas _mainCanvas;
+        
         // Blur effects can't operate with the main render texture - they need a camera
         private Camera _uiCamera;
 
@@ -59,12 +39,6 @@ namespace Elarion.Managers {
 
         private int _lastScreenWidth;
         private int _lastScreenHeight;
-        
-        public bool InTransition {
-            get { return CurrentScreen.InTransition; }
-        }
-
-        private UIScreen TransitionToScreen { get; set; }
 
         public Canvas MainCanvas {
             get {
@@ -79,8 +53,6 @@ namespace Elarion.Managers {
             }
         }
 
-        // TODO open the screen and all child components
-        // Option to wait for animations before closing?
         public UIScreen CurrentScreen {
             get { return _currentScreen; }
             private set {
@@ -124,8 +96,6 @@ namespace Elarion.Managers {
             _lastScreenWidth = Screen.width;
             _lastScreenHeight = Screen.height;
         }
-        
-        // TODO buttons that change screens with the option to set open & close animations for both screens being changed
         
         // TODO properties to keep track of visible and fullscreen elements; maybe handle making elements fullscreen here (and blur everything else); possibly handle all element state changes here
 
@@ -176,9 +146,7 @@ namespace Elarion.Managers {
             if(_lastScreenWidth != Screen.width || _lastScreenHeight != Screen.height) {
                 CacheScreenSize();
                 // TODO use a ScreenSizeChanged event; UIElements visible on a specific resolution might use that
-                foreach(var uiScreen in uiScreens) {
-                    uiScreen.UpdateTexture();
-                }
+                foreach(var uiScreen in uiScreens) { }
             }
 
             if(Input.GetKeyDown(KeyCode.U)) {
@@ -211,76 +179,16 @@ namespace Elarion.Managers {
             if(Input.GetKeyDown(KeyCode.K)) {
                 Open(uiScreens.First(s => s != CurrentScreen));
             }
-            if(Input.GetKeyDown(KeyCode.L)) {
-                StartTransition(uiScreens.First(s => s != CurrentScreen));
-            }
+            if(Input.GetKeyDown(KeyCode.L)) { }
         }
 
-        public void StartTransition(UIScreen toScreen, bool autoUpdate = true) {
-            if(InTransition) {
-                return;
-            }
-            
-            TransitionToScreen = toScreen;
-                        
-            // if autoUpdate == false - pause both animations
-            var fromTransition = CurrentScreen.StartTransition(UIAnimationDirection.From);
-            var toTransition = TransitionToScreen.StartTransition(UIAnimationDirection.To);
-            
-            var animationType = (fromTransition.type | toTransition.type);
-
-            var noTransition = animationType == UITransitionType.None;
-
-            if(noTransition) {
-                EndTransition();
-                return;
-            }
-
-            if(autoUpdate) {
-                this.CreateCoroutine(TransitionCoroutine(toTransition.Duration));
-            }
-        }
-        
-        private IEnumerator TransitionCoroutine(float transitionDuration) {
-            var transitionProgress = 0.0f;
-
-            while(transitionProgress <= 1) {
-                UpdateTransition(transitionProgress);
-                
-                transitionProgress += Time.deltaTime / transitionDuration;
-                yield return null;
-            }
-            EndTransition();
-        }
-
-        /// <summary>
-        /// Update the transition. This is either called automatically by the UIManager or could be manually called. Manual calls are useful when synchronization with an external system is required (e.g. slide the screen based on touch input).
-        /// </summary>
-        /// <param name="transitionProgress">Progress in percent</param>
-        public void UpdateTransition(float transitionProgress) {
-            CurrentScreen.UpdateTransition(transitionProgress);
-            TransitionToScreen.UpdateTransition(transitionProgress);
-        }
-
-        public void EndTransition() {
-            CurrentScreen.EndTransition();
-            TransitionToScreen.EndTransition();
-            
-            CurrentScreen = TransitionToScreen;
-            
-            TransitionToScreen = null;
-        }
-
-        #if UNITY_EDITOR
+#if UNITY_EDITOR
         
         // TODO menu item to enable/disable helper components in the inspector
 
         public static bool showUIHelperObjects = true;
 
         private void OnValidate() {
-            if(defaultAnimation == null) {
-                defaultAnimation = Resources.Load<UIAnimation>("UI Animations/Default UI Animation");
-            }
         }
         
         #endif

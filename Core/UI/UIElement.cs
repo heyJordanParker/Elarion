@@ -75,19 +75,6 @@ namespace Elarion.UI {
             set { State = State.SetFlag(UIState.Disabled, value); }
         }
 
-        protected int Width {
-            get { return Screen.width; }
-        }
-
-        protected int Height {
-            get { return Screen.height; }
-        }
-
-        // TODO move the cameras to a separate component (one that takes any UI and renders it to a texture); Or not - I can just delete it
-        public virtual RectTransform AnimationTarget {
-            get { return Transform; }
-        }
-
         public UIAnimator Animator {
             get { return animator; }
         }
@@ -196,8 +183,7 @@ namespace Elarion.UI {
             }
 
             if(_oldState != _state) {
-                OnStateChanged(_oldState , _state); 
-                _oldState = _state;
+                UpdateState(); 
             }
         }
 
@@ -209,11 +195,7 @@ namespace Elarion.UI {
             Visible = false;
         }
         
-        protected virtual void OnStateChanged(UIState oldState, UIState newState) {
-            if(oldState == newState) {
-                return;
-            }
-            
+        protected virtual void UpdateState() {
             // TODO check if any of the children elements are animating. If so - don't disable this; use a OnClose event to disable this alongside the child
             
             // TODO when I remove the canvas: disable children instead of the canvas
@@ -222,17 +204,19 @@ namespace Elarion.UI {
             canvas.enabled = Active;
             
             foreach(var effect in effects) {
-                if(oldState.HasFlag(effect.state) &&
-                   !newState.HasFlag(effect.state)) {
+                if(_oldState.HasFlag(effect.state) &&
+                   !_state.HasFlag(effect.state)) {
                     
                     effect.Stop(this);
                 }
-                if(!oldState.HasFlag(effect.state) &&
-                   newState.HasFlag(effect.state)) {
+                if(!_oldState.HasFlag(effect.state) &&
+                   _state.HasFlag(effect.state)) {
                     
                     effect.Start(this);
                 }
             }
+            
+            _oldState = _state;
         }
 
         protected internal void RegisterChild(UIElement child) {

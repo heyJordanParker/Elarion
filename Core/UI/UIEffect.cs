@@ -111,7 +111,7 @@ namespace Elarion.UI {
                 _stopCoroutine.Stop();
             }
             
-            CurrentEffect.rectTransform.SetParent(element.AnimationTarget, false);
+            CurrentEffect.rectTransform.SetParent(element.Transform, false);
             CurrentEffect.enabled = true;
 
             _startCoroutine = element.CreateCoroutine(GradualTransition(FadeDuration, false));
@@ -122,7 +122,7 @@ namespace Elarion.UI {
                 _startCoroutine.Stop();
             }
 
-            CurrentEffect.rectTransform.SetParent(element.AnimationTarget, false);
+            CurrentEffect.rectTransform.SetParent(element.Transform, false);
 
             _stopCoroutine = element.CreateCoroutine(GradualTransition(FadeDuration, true));
         }
