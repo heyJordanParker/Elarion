@@ -1,5 +1,4 @@
 ﻿using Elarion.UI;
-using UnityEngine;
 using UnityEditor;
 
 namespace Elarion.Editor.Editors {

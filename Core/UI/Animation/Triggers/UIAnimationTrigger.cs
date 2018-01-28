@@ -12,8 +12,4 @@ namespace Elarion.UI.Animation.Triggers {
         // TODO an option for multiple effects (conditional single field, conditional array field and a bool switch)
         
     }
-
-    public abstract class UIEffectTrigger : MonoBehaviour {
-        // TODO imitate the animation trigger
-    }
 }

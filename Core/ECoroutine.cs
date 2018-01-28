@@ -1,7 +1,5 @@
 using System;
 using System.Collections;
-using Elarion.Extensions;
-using Elarion.Managers;
 using UnityEngine;
 
 namespace Elarion {
@@ -52,6 +50,9 @@ namespace Elarion {
         public void Stop() {
             Stopped = true;
             Running = false;
+
+            // Synchronously fire the callback and update any dependant state
+            OnFinished(Stopped);
         }
 
         private IEnumerator CallWrapper() {
@@ -70,7 +71,11 @@ namespace Elarion {
             }
 
             _finished = true;
-            OnFinished(Stopped);
+
+            if(!Stopped) {
+                // The stop method instantly fires the callback, don't fire it twice
+                OnFinished(Stopped);
+            }
         }
 
         private static CoroutineResult ProcessEnumerator(IEnumerator e, out object result, bool finishedInner) {

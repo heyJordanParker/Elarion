@@ -1,11 +1,10 @@
-using System;
 using System.Collections;
+using System.Collections.Generic;
 using System.Linq;
 using Elarion.Attributes;
 using Elarion.Extensions;
 using Elarion.UI;
 using Elarion.UI.Animation;
-using Elarion.UI.Animations;
 using Elarion.Utility;
 using UnityEngine;
 using UnityEngine.UI;
@@ -20,9 +19,13 @@ namespace Elarion.Managers {
         
         // TODO basic loading screen - an intermediary screen that'll show between transitions and will stay open until a WaitFor function returns true (make it easily customizeable)
         
+        // TODO move the currently rendered fullscreen elements to the main canvas (in order) screen then popups (close one after the other)
+        
+        // TODO default animation ease function should be picked the same way as in UIAnimation (enum dropwdown and a custom value)
+        
         public UIScreen initialScreen;
 
-        // TODO dynamically register panels in the UIManager
+        // TODO dynamically register elements in the UIManager
         public UIScreen[] uiScreens;
         
         // TODO remove default animations and durations; it's easy enough to mass set those via the inspector
@@ -82,23 +85,10 @@ namespace Elarion.Managers {
             get { return _currentScreen; }
             private set {
                 if(_currentScreen != null) {
-                    _currentScreen.Fullscreen = false;
+                    _currentScreen.Close();
                 }
                 _currentScreen = value;
-                _currentScreen.Fullscreen = true;
-            }
-        }
-
-        // If more than one screen is visible (e.g. a menu and main screen) - render their textures inside this UIScreen and animate it instead of the two separately
-        // Add both screen's renders inside, switch their state
-        // Calculate the CompoundScreen's dimensions
-
-        // Use this for the Edge menu
-        public UIScreen CompoundScreen {
-            get {
-                var compoundScreenGO = new GameObject("Compound Screen");
-                compoundScreenGO.transform.parent = MainCanvas.transform;
-                return compoundScreenGO.AddComponent<UIScreen>();
+                _currentScreen.Open();
             }
         }
 
@@ -108,6 +98,26 @@ namespace Elarion.Managers {
             _uiCamera.transform.SetParent(MainCanvas.transform, false);
             CurrentScreen = initialScreen;
             CacheScreenSize();
+
+            _uiElements = Tools.FindSceneObjectsOfType<UIElement>();
+
+            // Enable all screens; Some might be disbled to make using the editor easier
+            foreach(var screen in uiScreens) {
+                screen.SetActive(true);
+            }
+            
+            // convert the flat array to a more usable structure
+            // maybe Dict<RectTransform, UIElement> to find parents quickly
+        }
+
+        private List<UIElement> _uiElements;
+
+        internal void RegisterUIElement(UIElement element) {
+            _uiElements.Add(element);
+        }
+
+        internal void UnregisterUIElement(UIElement element) {
+            _uiElements.Remove(element);
         }
 
         private void CacheScreenSize() {
@@ -117,15 +127,15 @@ namespace Elarion.Managers {
         
         // TODO buttons that change screens with the option to set open & close animations for both screens being changed
         
-        // TODO properties to keep track of visible and fullscreen elements; maybe handle making panels fullscreen here (and blur everything else); possibly handle all panel state changes here
+        // TODO properties to keep track of visible and fullscreen elements; maybe handle making elements fullscreen here (and blur everything else); possibly handle all element state changes here
 
-        public void Open(UIPanel uiPanel, UIAnimation overrideAnimation = null) {
-            if(uiPanel.Visible) {
-                Debug.LogWarning("Trying to open a visible panel.", uiPanel);
+        public void Open(UIElement uiElement, UIAnimation overrideAnimation = null) {
+            if(uiElement.Visible) {
+                Debug.LogWarning("Trying to open a visible element.", uiElement);
                 return;
             }
 
-            var uiScreen = uiPanel as UIScreen;
+            var uiScreen = uiElement as UIScreen;
             
             if(uiScreen != null) {
                 uiScreen.Open();
@@ -138,52 +148,61 @@ namespace Elarion.Managers {
                 // ui elements should always live inside another canvas - move it to the main canvas/screen canvas before showing; main canvas during transitions, screen canvas by any other time
 
                 // fullscreen popups and menus
-                if(!uiPanel.Fullscreen) {
+                if(!uiElement.Fullscreen) {
                     // do not blur the rest of the screen
                 } else {
                     // blur all other fullscreen elements
                 }
-                // animate the panel into view; 
+                // animate the element into view; 
                 // show it alongside the current screen
             }
         }
 
-        public void Close(UIPanel uiPanel, UIAnimation overrideAnimation = null) {
-            var uiScreen = uiPanel as UIScreen;
+        public void Close(UIElement uiElement, UIAnimation overrideAnimation = null) {
+            var uiScreen = uiElement as UIScreen;
             
             if(uiScreen != null) {
+                // this is not logical - remove that
                 Debug.LogWarning("Cannot manually close a UIScreen. If you want an empty UI Open a blank UIScreen instead.");
                 return;
             }
             
-            uiPanel.Close();   
+            uiElement.Close();   
         }
 
-        public UIPanel panel;
+        public UIElement testElement;
         
         public void Update() {
             if(_lastScreenWidth != Screen.width || _lastScreenHeight != Screen.height) {
                 CacheScreenSize();
-                // TODO use an event
+                // TODO use a ScreenSizeChanged event; UIElements visible on a specific resolution might use that
                 foreach(var uiScreen in uiScreens) {
                     uiScreen.UpdateTexture();
                 }
             }
 
+            if(Input.GetKeyDown(KeyCode.U)) {
+                testElement.Close();
+            }
+            
+            if(Input.GetKeyDown(KeyCode.Y)) {
+                testElement.Open();
+            }
+
             if(Input.GetKeyDown(KeyCode.O)) {
-                if(panel.Active) {
-                    panel.Close();
+                if(testElement.Active) {
+                    testElement.Close();
                 } else {
-                    panel.Open();
+                    testElement.Open();
                 }
             }
 
 //            if(Input.GetKeyUp(KeyCode.O)) {
-//                panel.Animator.Resize(new Vector2(-50, -50));
+//                element.Animator.Resize(new Vector2(-50, -50));
 //            }
 
             if(Input.GetKeyDown(KeyCode.I)) {
-                panel.Animator.Fade(0, UIAnimationDirection.From);
+                testElement.Animator.Fade(0, UIAnimationDirection.From);
             }
             
             if(Input.GetKeyDown(KeyCode.J)) {

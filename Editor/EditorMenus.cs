@@ -1,7 +1,6 @@
 ﻿using Elarion.Managers;
 using Elarion.UI;
 using Elarion.UI.Animation;
-using Elarion.UI.Animations;
 using UnityEditor;
 
 namespace Elarion.Editor {
@@ -12,11 +11,25 @@ namespace Elarion.Editor {
             ActiveEditorTracker.sharedTracker.ForceRebuild();
         }
 
-        [MenuItem("GameObject/UI/UI Manager")]
+        [MenuItem("GameObject/UI/UI Manager", false, 10000)]
         private static void CreateUIManager() {
             Utils.Create<UIManager>();
         }
-
+        
+        
+        // TODO customize those so that they'll create intuitive to use objects
+        // add animators, base hierarchy and so on (if it's missing)
+        [MenuItem("GameObject/UI/UI Element", false, -10)]
+        private static void CreateUIElement() {
+            Utils.Create<UIElement>();
+        }
+        
+        // TODO make sure this is fullscreen when created
+        [MenuItem("GameObject/UI/UI Screen", false, -10)]
+        private static void CreateUIScreen() {
+            Utils.Create<UIScreen>();
+        }
+        
         // TODO use CreateAssetMenuAttribute
         [MenuItem("Assets/Create/UI Animation")]
         private static void SaveUIAnimation() {

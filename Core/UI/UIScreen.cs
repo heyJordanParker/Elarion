@@ -1,12 +1,6 @@
-using System;
-using System.Collections;
-using System.Collections.Generic;
 using Elarion.Extensions;
-using Elarion.Managers;
 using Elarion.UI.Animation;
-using Elarion.UI.Animations;
 using Elarion.Utility;
-using Microsoft.Win32;
 using UnityEngine;
 using UnityEngine.UI;
 
@@ -15,7 +9,8 @@ namespace Elarion.UI {
     // TODO make this a generic fullscreen element
     // TODO Add a canvas to the fullscreen element; they need to display properly over other things 
     
-    public class UIScreen : UIPanel {
+    [RequireComponent(typeof(GraphicRaycaster))]
+    public class UIScreen : UIElement {
         [SerializeField, Tooltip("Transition effect to show while this screen is going out of view.")]
         protected UIAnimation fromAnimation;
 
@@ -57,6 +52,7 @@ namespace Elarion.UI {
 
         protected override void Awake() {
             base.Awake();
+            
             _camera = UIHelper.CreateUICamera(gameObject.name + " Camera");
             _camera.SetActive(false);
             
@@ -70,7 +66,9 @@ namespace Elarion.UI {
             UpdateTexture();
         }
 
-        private void OnDestroy() {
+        protected override void OnDestroy() {
+            base.OnDestroy();
+            
             if(_camera != null) {
                 if(_camera.targetTexture != null) {
                     Destroy(_camera.targetTexture);
@@ -117,6 +115,7 @@ namespace Elarion.UI {
         }
 
         protected override void OnClose() {
+
             base.OnClose();
             Fullscreen = false;
         }

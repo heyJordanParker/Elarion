@@ -1,6 +1,5 @@
-﻿using System;
+﻿ using System;
 using Elarion.Managers;
-using Elarion.UI;
 using UnityEngine;
 using UnityEngine.UI;
 
@@ -13,6 +12,15 @@ namespace Elarion.Utility {
 
         public static T Create<T>(string name = null, Transform parent = null) where T : Component {
             return CreateGO(name, parent).AddComponent<T>();
+        }
+
+        public static Canvas CreateAnimatorCanvas(out RectTransform transform, string name = null, Transform parent = null) {
+            var canvas = CreateGO(name, parent).AddComponent<Canvas>();
+            canvas.overrideSorting = true;
+
+            transform = canvas.gameObject.GetComponent<RectTransform>();
+            
+            return canvas;
         }
         
         public static Image CreateBlurImage(string name = null, Transform parent = null) {

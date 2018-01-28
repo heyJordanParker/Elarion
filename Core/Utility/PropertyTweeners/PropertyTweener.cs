@@ -10,7 +10,7 @@ namespace Elarion.Utility.PropertyTweeners {
     public abstract class PropertyTweener<TProperty, TTarget> where TProperty : struct {
         
         protected ECoroutine tweenerCoroutine;
-        
+
         public TProperty SavedValue { get; protected set; }
         public abstract TProperty CurrentValue { get; protected set; }
         public TProperty TargetValue { get; protected set; }
@@ -39,14 +39,12 @@ namespace Elarion.Utility.PropertyTweeners {
             }
             
             if(tweenerCoroutine != null && tweenerCoroutine.Running) {
-                tweenerCoroutine.Stop();
+                StopTween();
                 tweenerCoroutine.OnFinished += b => {
                     Tween(value, animationDirection, callback, animationOptions);
                 };
                 return;
             }
-            
-            Tweening = true;
             
             if(animationDirection == UIAnimationDirection.RelativeTo || animationDirection == UIAnimationDirection.RelativeFrom) {
                 value = AddValues(value, TargetValue);
@@ -65,22 +63,33 @@ namespace Elarion.Utility.PropertyTweeners {
             
             if(animationOptions.Instant) {
                 CurrentValue = TargetValue;
-                Tweening = false;
                 return;
             }
+
+            Tweening = true;
 
             tweenerCoroutine = _owner.CreateCoroutine(TweenCoroutine(animationOptions.EaseFunction, animationOptions.Duration));
             tweenerCoroutine.OnFinished += stopped => {
                 if(!stopped) {
                     CurrentValue = TargetValue;
                 }
-                
-                Tweening = false;
 
+                Tweening = false;
+                
                 if(callback != null) {
                     callback();
                 }
             };
+        }
+
+        public void StopTween(bool reset = false) {
+            if(tweenerCoroutine != null && tweenerCoroutine.Running) {
+                tweenerCoroutine.Stop();
+            }
+            
+            if(reset) {
+                TargetValue = CurrentValue = SavedValue;
+            }
         }
 
         public void SaveProperty() {
@@ -88,11 +97,7 @@ namespace Elarion.Utility.PropertyTweeners {
         }
 
         public void ResetProperty() {
-            if(tweenerCoroutine != null && tweenerCoroutine.Running) {
-                tweenerCoroutine.Stop();
-            }
-            
-            TargetValue = CurrentValue = SavedValue;
+            StopTween(true);
         }
         
         protected IEnumerator TweenCoroutine(Ease ease, float duration) {

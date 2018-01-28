@@ -1,5 +1,4 @@
-﻿using Elarion.Utility;
-using UnityEngine;
+﻿using UnityEngine;
 
 namespace Elarion.Extensions {
     public static class RectTransformExtensions {

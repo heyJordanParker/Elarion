@@ -1,5 +1,3 @@
-using UnityEngine.UI;
-
 namespace Elarion.UI {
     public class UILoadingScreen : UIScreen {
         

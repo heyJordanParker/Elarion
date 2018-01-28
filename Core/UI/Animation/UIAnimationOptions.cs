@@ -18,6 +18,10 @@ namespace Elarion.UI.Animation {
         public Ease EaseFunction {
             get {
                 if(!_easeFunction.HasValue) {
+                    if(UIManager == null) {
+                        return Ease.Linear;
+                    }
+                    
                     return UIManager.defaultAnimationEaseFunction;
                 }
 
@@ -28,6 +32,10 @@ namespace Elarion.UI.Animation {
         public float Duration {
             get {
                 if(_duration <= 0) {
+                    if(UIManager == null) {
+                        return 1;
+                    }
+                    
                     return UIManager.DefaultAnimationDuration;
                 }
 

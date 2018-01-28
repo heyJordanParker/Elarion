@@ -1,4 +1,3 @@
-using System.Collections;
 using Elarion.EventSystem;
 using Elarion.Managers;
 using UnityEngine;

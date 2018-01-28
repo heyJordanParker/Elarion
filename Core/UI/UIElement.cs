@@ -1,33 +1,274 @@
+using System;
+using System.Linq;
+using Elarion.Extensions;
+using Elarion.Managers;
+using Elarion.UI.Animation;
+using UnityEngine;
+
 namespace Elarion.UI {
-    public class UIElement : UIPanel {
-        // TODO use this class for reusable UIElements - Sidebars, menus, and such 
+    [RequireComponent(typeof(Canvas))]
+    [RequireComponent(typeof(CanvasGroup))]
+    public class UIElement : BasicUIElement {
         
-        // Appear AFTER the transition or appear WITH the screen transition (the latter option matches the appearing type with the screen transition type and starts alongside the transition); hook this up via events in the UIManager
+        // TODO UIForm inheritor - add error checking submitting and so on builtin
+        // TODO UIDialog inheritor - custom amount of buttons, extensible, based on prefab (so the user can skin it); dialog skins?
         
-        // appear, disappear animations; follow the UIScreen structure as much as possible (it needs to be somewhat intuitive)
+        // TODO more generic UI states - focused, in transition, full screen, compound screen, disabled (elements can be visible and disabled)
         
-        // focus (when it comes to the background behind a popup for example), click, hover, select, loading animations (outlines, scale, overlays, blurs, etc)
+        // TODO remove the canvas
         
-        // UIElements that show ONLY during a transition - loaders and such
+        // TODO make sure the UIElement's parent UIElement is actually a parent gameobject
         
-        // List of UIScreens for the element to be active in (
+        // TODO visibility options - mobile only, landscape only, portrait only, desktop only etc
         
-        // Hide during transitions option (animated stuff, performance?)
+        // TODO child elements (get via UIManager; UIManager stores parent elements)
         
-        // option to appear on screen level (below any transition effects)
+        // if it has a parent - let the user select AppearWithParent, ApearAfterParent, Manual
+        // to achieve that create a hidden variable (has parent) and update it with the OnValidate method - don't include it outside the editor
+
+        public UIEffect[] effects;
+
+        // TODO handle ActiveChild flag via hooking to child events
+        public event Action OnOpenEvent = () => { }; 
+        public event Action OnCloseEvent = () => { }; 
+
+        protected Canvas canvas;
+        protected CanvasGroup canvasGroup;
+        protected UIAnimator animator;
+
+        private UIState _oldState;
+        private UIState _state;
+
+        protected UIState State {
+            get { return _state; }
+            set { _state = value; }
+        }
         
-        // appear over effects - blur/overlay etc (loaders and such)
+        public bool Active {
+            get {
+                return Visible || InTransition || ActiveChild;
+            }
+        }
         
-        // register UI element in the UIManager
+        public bool ActiveChild {
+            get { return State.HasFlag(UIState.VisibleChild); }
+            set { State = State.SetFlag(UIState.VisibleChild, value); }
+        }
+
+        public bool InTransition {
+            get { return State.HasFlag(UIState.InTransition); }
+            set { State = State.SetFlag(UIState.InTransition, value); }
+        }
         
-        // global elements e.g. popups that render over everything else; maybe render priority or something
+        public bool Visible {
+            get { return State.HasFlag(UIState.Visible); }
+            set { State = State.SetFlag(UIState.Visible, value); }
+        }
         
-        // layer for rendering - to help manage popups and similar stuff
+        public bool Fullscreen {
+            get { return State.HasFlag(UIState.Fullscreen); }
+            set { State = State.SetFlag(UIState.Fullscreen, value); }
+        }
         
-        // UI Elements (e.g. top & bottom bars, popups) - visibility options - for native & mobile (screen orientation/size)
+        public bool Disabled {
+            get { return State.HasFlag(UIState.Disabled); }
+            set { State = State.SetFlag(UIState.Disabled, value); }
+        }
+
+        protected int Width {
+            get { return Screen.width; }
+        }
+
+        protected int Height {
+            get { return Screen.height; }
+        }
+
+        // TODO move the cameras to a separate component (one that takes any UI and renders it to a texture); Or not - I can just delete it
+        public virtual RectTransform AnimationTarget {
+            get { return Transform; }
+        }
+
+        public UIAnimator Animator {
+            get { return animator; }
+        }
+
+        public CanvasGroup CanvasGroup {
+            get { return canvasGroup; }
+        }
+
+        public float Alpha {
+            get { return canvasGroup.alpha; }
+            set { canvasGroup.alpha = Mathf.Clamp01(value); }
+        }
+
+        protected override void Awake() {
+            base.Awake();
+
+            _oldState = _state = UIState.NotInitialized;
+            
+            animator = GetComponent<UIAnimator>();
+
+            canvas = GetComponent<Canvas>();
+            canvas.enabled = false;
+            
+            canvasGroup = GetComponent<CanvasGroup>();
+        }
+
+        protected virtual void Start() {
+            if(UIManager == null) {
+                Debug.LogWarning("Enabling a UIElement without a UIManager on the scene.", gameObject);
+                return;
+            }
+
+            if(Parent != null) {
+                Parent.RegisterChild(this);
+                return;
+            }
+            
+            UIManager.RegisterUIElement(this);
+        }
+
+        protected virtual void OnDestroy() {
+            if(Parent != null) {
+                Parent.UnregisterChild(this);
+                return;
+            }
+            
+            if(UIManager == null) {
+                return;
+            }
+            
+            UIManager.UnregisterUIElement(this);
+        }
+
+        // TODO use the OnOpenEvent event, not the method
+        // TODO register the OnOpen method in the OnOpenEvent event
+        public void Open(bool skipAnimation = false, UIAnimation overrideAnimation = null) {
+            if(Visible) {
+                return;
+            }
+            
+            OnOpen();
+            
+            if(animator == null || skipAnimation) {
+                return;
+            }
+            
+            animator.ResetToSavedProperties();
+
+            if(overrideAnimation != null) {
+                animator.Play(overrideAnimation);
+                return;
+            }
+            
+            animator.Play(UIAnimationType.OnOpen);
+            
+            // TODO open child elements
+            // turn the element off after animations, effects and child elements' effects and animations
+        }
+
+        public void Close(bool skipAnimation = false, UIAnimation overrideAnimation = null) {
+            if(!Visible) {
+                return;
+            }
+            
+            OnClose();
+            
+            if(animator == null || skipAnimation) {
+                return;
+            }
+
+            if(overrideAnimation != null) {
+                animator.Play(overrideAnimation);
+                return;
+            }
+            
+            animator.Play(UIAnimationType.OnClose);
+
+            // after all the effects
+            // Unblur screen only after the elements have finished their animations; don't blur the screen if the elements haven't changed
+        }
+
+        protected virtual void Update() {
+            // TODO use an event?
+            if(animator != null) {
+                InTransition = animator.Animating;
+            }
+
+            if(_oldState != _state) {
+                OnStateChanged(_oldState , _state); 
+                _oldState = _state;
+            }
+        }
+
+        protected virtual void OnOpen() {
+            Visible = true;
+        }
+
+        protected virtual void OnClose() {
+            Visible = false;
+        }
         
-        // Optional Apply an effect over everything else (on a layer below the current one) - blur and/or color overlay (useful for popups & menus)
+        protected virtual void OnStateChanged(UIState oldState, UIState newState) {
+            if(oldState == newState) {
+                return;
+            }
+            
+            // TODO check if any of the children elements are animating. If so - don't disable this; use a OnClose event to disable this alongside the child
+            
+            // TODO when I remove the canvas: disable children instead of the canvas
+            // TODO when I remove the canvas: disable any graphic component on this object instead of the canvas
+            // (this all is to actually hide the object) 
+            canvas.enabled = Active;
+            
+            foreach(var effect in effects) {
+                if(oldState.HasFlag(effect.state) &&
+                   !newState.HasFlag(effect.state)) {
+                    
+                    effect.Stop(this);
+                }
+                if(!oldState.HasFlag(effect.state) &&
+                   newState.HasFlag(effect.state)) {
+                    
+                    effect.Start(this);
+                }
+            }
+        }
+
+        protected internal void RegisterChild(UIElement child) {
+            
+        }
+
+        protected internal void UnregisterChild(UIElement child) {
+            
+        } 
+
+        // TODO cache parent in a field
+        // TODO setter - sets the parent game object and refreshes the parent field
+        internal UIElement Parent {
+            get {
+                var parentElements = GetComponentsInParent<UIElement>(includeInactive: true);
+
+                if(parentElements == null || parentElements.Length < 2) {
+                    return null;
+                }
+
+                // GetComponentsInParent operates recursively - the first member is this object, the second is the first parent with the component
+                return parentElements[1];
+            }
+        }
+
+        // TODO dynamically register and unregister children objects in their parents instead of the UIManager
+        // TODO hook the parent object to children OnOpen/OnClose events - use them to determine when should it get disabled (after all the children have finished animating)
+        internal UIElement[] Children {
+            get {    
+                return gameObject.GetComponentsInChildren<UIElement>(includeInactive: true).Skip(1).ToArray();
+            }
+        }
+
+        protected static UIManager UIManager {
+            get { return Singleton.Get<UIManager>(); }
+        }
         
-        // Deactivate method (with a callback) that allows the element to animate out of view; just disables the element if no type is set up
     }
 }

@@ -15,7 +15,7 @@ namespace Elarion.UI {
         // TODO UIEffects for animations
         // you can have effects tied to UIStates or to animations (the effect can show up while something is animating or when something is in a certain state)
         
-        // TODO FadeIn & FadeOut effects (play with the panel's alpha)
+        // TODO FadeIn & FadeOut effects (play with the element's alpha)
         
         // Move/MoveAnchor, Scale, and Rotate effects - e.g. a note can scale down while moving
         
@@ -106,25 +106,25 @@ namespace Elarion.UI {
             }
         }
 
-        public void Start(UIPanel panel) {
+        public void Start(UIElement element) {
             if(_stopCoroutine != null && _stopCoroutine.Running) {
                 _stopCoroutine.Stop();
             }
             
-            CurrentEffect.rectTransform.SetParent(panel.AnimationTarget, false);
+            CurrentEffect.rectTransform.SetParent(element.AnimationTarget, false);
             CurrentEffect.enabled = true;
 
-            _startCoroutine = panel.CreateCoroutine(GradualTransition(FadeDuration, false));
+            _startCoroutine = element.CreateCoroutine(GradualTransition(FadeDuration, false));
         }
 
-        public void Stop(UIPanel panel) {
+        public void Stop(UIElement element) {
             if(_startCoroutine != null && _startCoroutine.Running) {
                 _startCoroutine.Stop();
             }
 
-            CurrentEffect.rectTransform.SetParent(panel.AnimationTarget, false);
+            CurrentEffect.rectTransform.SetParent(element.AnimationTarget, false);
 
-            _stopCoroutine = panel.CreateCoroutine(GradualTransition(FadeDuration, true));
+            _stopCoroutine = element.CreateCoroutine(GradualTransition(FadeDuration, true));
         }
 
         private IEnumerator GradualTransition(float duration, bool reverse) {
