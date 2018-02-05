@@ -10,6 +10,8 @@ namespace Elarion.UI {
         OnBlur,
         OnHover,
         OnUnhover,
+        OnPointerDown,
+        OnPointerUp,
     }
 
     [Serializable]

@@ -24,7 +24,7 @@ namespace Elarion.Editor {
         private static void CreateUIElement() {
             Utils.Create<UIElement>();
             
-            // creates a UIScenes object -> UIScene -> UIElement
+            // creates a UIScenes object -> UIScene -> UIElement/
         }
         
         // TODO make sure this is fullscreen when created

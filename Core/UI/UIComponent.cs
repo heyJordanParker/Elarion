@@ -6,21 +6,22 @@ using Elarion.Managers;
 using Elarion.UI.Animation;
 using UnityEditor;
 using UnityEngine;
+using UnityEngine.EventSystems;
 using UnityEngine.UI;
 
 namespace Elarion.UI {
-    
-    // TODO separate this into UIPanel, UIElement, and use the UIBehavior as the base class
-    // TODO UIPanel should be very similar to this class
-    // TODO UIElement shouldn't use a canvas and care about child elements - just an animated transform with texture 
-    // TODO UIScene might not be necessary at all with this setup; just add a Fullscreen checkbox to the UIPanel
 
     [RequireComponent(typeof(RectTransform))]
-    public abstract class UIComponent : MonoBehaviour {
+    public abstract class UIComponent : UIBehaviour {
         
         // TODO visibility options (in another component) - mobile only, landscape only, portrait only, desktop only etc
+        // TODO visibility options (screen/parent size based - use the OnParentChanged thing)
+        // TODO visibility options component can work with a manually-settable Hidden flag (no enabling/disabling conflicts)
+        // TODO make sure the visibility options component can be attached to a UIRoot in addition to any UIComponent
         
-        // TODO hide the canvas, canvas group, and other components the user shouldn't modify (follow the UIManager's hide configuration though) 
+        // TODO hide/lock the canvas, canvas group, and other components the user shouldn't modify (follow the UIManager's hide configuration though); HideFlags/Custom Editors?
+        
+        public event Action OnStateChanged = () => { };
 
         [SerializeField]
         protected UIEffect[] effects;
@@ -28,25 +29,30 @@ namespace Elarion.UI {
         [SerializeField]
         protected bool interactable = true;
         
-        public event Action OnStateChanged = () => { };
-
         protected UIAnimator animator;
-        // TODO move this to the UIPanel
-        protected List<UIComponent> childElements;
-
+        
         private UIState _oldState;
         private UIState _state;
-        private UIComponent _parentComponent;
-        private bool _isCanvasInteractable;
+        private UIComponent _parent;
         
         public RectTransform Transform { get; private set; }
+        
+        public UIComponent Parent {
+            get { return _parent; }
+        }
+        
+        protected List<UIComponent> ChildElements {
+            get {
+                return UIComponentCache.Where(component => component.Parent == this).ToList();
+            }
+        }
         
         protected UIState State {
             get { return _state; }
             set { _state = value; }
         }
 
-        public bool ShouldRender {
+        public virtual bool ShouldRender {
             get { return Opened || InTransition || ActiveChild; }
         }
         
@@ -77,72 +83,65 @@ namespace Elarion.UI {
 
         protected virtual bool Interactable {
             get {
-                var interactableParent = Parent == null || Parent.Interactable;
-                return interactableParent && interactable && _isCanvasInteractable;
+                var parentComponent = Parent as UIComponent;
+                var interactableParent = parentComponent == null || parentComponent.Interactable;
+                return interactableParent && interactable;
             }
         }
 
         public UIAnimator Animator {
             get { return animator; }
         }
-        
-        public UIComponent Parent {
-            get { return _parentComponent; }
-        }
 
         public abstract float Alpha {
             get; set;
         }
-
+        
         protected abstract Behaviour Render { get; }
-
-        protected virtual void Awake() {
+        
+        protected override void Awake() {
+            base.Awake();
             Transform = GetComponent<RectTransform>();
 
             _oldState = _state = UIState.NotInitialized;
             
-            childElements = new List<UIComponent>();
-            
             animator = GetComponent<UIAnimator>();
             
+            UIComponentCache.Add(this);
+        }
+
+        protected override void Start() {
+            base.Start();
+            
+            // calculate the parent component after all components were registered in the cache (in Awake)
             UpdateParent();
         }
 
-        protected virtual void Start() {
-            if(UIManager == null) {
-                Debug.LogWarning("Enabling a UIElement without a UIManager on the scene.", gameObject);
-                return;
-            }
-
-            if(Parent != null) {
-                Parent.RegisterChild(this);
-                return;
-            }
-            
-            UIManager.RegisterUIElement(this);
+        protected override void OnDestroy() {
+            base.OnDestroy();
+            UIComponentCache.Remove(this);
         }
 
-        protected virtual void OnDestroy() {
-            if(Parent != null) {
-                Parent.UnregisterChild(this);
-                return;
-            }
-            
-            if(UIManager == null) {
-                return;
-            }
-            
-            UIManager.UnregisterUIElement(this);
-        }
-
-        public void Open(bool resetToSavedProperties = true, bool skipAnimation = false, UIAnimation overrideAnimation = null) {
+        public void Open(bool resetToSavedProperties = true, bool focus = false, bool skipAnimation = false, UIAnimation overrideAnimation = null, bool renderOnTop = true) {
             if(Opened) {
                 return;
             }
 
-            Opened = true;
+            if(renderOnTop) {
+                Transform.SetAsLastSibling();
+            }
 
-            foreach(var child in childElements) {
+            Opened = true;
+            
+            // TODO create a UIRoot class to be the topmost parent of any UI Hierarchy (one per scene). This will simplify the parenting and remove the weird if/then cases and conditional registration to the UIManager. Register the UIRoot in the UIManager (just set one UIManager Property from the UIRoot Awake)
+            // TODO test what will happen with multiple UIRoots (allow them if it isn't an issue)
+            
+            // UIRoot -> Scenes/Panels/Elements -> Panels/Elements
+            
+            // TODO Handle focus - focus this element and unfocus every other child in the parent element (same hierarchical level)
+            // Parent.Focus(this); Parent.Focus(null) should also be valid
+            
+            foreach(var child in ChildElements) {
                 child.Open(resetToSavedProperties, skipAnimation);
             }
             
@@ -162,7 +161,7 @@ namespace Elarion.UI {
             animator.Play(UIAnimationType.OnOpen);
         }
 
-        public void Close(bool skipAnimation = false, UIAnimation overrideAnimation = null) {
+        public void Close(bool skipAnimation = false, bool unfocus = false, UIAnimation overrideAnimation = null) {
             if(!Opened) {
                 return;
             }
@@ -170,7 +169,7 @@ namespace Elarion.UI {
             Opened = false;
 
 
-            foreach(var child in childElements) {
+            foreach(var child in ChildElements) {
                 child.Close(skipAnimation);
             }
             
@@ -184,8 +183,6 @@ namespace Elarion.UI {
             }
             
             animator.Play(UIAnimationType.OnClose);
-
-            // TODO figure out how to blur the screen (based on the selected game object; get inspiration from the Selectable class)
         }
 
         protected virtual void Update() {
@@ -226,74 +223,56 @@ namespace Elarion.UI {
         }
 
         private void UpdateChildState() {
-            ActiveChild = childElements.SingleOrDefault(childElement => childElement.ShouldRender);
+            ActiveChild = ChildElements.SingleOrDefault(childElement => childElement.ShouldRender);
         }
         
         private void UpdateParent() {
+            foreach(var childElement in ChildElements) {
+                childElement.OnStateChanged -= UpdateChildState;
+            }
+            
             var parentElements = GetComponentsInParent<UIComponent>(includeInactive: true);
 
             if(parentElements == null || parentElements.Length < 2) {
-                _parentComponent = null;
+                _parent = null;
                 return;
             }
 
             // GetComponentsInParent operates recursively - the first member is this object, the second is the first parent with the component
-            _parentComponent = parentElements[1];
-        }
-
-        protected internal void RegisterChild(UIComponent child) {
-            child.OnStateChanged += UpdateChildState;
-            childElements.Add(child);
-        }
-
-        protected internal void UnregisterChild(UIComponent child) {
-            child.OnStateChanged -= UpdateChildState;
-            childElements.Remove(child);
-        }
-        
-        // TODO optimize this; Unity calls it even if the Canvas' alpha changed - might be slow 
-        protected virtual void OnCanvasGroupChanged() {
-            var isCanvasIntractable = true;
-
-            for(var t = transform; t != null; t = t.parent) {
-                var canvases = t.GetComponents<CanvasGroup>();
-                
-                var finishedIteration = false;
-                
-                foreach(var canvas in canvases) {
-                    if(!canvas.interactable) {
-                        isCanvasIntractable = false;
-                        finishedIteration = true;
-                    }
-
-                    if(canvas.ignoreParentGroups) {
-                        finishedIteration = true;
-                    }
-                }
-
-                if(finishedIteration)
-                    break;
+            _parent = parentElements[1];
+            
+            foreach(var childElement in ChildElements) {
+                childElement.OnStateChanged += UpdateChildState;
             }
-
-            // TODO the enabled state is based on this and the personal state; if both are true - this object becomes enabled
-            _isCanvasInteractable = isCanvasIntractable;
         }
-        
-        protected virtual void OnTransformParentChanged() {
+
+        protected override void OnTransformParentChanged() {
             UpdateParent();
         }
         
         protected virtual void OnTransformChildrenChanged() { }
-        
-        protected static UIManager UIManager {
-            get { return Singleton.Get<UIManager>(); }
-        }
 
-        protected virtual void OnValidate() {
+        protected override void OnValidate() {
             // TODO make sure this lives under a UIScene (what about popups?)
             
             // TODO create UI Manager if missing; Trigger it to create the UI Canvas; Make this a child to the UI Canvas if it's the topmost canvas (too rigid?)
 
+        }
+                
+        private static List<UIComponent> _uiComponentCache;
+
+        private static List<UIComponent> UIComponentCache {
+            get {
+                if(_uiComponentCache == null) {
+                    _uiComponentCache = new List<UIComponent>();
+                }
+
+                return _uiComponentCache;
+            }
+        }
+                
+        protected static UIManager UIManager {
+            get { return Singleton.Get<UIManager>(); }
         }
         
     }

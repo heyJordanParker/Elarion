@@ -104,11 +104,6 @@ namespace Elarion.UI.Animation {
                         overrideParentAnchors = true;
                         overrideParentAnchorMin = new Vector2(0.5f, 0.5f);
                         overrideParentAnchorMax = new Vector2(0.5f, 0.5f);
-                        overrideAnimationPriority = true;
-                        animationPriority = DefaultAnimationPriority + 5;
-                    } else {
-                        overrideAnimationPriority = false;
-                        animationPriority = DefaultAnimationPriority;
                     }
                 }
             }

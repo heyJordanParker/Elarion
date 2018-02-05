@@ -1,9 +1,11 @@
 using UnityEngine;
+using UnityEngine.EventSystems;
 using UnityEngine.UI;
 
 namespace Elarion.UI {
     public class UIElement : UIComponent {
 
+        [SerializeField]
         protected Graphic graphic;
         
         public override float Alpha {
@@ -21,15 +23,21 @@ namespace Elarion.UI {
 
         protected override void Awake() {
             base.Awake();
-            graphic = GetComponent<Graphic>();
+            
             if(!graphic) {
+                graphic = GetComponent<Graphic>();
+
+                if(graphic) {
+                    return;
+                }
+                
                 Debug.LogWarning("Cannot initialize a UIElement without a graphic component. Disablng.", gameObject);
                 gameObject.SetActive(false);
-                return;
             }
         }
 
         protected override void OnValidate() {
+            base.OnValidate();
             var selectable = GetComponent<Selectable>();
             if(selectable) {
                 selectable.interactable = interactable;

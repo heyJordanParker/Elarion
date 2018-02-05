@@ -6,6 +6,7 @@ using UnityEngine;
 namespace Elarion {
     public abstract class Singleton : MonoBehaviour {
         
+        // TODO open-source the new singleton implementation on GitHub
         // TODO keep this implementation of singleton and create a second one with the below specifications (rename this to SingletonBehavior)
         // TODO use [RuntimeInitializeOnLoadMethod] 
         // TODO create a method that automatically creates singleton instances
@@ -13,7 +14,9 @@ namespace Elarion {
         // TODO remove the MonoBehavior inheritance
         // TODO add default Unity method stubs (update, late update, fixed update, ondestroy, create coroutine)
         // TODO add other method stubs (initialize, deinitialize)
-        // TODO figure out how to pass configuration data to the managers;
+        // TODO figure out how to pass configuration data to the managers (tags, initializer objects, behaviors registering (component registration), scriptable configuration objects in /Resources, ?)
+        // TODO default values, mocking, unit tests
+        // TODO creating Singletons in the editor (for editor purposes, or to use with [ExecuteInEditMode])
         // Tags to find scene objects?
         // configuration scriptableobject for static variables?
         

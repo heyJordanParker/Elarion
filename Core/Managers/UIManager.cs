@@ -7,7 +7,6 @@ using Elarion.UI.Animation;
 using Elarion.Utility;
 using UnityEngine;
 using UnityEngine.Serialization;
-using UnityEngine.UI;
 
 namespace Elarion.Managers {
     public class UIManager : Singleton {
@@ -22,19 +21,13 @@ namespace Elarion.Managers {
         
         // TODO basic loading screen - an intermediary screen that'll show between transitions and will stay open until a WaitFor function returns true (make it easily customizeable)
         
-        // TODO move the currently rendered fullscreen elements to the main canvas (in order) screen then popups (close one after the other)
-        
-        // TODO default animation ease function should be picked the same way as in UIAnimation (enum dropwdown and a custom value)
-        
-        [FormerlySerializedAs("initialScreen")]
+        // TODO move this to the scenes as a field (use OnValidate to ensure that at exactly one is set to initial) 
         public UIScene initialScene;
 
-        [FormerlySerializedAs("uiScreens")]
+        // TODO find them; maybe even proxy that through the UI roots and leave the UIManager mostly out of it
         public UIScene[] uiScenes;
 
-        public Color transitionBackground = Color.white;
-
-        private Canvas _mainCanvas;
+        private List<UIRoot> _uiRoots;
         
         // Blur effects can't operate with the main render texture - they need a camera
         private Camera _uiCamera;
@@ -57,42 +50,25 @@ namespace Elarion.Managers {
 
         protected override void Awake() {
             base.Awake();
-            _uiCamera = UIHelper.CreateUICamera("Main UI Camera");
-            _uiCamera.clearFlags = CameraClearFlags.Color;
-            _uiCamera.backgroundColor = transitionBackground;
-            _uiCamera.transform.SetParent(transform, false);
+            _uiCamera = UIHelper.CreateUICamera("Main UI Camera", transform);
             CacheScreenSize();
 
-//            _uiElements = Tools.FindSceneObjectsOfType<UIElement>();
-            _uiElements = new List<UIComponent>();
-
-            // Enable all screens; Some might be disbled to make using the editor easier
-            foreach(var screen in uiScenes) {
-                screen.SetActive(true);
+            _uiRoots = new List<UIRoot> { FindObjectOfType<UIRoot>() };
+            
+            foreach(var scene in uiScenes) {
+                scene.SetActive(true);
             }
             
             // convert the flat array to a more usable structure
             // maybe Dict<RectTransform, UIElement> to find parents quickly
         }
 
-        protected IEnumerator Start() {
-            yield return null;
-            // wait for a frame
+        protected void Start() {
+            // TODO move this to the UIRoot
             CurrentScreen = initialScene;
         }
         
-        // those are the top level elements
-        // not sure if they're needed?
-        private List<UIComponent> _uiElements;
-
-        internal void RegisterUIElement(UIComponent component) {
-            _uiElements.Add(component);
-        }
-
-        internal void UnregisterUIElement(UIComponent component) {
-            _uiElements.Remove(component);
-        }
-
+        // will this ever be necessary?
         private void CacheScreenSize() {
             _lastScreenWidth = Screen.width;
             _lastScreenHeight = Screen.height;
@@ -153,6 +129,8 @@ namespace Elarion.Managers {
                 // TODO use a ScreenSizeChanged event; UIElements visible on a specific resolution might use that
                 foreach(var uiScreen in uiScenes) { }
             }
+            
+            // TODO find a way to integrate Unity's Selectable functionality with my focus functionality (focus to follow the selection)
 
             if(Input.GetKeyDown(KeyCode.U)) {
                 testElement.Close();

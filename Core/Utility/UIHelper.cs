@@ -16,7 +16,6 @@ namespace Elarion.Utility {
 
         public static Canvas CreateAnimatorCanvas(out RectTransform transform, string name = null, Transform parent = null) {
             var canvas = CreateGO(name, parent).AddComponent<Canvas>();
-            canvas.overrideSorting = true;
 
             transform = canvas.gameObject.GetComponent<RectTransform>();
 
@@ -71,6 +70,8 @@ namespace Elarion.Utility {
             camera.allowMSAA = false;
             camera.clearFlags = CameraClearFlags.Color;
             camera.orthographic = true;
+            camera.clearFlags = CameraClearFlags.Color;
+            camera.backgroundColor = Color.white;
             
             return camera;
         }

@@ -158,12 +158,6 @@ namespace Elarion.UI.Animation {
                     _canvasTransform.rect.height + (cachedHeight - _canvasTransform.rect.height));
             }
 
-            // make open animations a tiny bit more important
-            var isOpenAnimation = _animations.SingleOrDefault(t => t.type == UIAnimationType.OnOpen && t.animation == animation) != null ? 1 : 0;
-            
-            _canvas.sortingOrder = animation.animationPriority + isOpenAnimation;
-            _canvas.overrideSorting = Target.Parent == null;
-
             Target.Transform.SetParent(_canvasTransform, true);
 
         }

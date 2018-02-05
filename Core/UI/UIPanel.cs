@@ -7,7 +7,7 @@ namespace Elarion.UI {
     [RequireComponent(typeof(GraphicRaycaster))] // to propagate input events
     public class UIPanel : UIComponent {
         // TODO UIForm inheritor - add error checking submitting and so on builtin
-        // TODO UIDialog inheritor - custom amount of buttons, extensible, based on prefab (so the user can skin it); dialog skins?
+        // TODO UIDialog inheritor - dynamic amount of (getcomponent; onchildren changed), extensible; dialog skins?
         
         protected Canvas canvas;
         protected CanvasGroup canvasGroup;
@@ -30,8 +30,8 @@ namespace Elarion.UI {
         }
         
         protected override void OnValidate() {
+            base.OnValidate();
             var canvasGroup = GetComponent<CanvasGroup>();
-            canvasGroup.hideFlags = HideFlags.NotEditable;
             if(canvasGroup) {
                 canvasGroup.interactable = interactable;
             }

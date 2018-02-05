@@ -9,9 +9,9 @@ namespace Elarion.UI.Animation {
     [Serializable]
     public partial class UIAnimation : ScriptableObject {
 
-        private const int DefaultAnimationPriority = 10; 
-        
         // TODO animation delay
+        
+        // TODO animation sound
         
         // TODO Animate interface (containing the animate method); maybe add a target field (useful for other scripts)
 
@@ -103,30 +103,19 @@ namespace Elarion.UI.Animation {
         [Space(10)]
         [Header("Advanced Options")]
         [ConditionalVisibility(enableConditions: "_movement == AnimationMovementPreset.Custom")]
-        public bool overrideAnimationPriority = false;
-        
-        [ConditionalVisibility("overrideAnimationPriority", "_movement == AnimationMovementPreset.Custom")]
-        public int animationPriority = DefaultAnimationPriority;
-
-        [ConditionalVisibility(enableConditions: "_movement == AnimationMovementPreset.Custom")]
         public bool overrideParentAnchors = false;
         
         [ConditionalVisibility("overrideParentAnchors", "_movement == AnimationMovementPreset.Custom")]
         public Vector2 overrideParentAnchorMin = new Vector2(0.5f, 0.5f);
         [ConditionalVisibility("overrideParentAnchors", "_movement == AnimationMovementPreset.Custom")]
         public Vector2 overrideParentAnchorMax = new Vector2(0.5f, 0.5f);
+
         
+        // TODO move this to the scripts that call/chain animations - it doesn't need to be here
         [HideInInspector]
         [Tooltip("Save the position after the movement finishes.", order = 0)]
         [ConditionalVisibility("_movement == AnimationMovementPreset.Custom", order = 1)]
         public bool savePosition = false;
-
-
-        private UIAnimationOptions AnimationOptions {
-            get {
-                return new UIAnimationOptions(savePosition, Duration == 0, _customEaseFunction, Duration);
-            }
-        }
         
         public float Duration {
             get {
@@ -148,6 +137,12 @@ namespace Elarion.UI.Animation {
             }
         }
 
+        private UIAnimationOptions AnimationOptions {
+            get {
+                return new UIAnimationOptions(savePosition, Duration == 0, _customEaseFunction, Duration);
+            }
+        }
+        
         public void Animate(UIAnimator animator, Action callback = null) {
             // animation delay?
             
