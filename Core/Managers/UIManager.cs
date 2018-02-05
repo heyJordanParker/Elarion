@@ -1,3 +1,4 @@
+using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using Elarion.Extensions;
@@ -5,6 +6,7 @@ using Elarion.UI;
 using Elarion.UI.Animation;
 using Elarion.Utility;
 using UnityEngine;
+using UnityEngine.Serialization;
 using UnityEngine.UI;
 
 namespace Elarion.Managers {
@@ -24,9 +26,11 @@ namespace Elarion.Managers {
         
         // TODO default animation ease function should be picked the same way as in UIAnimation (enum dropwdown and a custom value)
         
-        public UIScreen initialScreen;
+        [FormerlySerializedAs("initialScreen")]
+        public UIScene initialScene;
 
-        public UIScreen[] uiScreens;
+        [FormerlySerializedAs("uiScreens")]
+        public UIScene[] uiScenes;
 
         public Color transitionBackground = Color.white;
 
@@ -35,25 +39,12 @@ namespace Elarion.Managers {
         // Blur effects can't operate with the main render texture - they need a camera
         private Camera _uiCamera;
 
-        private UIScreen _currentScreen;
+        private UIScene _currentScreen;
 
         private int _lastScreenWidth;
         private int _lastScreenHeight;
 
-        public Canvas MainCanvas {
-            get {
-                if(_mainCanvas == null) {
-                    var transitionCanvasGo = new GameObject("Main Canvas");
-                    transitionCanvasGo.AddComponent<Image>().color = transitionBackground;
-                    _mainCanvas = transitionCanvasGo.AddComponent<Canvas>();
-                    _mainCanvas.renderMode = RenderMode.ScreenSpaceOverlay;
-                    _mainCanvas.transform.SetParent(transform);
-                }
-                return _mainCanvas;
-            }
-        }
-
-        public UIScreen CurrentScreen {
+        public UIScene CurrentScreen {
             get { return _currentScreen; }
             private set {
                 if(_currentScreen != null) {
@@ -67,14 +58,16 @@ namespace Elarion.Managers {
         protected override void Awake() {
             base.Awake();
             _uiCamera = UIHelper.CreateUICamera("Main UI Camera");
-            _uiCamera.transform.SetParent(MainCanvas.transform, false);
-            CurrentScreen = initialScreen;
+            _uiCamera.clearFlags = CameraClearFlags.Color;
+            _uiCamera.backgroundColor = transitionBackground;
+            _uiCamera.transform.SetParent(transform, false);
             CacheScreenSize();
 
-            _uiElements = Tools.FindSceneObjectsOfType<UIElement>();
+//            _uiElements = Tools.FindSceneObjectsOfType<UIElement>();
+            _uiElements = new List<UIComponent>();
 
             // Enable all screens; Some might be disbled to make using the editor easier
-            foreach(var screen in uiScreens) {
+            foreach(var screen in uiScenes) {
                 screen.SetActive(true);
             }
             
@@ -82,14 +75,22 @@ namespace Elarion.Managers {
             // maybe Dict<RectTransform, UIElement> to find parents quickly
         }
 
-        private List<UIElement> _uiElements;
+        protected IEnumerator Start() {
+            yield return null;
+            // wait for a frame
+            CurrentScreen = initialScene;
+        }
+        
+        // those are the top level elements
+        // not sure if they're needed?
+        private List<UIComponent> _uiElements;
 
-        internal void RegisterUIElement(UIElement element) {
-            _uiElements.Add(element);
+        internal void RegisterUIElement(UIComponent component) {
+            _uiElements.Add(component);
         }
 
-        internal void UnregisterUIElement(UIElement element) {
-            _uiElements.Remove(element);
+        internal void UnregisterUIElement(UIComponent component) {
+            _uiElements.Remove(component);
         }
 
         private void CacheScreenSize() {
@@ -97,15 +98,19 @@ namespace Elarion.Managers {
             _lastScreenHeight = Screen.height;
         }
         
+        // TODO move that functionality to the the Open/Close functions of UIElements. This is confusing. 
+        
         // TODO properties to keep track of visible and fullscreen elements; maybe handle making elements fullscreen here (and blur everything else); possibly handle all element state changes here
 
-        public void Open(UIElement uiElement, UIAnimation overrideAnimation = null) {
-            if(uiElement.Visible) {
-                Debug.LogWarning("Trying to open a visible element.", uiElement);
+        public void Open(UIComponent uiComponent, UIAnimation overrideAnimation = null) {
+            if(uiComponent.Opened) {
+                Debug.LogWarning("Trying to open a visible element.", uiComponent);
                 return;
             }
+            
+            // what to do when opening an element that's on another screen - not open it, open it and transfer to the screen?
 
-            var uiScreen = uiElement as UIScreen;
+            var uiScreen = uiComponent as UIScene;
             
             if(uiScreen != null) {
                 uiScreen.Open();
@@ -118,7 +123,7 @@ namespace Elarion.Managers {
                 // ui elements should always live inside another canvas - move it to the main canvas/screen canvas before showing; main canvas during transitions, screen canvas by any other time
 
                 // fullscreen popups and menus
-                if(!uiElement.Fullscreen) {
+                if(!uiComponent.Fullscreen) {
                     // do not blur the rest of the screen
                 } else {
                     // blur all other fullscreen elements
@@ -128,25 +133,25 @@ namespace Elarion.Managers {
             }
         }
 
-        public void Close(UIElement uiElement, UIAnimation overrideAnimation = null) {
-            var uiScreen = uiElement as UIScreen;
+        public void Close(UIComponent uiComponent, UIAnimation overrideAnimation = null) {
+            var uiScreen = uiComponent as UIScene;
             
             if(uiScreen != null) {
                 // this is not logical - remove that
-                Debug.LogWarning("Cannot manually close a UIScreen. If you want an empty UI Open a blank UIScreen instead.");
+                Debug.LogWarning("Cannot manually close a UIScene. If you want an empty UI Open a blank UIScene instead.");
                 return;
             }
             
-            uiElement.Close();   
+            uiComponent.Close();   
         }
 
-        public UIElement testElement;
+        public UIComponent testElement;
         
         public void Update() {
             if(_lastScreenWidth != Screen.width || _lastScreenHeight != Screen.height) {
                 CacheScreenSize();
                 // TODO use a ScreenSizeChanged event; UIElements visible on a specific resolution might use that
-                foreach(var uiScreen in uiScreens) { }
+                foreach(var uiScreen in uiScenes) { }
             }
 
             if(Input.GetKeyDown(KeyCode.U)) {
@@ -158,26 +163,22 @@ namespace Elarion.Managers {
             }
 
             if(Input.GetKeyDown(KeyCode.O)) {
-                if(testElement.Active) {
+                if(testElement.ShouldRender) {
                     testElement.Close();
                 } else {
                     testElement.Open();
                 }
             }
 
-//            if(Input.GetKeyUp(KeyCode.O)) {
-//                element.Animator.Resize(new Vector2(-50, -50));
-//            }
-
             if(Input.GetKeyDown(KeyCode.I)) {
                 testElement.Animator.Fade(0, UIAnimationDirection.From);
             }
             
             if(Input.GetKeyDown(KeyCode.J)) {
-                CurrentScreen = uiScreens.First(s => s != CurrentScreen);
+                CurrentScreen = uiScenes.First(s => s != CurrentScreen);
             }
             if(Input.GetKeyDown(KeyCode.K)) {
-                Open(uiScreens.First(s => s != CurrentScreen));
+                Open(uiScenes.First(s => s != CurrentScreen));
             }
             if(Input.GetKeyDown(KeyCode.L)) { }
         }
@@ -188,7 +189,10 @@ namespace Elarion.Managers {
 
         public static bool showUIHelperObjects = true;
 
-        private void OnValidate() {
+        protected override void OnValidate() {
+            base.OnValidate();
+            
+            
         }
         
         #endif

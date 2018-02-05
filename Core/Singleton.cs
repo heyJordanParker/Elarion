@@ -1,10 +1,22 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using UnityEngine;
 
 namespace Elarion {
     public abstract class Singleton : MonoBehaviour {
-
+        
+        // TODO keep this implementation of singleton and create a second one with the below specifications (rename this to SingletonBehavior)
+        // TODO use [RuntimeInitializeOnLoadMethod] 
+        // TODO create a method that automatically creates singleton instances
+        // TODO create a hidden game object to use for Unity-related functionality (instantiating, updates, coroutines, and so on)
+        // TODO remove the MonoBehavior inheritance
+        // TODO add default Unity method stubs (update, late update, fixed update, ondestroy, create coroutine)
+        // TODO add other method stubs (initialize, deinitialize)
+        // TODO figure out how to pass configuration data to the managers;
+        // Tags to find scene objects?
+        // configuration scriptableobject for static variables?
+        
         private static Dictionary<Type, Singleton> _instances;
 
         private static Dictionary<Type, Singleton> Instances {
@@ -42,5 +54,42 @@ namespace Elarion {
         public static void Cleanup() {
             _instances = null;
         }
+
+        
+        #if UNITY_EDITOR
+        protected virtual void OnValidate() {
+            if(UnityEditor.EditorApplication.isPlayingOrWillChangePlaymode || UnityEditor.SceneManagement.EditorSceneManager.loadedSceneCount == 0) {
+                // loaded scene count is to prevent GetActiveScene from throwing an exception when exiting play mode
+                return;
+            }
+            
+            var scene = UnityEngine.SceneManagement.SceneManager.GetActiveScene();
+
+            var rootGameObjects = scene.GetRootGameObjects();
+
+            var singletons = new List<Singleton> {this};
+
+
+            foreach(var gameObject in rootGameObjects) {
+                var component = gameObject.GetComponent(GetType());
+
+                if(!component) {
+                    component = gameObject.GetComponentInChildren(GetType(), true);
+                }
+
+                if(component == this) {
+                    continue;
+                }
+                
+                if(component != null) {
+                    singletons.Add(component as Singleton);
+                }
+            }
+
+            if(singletons.Count > 1) {
+                Debug.Log("The scene contains multiple instances of the " + GetType().Name + " Singleton.", this);
+            }
+        }
+        #endif
     }
 }

@@ -73,14 +73,16 @@ namespace Elarion.Editor {
             var savePath = AssetDatabase.GenerateUniqueAssetPath(path);
             AssetDatabase.CreateAsset(savedObject, savePath);
             Selection.activeObject = savedObject;
+            
+            Undo.RegisterCreatedObjectUndo(savedObject, "Creating " + name);
+            
             return savedObject as T;
         }
 
-        public static T Create<T>() where T : MonoBehaviour {
+        public static T Create<T>(bool createAtSelection = true, string layer = null) where T : MonoBehaviour {
             var niceTypeName = ObjectNames.NicifyVariableName(typeof(T).Name);
             
             if(typeof(T).IsSubclassOf(typeof(Singleton))) {
-                
                 var scene = UnityEngine.SceneManagement.SceneManager.GetActiveScene();
 
                 var rootGameObjects = scene.GetRootGameObjects();
@@ -95,14 +97,23 @@ namespace Elarion.Editor {
             
             var go = new GameObject("New " + niceTypeName);
 
-            if(Selection.activeGameObject != null) {
-                go.transform.SetParent(Selection.activeGameObject.transform);
-                go.transform.Reset();
-                go.layer = Selection.activeGameObject.layer;
+            if(createAtSelection) {
+                if(Selection.activeGameObject != null) {
+                    go.transform.SetParent(Selection.activeGameObject.transform);
+                    go.transform.Reset();
+                    go.layer = Selection.activeGameObject.layer;
+                }
             }
+
+            if(layer != null) {
+                go.layer = LayerMask.NameToLayer(layer);
+            }
+            
             var behavior = go.AddComponent<T>();
 
             Selection.activeGameObject = go;
+            
+            Undo.RegisterCreatedObjectUndo(go, "Creating " + niceTypeName);
             
             return behavior;
         }

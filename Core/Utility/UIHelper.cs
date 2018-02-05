@@ -19,7 +19,7 @@ namespace Elarion.Utility {
             canvas.overrideSorting = true;
 
             transform = canvas.gameObject.GetComponent<RectTransform>();
-            
+
             return canvas;
         }
         
@@ -33,21 +33,30 @@ namespace Elarion.Utility {
             var image = CreateOverlayImage(name, parent);
             image.sprite = Resources.Load<Sprite>(ShadowImagePath);
             image.type = Image.Type.Sliced;
-            image.rectTransform.offsetMax = new Vector2(-ShadowImageOffset, -ShadowImageOffset);
-            image.rectTransform.offsetMin = new Vector2(ShadowImageOffset, ShadowImageOffset);
             image.fillCenter = false;
+            ResetShadowImage(image);
             return image;
         }
         
         public static Image CreateOverlayImage(string name = null, Transform parent = null) {
             var image = CreateGO(name, parent).AddComponent<Image>();
+            ResetOverlayImage(image);
+            image.transform.SetAsLastSibling();
+            image.raycastTarget = false;
+            return image;
+        }
+
+        public static void ResetOverlayImage(Image image) {
             image.rectTransform.anchorMin = Vector2.zero;
             image.rectTransform.anchorMax = Vector2.one;
             image.rectTransform.offsetMin = Vector2.zero;
             image.rectTransform.offsetMax = Vector2.zero;
-            image.raycastTarget = false;
-            image.transform.SetAsLastSibling();
-            return image;
+        }
+
+        public static void ResetShadowImage(Image image) {
+            ResetOverlayImage(image);
+            image.rectTransform.offsetMax = new Vector2(-ShadowImageOffset, -ShadowImageOffset);
+            image.rectTransform.offsetMin = new Vector2(ShadowImageOffset, ShadowImageOffset);
         }
 
         public static RenderTexture CreateRendureTexture(int width, int height) {
@@ -84,11 +93,11 @@ namespace Elarion.Utility {
         }
 
         public static void SetBlurIntensity(this Image blurImage, float intensity) {
-            if(Math.Abs(blurImage.material.GetFloat("_Radius") - intensity) < Mathf.Epsilon) {
+            if(Math.Abs(blurImage.materialForRendering.GetFloat("_Radius") - intensity) < Mathf.Epsilon) {
                 return;
             }
             
-            blurImage.material.SetFloat("_Radius", intensity);
+            blurImage.materialForRendering.SetFloat("_Radius", intensity);
         }
 
         public static Canvas CreateCanvas(string name = null, Transform parent = null) {

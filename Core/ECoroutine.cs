@@ -16,7 +16,6 @@ namespace Elarion {
 
         private readonly MonoBehaviour _owner;
         private readonly IEnumerator _routine;
-        private readonly bool _pauseOnInactive;
         private bool _finished;
 
         private GameObject GameObject {
@@ -27,10 +26,9 @@ namespace Elarion {
         public bool Running { get; private set; }
         public bool Paused { get; set; }
 
-        public ECoroutine(IEnumerator routine, MonoBehaviour owner, bool autoStart = true, bool pauseOnInactive = true) {
+        public ECoroutine(IEnumerator routine, MonoBehaviour owner, bool autoStart = true) {
             _routine = routine;
             _owner = owner;
-            _pauseOnInactive = pauseOnInactive;
             _finished = false;
             
             if(autoStart) {
@@ -59,7 +57,7 @@ namespace Elarion {
             while(Running) {
                 if(GameObject == null)
                     yield break;
-                if(Paused || (_pauseOnInactive && !GameObject.activeInHierarchy))
+                if(Paused)
                     yield return null;
                 else {
                     object result;

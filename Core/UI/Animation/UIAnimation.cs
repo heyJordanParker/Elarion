@@ -1,37 +1,38 @@
 using System;
+using System.Diagnostics;
 using Elarion.Attributes;
 using UnityEngine;
 
 namespace Elarion.UI.Animation {
 
-    // Animations modify the properties of an object
+    // Animations modify the properties of an object. They're used to move one or more properties from point A to point B.
     [Serializable]
     public partial class UIAnimation : ScriptableObject {
 
         private const int DefaultAnimationPriority = 10; 
         
-        // TODO slides have a higher animation priority than fades
-        
         // TODO animation delay
         
         // TODO Animate interface (containing the animate method); maybe add a target field (useful for other scripts)
 
-        // old
-        [HideInInspector]
-        public UITransitionType type = UITransitionType.AplhaFade;
-
-        // old
-        [HideInInspector]
-        public SlideDirection slideDirection = SlideDirection.Left;
-
+        #region PresetConfiguration
+        
+        #if UNITY_EDITOR
         [Header("Animation Configuration")]
         [SerializeField]
         private AnimationMovementPreset _movement = AnimationMovementPreset.NoMovement;
+        #endif
+        
         [SerializeField]
         [ConditionalVisibility("_movement != AnimationMovementPreset.NoMovement || AnimationMovementPreset.Custom")]
         private AnimationPresetDirection _movementDirection = AnimationPresetDirection.From;
+        
+        #if UNITY_EDITOR
         [SerializeField]
         private AnimationFadePreset _fade = AnimationFadePreset.FadeIn;
+        #endif
+        
+        #endregion 
         
         [Space(10)]
         [SerializeField]
@@ -47,8 +48,6 @@ namespace Elarion.UI.Animation {
         [SerializeField, ConditionalVisibility(
              "_easeFunction == UIAnimationEase.Custom")]
         private Ease _customEaseFunction = Ease.Linear;
-
-        // effects?
 
         [Header("Movement Options")]
         [ConditionalVisibility(enableConditions: "_movement == AnimationMovementPreset.Custom")]
@@ -150,7 +149,6 @@ namespace Elarion.UI.Animation {
         }
 
         public void Animate(UIAnimator animator, Action callback = null) {
-            // maybe animate to saved position?
             // animation delay?
             
             Action syncedCallback = null;

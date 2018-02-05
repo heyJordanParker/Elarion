@@ -2,7 +2,6 @@
 
 namespace Elarion.Extensions {
     public static class RectTransformExtensions {
-
         public static bool IsInside(this RectTransform transform, RectTransform container) {
             var screenTransform = transform.ToScreenSpace();
             var screenContainer = container.ToScreenSpace();
@@ -18,7 +17,8 @@ namespace Elarion.Extensions {
             return rect;
         }
 
-        public static void CopyPosition(this RectTransform toTransform, RectTransform fromTransform, bool copySize = false) {
+        public static void CopyPosition(this RectTransform toTransform, RectTransform fromTransform,
+            bool copySize = false) {
 
             toTransform.position = fromTransform.position;
 
@@ -28,7 +28,18 @@ namespace Elarion.Extensions {
         }
 
         public static void CopySize(this RectTransform toTransform, RectTransform fromTransform) {
-            toTransform.sizeDelta = fromTransform.GetComponent<RectTransform>().sizeDelta * fromTransform.lossyScale.magnitude / toTransform.lossyScale.magnitude;
+            toTransform.sizeDelta = fromTransform.GetComponent<RectTransform>().sizeDelta *
+                                    fromTransform.lossyScale.magnitude / toTransform.lossyScale.magnitude;
+        }
+
+        public static void SetPivot(this RectTransform rectTransform, Vector2 pivot) {
+            var size = rectTransform.rect.size;
+            var scale = rectTransform.localScale;
+            var deltaPivot = rectTransform.pivot - pivot;
+            var deltaPosition = new Vector3(deltaPivot.x * size.x * scale.x, deltaPivot.y * size.y * scale.y);
+            
+            rectTransform.pivot = pivot;
+            rectTransform.localPosition -= deltaPosition;
         }
     }
 }

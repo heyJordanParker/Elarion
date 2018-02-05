@@ -1,18 +1,23 @@
 using System;
+using System.Linq;
 using Elarion.Attributes;
 using Elarion.Managers;
 using Elarion.Utility;
-using Elarion.Utility.PropertyTweeners.CanvasGroup;
 using Elarion.Utility.PropertyTweeners.RectTransform;
+using Elarion.Utility.PropertyTweeners.UIComponent;
 using UnityEngine;
+using UnityEngine.SceneManagement;
+using UnityEngine.UI;
 
 namespace Elarion.UI.Animation {
-    // TODO decouple this from the UIElement
+    // TODO add effects here; duplicate the animation editor for them but use state dropdown + effect
+    
+    // TODO handle state effects & animation effects
     
     // TODO log a warning if two animations are of the same type
     
-    [RequireComponent(typeof(UIElement))]
-    public class UIAnimator : BasicUIElement {
+    [RequireComponent(typeof(UIComponent))]
+    public class UIAnimator : MonoBehaviour {
 
         [Serializable]
         public class TypedAnimation {
@@ -26,7 +31,7 @@ namespace Elarion.UI.Animation {
             new TypedAnimation {type = UIAnimationType.OnClose}, 
         };
 
-        private UIElement _target;
+        private UIComponent _target;
 
         [SerializeField, ReadOnly]
         private UIAnimation _currentAnimation = null;
@@ -41,11 +46,20 @@ namespace Elarion.UI.Animation {
         private AlphaTweener _alphaTweener;
         
         private RectTransform _targetParent;
+        
+        public UIComponent Target {
+            get {
+                if(_target == null) {
+                    _target = GetComponent<UIComponent>();
+                }
+                return _target;
+            }
+        }
 
         internal PositionTweener PositionTweener {
             get {
                 if(_positionTweener == null) {
-                    _positionTweener = new PositionTweener(this) {Target = _target.Transform};
+                    _positionTweener = new PositionTweener(this) {Target = Target.Transform};
                 }
 
                 return _positionTweener;
@@ -55,7 +69,7 @@ namespace Elarion.UI.Animation {
         internal AnchorsTweener AnchorsTweener {
             get {
                 if(_anchorsTweener == null) {
-                    _anchorsTweener = new AnchorsTweener(this) {Target = _target.Transform};
+                    _anchorsTweener = new AnchorsTweener(this) {Target = Target.Transform};
                 }
 
                 return _anchorsTweener;
@@ -65,7 +79,7 @@ namespace Elarion.UI.Animation {
         internal RotationTweener RotationTweener {
             get {
                 if(_rotationTweener == null) {
-                    _rotationTweener = new RotationTweener(this) {Target = _target.Transform};
+                    _rotationTweener = new RotationTweener(this) {Target = Target.Transform};
                 }
 
                 return _rotationTweener;
@@ -75,7 +89,7 @@ namespace Elarion.UI.Animation {
         internal SizeTweener SizeTweener {
             get {
                 if(_sizeTweener == null) {
-                    _sizeTweener = new SizeTweener(this) {Target = _target.Transform};
+                    _sizeTweener = new SizeTweener(this) {Target = Target.Transform};
                 }
 
                 return _sizeTweener;
@@ -86,7 +100,7 @@ namespace Elarion.UI.Animation {
         internal AlphaTweener AlphaTweener {
             get {
                 if(_alphaTweener == null) {
-                    _alphaTweener = new AlphaTweener(this) {Target = _target.CanvasGroup};
+                    _alphaTweener = new AlphaTweener(this) {Target = Target};
                 }
 
                 return _alphaTweener;
@@ -100,13 +114,6 @@ namespace Elarion.UI.Animation {
             }
         }
 
-
-        protected override void Awake() {
-            base.Awake();
-            _target = GetComponent<UIElement>();
-            _currentAnimation = null;
-        }
-
         protected virtual void OnAnimationStart(UIAnimation animation) {
             
             // TODO concurrent animations; hover & click at the same time
@@ -116,22 +123,27 @@ namespace Elarion.UI.Animation {
             }
             
             if(_canvas == null) {
-                _canvas = UIHelper.CreateAnimatorCanvas(out _canvasTransform, "Animator Canvas", transform);
+                _canvas = UIHelper.CreateAnimatorCanvas(out _canvasTransform, Target.gameObject.name + " (Animator Canvas)", transform);
             }
 
             _currentAnimation = animation;
             
-            if(_target.Transform.parent != _canvasTransform)
-                _targetParent = _target.Transform.parent.GetComponent<RectTransform>();
+            if(Target.Transform.parent != _canvasTransform)
+                if(Target.Transform.parent)
+                    _targetParent = Target.Transform.parent.GetComponent<RectTransform>();
+                else
+                    _targetParent = null;
 
             _canvasTransform.SetParent(_targetParent, false);
-            _canvasTransform.pivot = _target.Transform.pivot;
+            _canvasTransform.SetSiblingIndex(Target.Transform.GetSiblingIndex());
+            _canvasTransform.pivot = Target.Transform.pivot;
 
             _canvasTransform.anchorMin = new Vector2(AnchorsTweener.SavedValue.x, AnchorsTweener.SavedValue.y);
             _canvasTransform.anchorMax = new Vector2(AnchorsTweener.SavedValue.z, AnchorsTweener.SavedValue.w);
             
             _canvasTransform.anchoredPosition = PositionTweener.SavedValue;
             _canvasTransform.sizeDelta = SizeTweener.SavedValue;
+            _canvasTransform.localScale = Target.Transform.localScale;
             
             if(animation.overrideParentAnchors) {
                 var cachedPosition = _canvasTransform.position;
@@ -146,18 +158,19 @@ namespace Elarion.UI.Animation {
                     _canvasTransform.rect.height + (cachedHeight - _canvasTransform.rect.height));
             }
 
-            _canvas.sortingOrder = animation.animationPriority;
+            // make open animations a tiny bit more important
+            var isOpenAnimation = _animations.SingleOrDefault(t => t.type == UIAnimationType.OnOpen && t.animation == animation) != null ? 1 : 0;
+            
+            _canvas.sortingOrder = animation.animationPriority + isOpenAnimation;
+            _canvas.overrideSorting = Target.Parent == null;
 
-            _target.Transform.SetParent(_canvasTransform, true);
+            Target.Transform.SetParent(_canvasTransform, true);
 
         }
 
-        
-        // TODO tweeners should have their callbacks synchronized
-        // Currently they're calling the callback function multiple times
-        // Also, if one tweener is stopped - others continue running
         protected virtual void OnAnimationEnd(UIAnimation animation) {
-            _target.Transform.SetParent(_targetParent, true);
+            Target.Transform.SetParent(_targetParent, true);
+            Target.Transform.SetSiblingIndex(_canvasTransform.GetSiblingIndex());
 
             _currentAnimation = null;
         }
@@ -269,9 +282,55 @@ namespace Elarion.UI.Animation {
             SizeTweener.ResetProperty();
             AlphaTweener.ResetProperty();
         }
+        
+        public void ResetToSavedPropertiesGraceful() {
+            PositionTweener.ResetPropertyGraceful();
+            AnchorsTweener.ResetPropertyGraceful();
+            RotationTweener.ResetPropertyGraceful();
+            SizeTweener.ResetPropertyGraceful();
+            AlphaTweener.ResetPropertyGraceful();
+        }
 
         protected static UIManager UIManager {
             get { return Singleton.Get<UIManager>(); }
         }
+
+#if UNITY_EDITOR
+
+        // Editor-only helper field/logic to add a mask to the game object
+        [Tooltip("Prevents child animations from overflowing.")]
+        public bool maskChildAnimations = false;
+        
+        private void OnValidate() {
+            if(UnityEditor.EditorApplication.isPlayingOrWillChangePlaymode) {
+                return;
+            }
+            
+            if(maskChildAnimations) {
+                if(gameObject.GetComponent<Mask>()) {
+                    return;
+                }
+                
+                gameObject.AddComponent<Mask>();
+                
+                if(!gameObject.GetComponent<Graphic>()) {
+                    var image = gameObject.AddComponent<Image>();
+                    image.color = new Color(1, 1, 1, 0);
+                }
+            } else {
+                if(!gameObject.GetComponent<Mask>()) {
+                    return;
+                }
+
+                UnityEditor.EditorApplication.delayCall += () => {
+                    UnityEditor.SceneManagement.EditorSceneManager.MarkSceneDirty(SceneManager.GetActiveScene());
+                    DestroyImmediate(gameObject.GetComponent<Mask>());
+                };
+                
+            }
+            
+        }
+
+#endif
     }
 }

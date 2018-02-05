@@ -99,6 +99,10 @@ namespace Elarion.Utility.PropertyTweeners {
         public void ResetProperty() {
             StopTween(true);
         }
+
+        public void ResetPropertyGraceful(float duration = 0.3f) {
+            Tween(SavedValue, UIAnimationDirection.To, ResetProperty, new UIAnimationOptions(duration: duration));
+        }
         
         protected IEnumerator TweenCoroutine(Ease ease, float duration) {
             var movementProgress = 0.0f;

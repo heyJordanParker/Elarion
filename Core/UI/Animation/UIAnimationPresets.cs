@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using UnityEngine;
 
 namespace Elarion.UI.Animation {
@@ -70,7 +71,7 @@ namespace Elarion.UI.Animation {
 
             return UIAnimationDirection.RelativeFrom;
         }
-
+        
         #if UNITY_EDITOR
         private void OnValidate() {
             if(MovementPresets.ContainsKey(_movement)) {
