@@ -84,12 +84,6 @@ namespace Elarion.Utility {
             var layout = gameObject.AddComponent<LayoutElement>();
             layout.ignoreLayout = true;
             
-            #if UNITY_EDITOR
-            if(!UIManager.showUIHelperObjects) {
-                gameObject.hideFlags = HideFlags.HideInHierarchy;
-            }
-            #endif
-
             return gameObject;
         }
 

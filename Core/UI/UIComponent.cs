@@ -11,15 +11,19 @@ using UnityEngine.UI;
 
 namespace Elarion.UI {
 
+    public interface IUIHierarchyMember {
+        
+    }
+
     [RequireComponent(typeof(RectTransform))]
-    public abstract class UIComponent : UIBehaviour {
+    public abstract class UIComponent : UIBehaviour, IUIHierarchyMember {
         
         // TODO visibility options (in another component) - mobile only, landscape only, portrait only, desktop only etc
         // TODO visibility options (screen/parent size based - use the OnParentChanged thing)
         // TODO visibility options component can work with a manually-settable Hidden flag (no enabling/disabling conflicts)
         // TODO make sure the visibility options component can be attached to a UIRoot in addition to any UIComponent
         
-        // TODO hide/lock the canvas, canvas group, and other components the user shouldn't modify (follow the UIManager's hide configuration though); HideFlags/Custom Editors?
+        // TODO hide/lock the canvas, canvas group, and other components the user shouldn't modify; HideFlags/Custom Editors?
         
         public event Action OnStateChanged = () => { };
 
@@ -33,17 +37,14 @@ namespace Elarion.UI {
         
         private UIState _oldState;
         private UIState _state;
-        private UIComponent _parent;
-        
+
         public RectTransform Transform { get; private set; }
         
-        public UIComponent Parent {
-            get { return _parent; }
-        }
-        
-        protected List<UIComponent> ChildElements {
+        public UIBehaviour Parent { get; protected set; }
+
+        protected IEnumerable<UIComponent> ChildElements {
             get {
-                return UIComponentCache.Where(component => component.Parent == this).ToList();
+                return UIComponentCache.Where(component => component.Parent == this);
             }
         }
         
@@ -110,10 +111,9 @@ namespace Elarion.UI {
             UIComponentCache.Add(this);
         }
 
-        protected override void Start() {
-            base.Start();
+        protected override void OnEnable() {
+            base.OnEnable();
             
-            // calculate the parent component after all components were registered in the cache (in Awake)
             UpdateParent();
         }
 
@@ -127,19 +127,21 @@ namespace Elarion.UI {
                 return;
             }
 
+            if(!gameObject.activeSelf) {
+                gameObject.SetActive(true);
+            }
+            
+            // TODO register opens/closes in a static stack for undo functionality
+
             if(renderOnTop) {
                 Transform.SetAsLastSibling();
             }
 
             Opened = true;
             
-            // TODO create a UIRoot class to be the topmost parent of any UI Hierarchy (one per scene). This will simplify the parenting and remove the weird if/then cases and conditional registration to the UIManager. Register the UIRoot in the UIManager (just set one UIManager Property from the UIRoot Awake)
-            // TODO test what will happen with multiple UIRoots (allow them if it isn't an issue)
-            
-            // UIRoot -> Scenes/Panels/Elements -> Panels/Elements
-            
             // TODO Handle focus - focus this element and unfocus every other child in the parent element (same hierarchical level)
             // Parent.Focus(this); Parent.Focus(null) should also be valid
+            // TODO unfocus all other parent children (cache them in an array), focus this object (Focused = true), add all unfocused children to a OnClose callback (one-time)
             
             foreach(var child in ChildElements) {
                 child.Open(resetToSavedProperties, skipAnimation);
@@ -161,7 +163,7 @@ namespace Elarion.UI {
             animator.Play(UIAnimationType.OnOpen);
         }
 
-        public void Close(bool skipAnimation = false, bool unfocus = false, UIAnimation overrideAnimation = null) {
+        public void Close(bool skipAnimation = false, UIAnimation overrideAnimation = null) {
             if(!Opened) {
                 return;
             }
@@ -231,15 +233,24 @@ namespace Elarion.UI {
                 childElement.OnStateChanged -= UpdateChildState;
             }
             
-            var parentElements = GetComponentsInParent<UIComponent>(includeInactive: true);
+            var parentComponents = GetComponentsInParent<UIComponent>(includeInactive: true);
 
-            if(parentElements == null || parentElements.Length < 2) {
-                _parent = null;
-                return;
+            if(parentComponents == null || parentComponents.Length < 2) {
+
+                var parentRoot = GetComponentInParent<UIRoot>();
+
+                if(parentRoot == null) {
+                    Debug.LogWarning("UIComponents must have a UIRoot in the parent hierarchy; Disabling.", gameObject);
+                    gameObject.SetActive(false);
+                    Parent = null;
+                    return;
+                }
+                
+                Parent = parentRoot;
+            } else {
+                // GetComponentsInParent operates recursively - the first member is this object, the second is the first parent with the component
+                Parent = parentComponents[1];
             }
-
-            // GetComponentsInParent operates recursively - the first member is this object, the second is the first parent with the component
-            _parent = parentElements[1];
             
             foreach(var childElement in ChildElements) {
                 childElement.OnStateChanged += UpdateChildState;
@@ -253,6 +264,7 @@ namespace Elarion.UI {
         protected virtual void OnTransformChildrenChanged() { }
 
         protected override void OnValidate() {
+            UpdateParent();
             // TODO make sure this lives under a UIScene (what about popups?)
             
             // TODO create UI Manager if missing; Trigger it to create the UI Canvas; Make this a child to the UI Canvas if it's the topmost canvas (too rigid?)
@@ -261,7 +273,7 @@ namespace Elarion.UI {
                 
         private static List<UIComponent> _uiComponentCache;
 
-        private static List<UIComponent> UIComponentCache {
+        protected static List<UIComponent> UIComponentCache {
             get {
                 if(_uiComponentCache == null) {
                     _uiComponentCache = new List<UIComponent>();
@@ -270,10 +282,5 @@ namespace Elarion.UI {
                 return _uiComponentCache;
             }
         }
-                
-        protected static UIManager UIManager {
-            get { return Singleton.Get<UIManager>(); }
-        }
-        
     }
 }

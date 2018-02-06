@@ -285,10 +285,6 @@ namespace Elarion.UI.Animation {
             AlphaTweener.ResetPropertyGraceful();
         }
 
-        protected static UIManager UIManager {
-            get { return Singleton.Get<UIManager>(); }
-        }
-
 #if UNITY_EDITOR
 
         // Editor-only helper field/logic to add a mask to the game object

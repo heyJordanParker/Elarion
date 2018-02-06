@@ -91,7 +91,7 @@ namespace Elarion.UI {
                 switch(type) {
                     case UIEffectType.Blur: {
                         if(Blur == null) {
-                            Blur = UIHelper.CreateBlurImage("Blur Effect", UIManager.transform);
+                            Blur = UIHelper.CreateBlurImage("Blur Effect");
                             Blur.enabled = false;
                         }
                         UIHelper.ResetOverlayImage(Blur);
@@ -101,7 +101,7 @@ namespace Elarion.UI {
                     }
                     case UIEffectType.Shadow: {
                         if(Shadow == null) {
-                            Shadow = UIHelper.CreateShadowImage("Shadow Effect", UIManager.transform);
+                            Shadow = UIHelper.CreateShadowImage("Shadow Effect");
                             Shadow.enabled = false;
                         }
                         UIHelper.ResetShadowImage(Shadow);
@@ -111,7 +111,7 @@ namespace Elarion.UI {
                     }
                     case UIEffectType.Overlay: {
                         if(ColorOverlay == null) {
-                            ColorOverlay = UIHelper.CreateOverlayImage("Color Overlay Effect", UIManager.transform);
+                            ColorOverlay = UIHelper.CreateOverlayImage("Color Overlay Effect");
                             ColorOverlay.enabled = false;
                         }
                         UIHelper.ResetOverlayImage(ColorOverlay);
@@ -196,10 +196,6 @@ namespace Elarion.UI {
                 default:
                     goto case UIEffectType.Blur;
             }
-        }
-
-        private static UIManager UIManager {
-            get { return Singleton.Get<UIManager>(); }
         }
     }
 }
