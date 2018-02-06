@@ -264,6 +264,7 @@ namespace Elarion.UI {
         protected virtual void OnTransformChildrenChanged() { }
 
         protected override void OnValidate() {
+            base.OnValidate();
             UpdateParent();
             // TODO make sure this lives under a UIScene (what about popups?)
             

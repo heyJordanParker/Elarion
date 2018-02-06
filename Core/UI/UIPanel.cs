@@ -24,8 +24,6 @@ namespace Elarion.UI {
         protected override void Awake() {
             base.Awake();
             canvas = GetComponent<Canvas>();
-            canvas.enabled = false;
-            
             canvasGroup = GetComponent<CanvasGroup>();
         }
         

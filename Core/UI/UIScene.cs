@@ -18,6 +18,7 @@ namespace Elarion.UI {
         
         protected override void Awake() {
             base.Awake();
+            canvas.enabled = false;
             Fullscreen = true;
         }
 
