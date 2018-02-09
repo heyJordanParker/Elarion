@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using Elarion.Attributes;
 using Elarion.Extensions;
 using Elarion.Managers;
 using Elarion.UI.Animation;
@@ -11,12 +12,8 @@ using UnityEngine.UI;
 
 namespace Elarion.UI {
 
-    public interface IUIHierarchyMember {
-        
-    }
-
     [RequireComponent(typeof(RectTransform))]
-    public abstract class UIComponent : UIBehaviour, IUIHierarchyMember {
+    public abstract class UIComponent : UIBehaviour {
         
         // TODO visibility options (in another component) - mobile only, landscape only, portrait only, desktop only etc
         // TODO visibility options (screen/parent size based - use the OnParentChanged thing)
@@ -37,6 +34,8 @@ namespace Elarion.UI {
         
         private UIState _oldState;
         private UIState _state;
+
+        private bool _initialized;
 
         public RectTransform Transform { get; private set; }
         
@@ -72,11 +71,6 @@ namespace Elarion.UI {
             set { State = State.SetFlag(UIState.Opened, value); }
         }
         
-        public bool Fullscreen {
-            get { return State.HasFlag(UIState.Fullscreen); }
-            set { State = State.SetFlag(UIState.Fullscreen, value); }
-        }
-        
         public bool Disabled {
             get { return State.HasFlag(UIState.Disabled); }
             set { State = State.SetFlag(UIState.Disabled, value); }
@@ -103,18 +97,41 @@ namespace Elarion.UI {
         protected override void Awake() {
             base.Awake();
             Transform = GetComponent<RectTransform>();
-
-            _oldState = _state = UIState.NotInitialized;
-            
             animator = GetComponent<UIAnimator>();
             
+            // test
+            _initialized = true;
+            
             UIComponentCache.Add(this);
+        }
+
+        protected override void Start() {
+            // this is to prevent OnEnable functions from calling the Open method when the scene loads 
+            _initialized = true;
         }
 
         protected override void OnEnable() {
             base.OnEnable();
             
             UpdateParent();
+
+            if(!gameObject.activeInHierarchy || !_initialized) {
+                return;
+            }
+            
+            Open(focus: false, skipAnimation: true);
+        }
+
+        protected override void OnDisable() {
+            base.OnDisable();
+            
+            ActiveChild = false;
+            
+            if(Opened) {
+                Close(skipAnimation: true);
+            }
+            
+            UpdateState();
         }
 
         protected override void OnDestroy() {
@@ -122,14 +139,24 @@ namespace Elarion.UI {
             UIComponentCache.Remove(this);
         }
 
-        public void Open(bool resetToSavedProperties = true, bool focus = false, bool skipAnimation = false, UIAnimation overrideAnimation = null, bool renderOnTop = true) {
+        public void Open(bool resetToSavedProperties = true, bool focus = false, bool skipAnimation = false, UIAnimation overrideAnimation = null, bool renderOnTop = true, bool autoEnable = true) {
+            if(!autoEnable && !gameObject.activeSelf) {
+                // don't open disabled objects if we're not intending to enable them
+                return;
+            }
+            
             if(Opened) {
                 return;
             }
-
-            if(!gameObject.activeSelf) {
+            
+            Opened = true;
+            
+            if(!gameObject.activeSelf && autoEnable) {
+                // this calls OnEnable which calls the Open method which instantly returns because Opened == true 
                 gameObject.SetActive(true);
             }
+            
+            // TODO enable parents & open them; that'll even change the scene if an element from another scene gets opened 
             
             // TODO register opens/closes in a static stack for undo functionality
 
@@ -137,14 +164,12 @@ namespace Elarion.UI {
                 Transform.SetAsLastSibling();
             }
 
-            Opened = true;
-            
             // TODO Handle focus - focus this element and unfocus every other child in the parent element (same hierarchical level)
             // Parent.Focus(this); Parent.Focus(null) should also be valid
             // TODO unfocus all other parent children (cache them in an array), focus this object (Focused = true), add all unfocused children to a OnClose callback (one-time)
             
             foreach(var child in ChildElements) {
-                child.Open(resetToSavedProperties, skipAnimation);
+                child.Open(resetToSavedProperties: resetToSavedProperties, skipAnimation: skipAnimation, autoEnable: false);
             }
             
             if(animator == null || skipAnimation) {
@@ -172,7 +197,7 @@ namespace Elarion.UI {
 
 
             foreach(var child in ChildElements) {
-                child.Close(skipAnimation);
+                child.Close(skipAnimation: skipAnimation);
             }
             
             if(animator == null || skipAnimation) {
@@ -188,19 +213,16 @@ namespace Elarion.UI {
         }
 
         protected virtual void Update() {
+            UpdateState(); 
+        }
+
+        private void UpdateState() {
             if(animator != null) {
                 InTransition = animator.Animating;
             }
 
             Disabled = !Interactable;
-
-            // Update the state only once per frame
-            if(_oldState != _state) {
-                UpdateState(); 
-            }
-        }
-
-        private void UpdateState() {
+            
             if(_state == _oldState) {
                 return;
             }
@@ -240,6 +262,10 @@ namespace Elarion.UI {
                 var parentRoot = GetComponentInParent<UIRoot>();
 
                 if(parentRoot == null) {
+                    if(!gameObject.activeInHierarchy) {
+                        return;
+                    }
+                    
                     Debug.LogWarning("UIComponents must have a UIRoot in the parent hierarchy; Disabling.", gameObject);
                     gameObject.SetActive(false);
                     Parent = null;
@@ -271,7 +297,7 @@ namespace Elarion.UI {
             // TODO create UI Manager if missing; Trigger it to create the UI Canvas; Make this a child to the UI Canvas if it's the topmost canvas (too rigid?)
 
         }
-                
+        
         private static List<UIComponent> _uiComponentCache;
 
         protected static List<UIComponent> UIComponentCache {

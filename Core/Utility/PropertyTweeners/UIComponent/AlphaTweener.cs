@@ -2,6 +2,11 @@
 using UnityEngine;
 
 namespace Elarion.Utility.PropertyTweeners.UIComponent {
+    // TODO make this a GameObject property tweener (make all the tweeners work with a GO)
+    // TODO automatically cache the proper component needed for tweening in the constructor
+    // TODO try getting a canvasgroup and if that's not present, a Graphic to perform the tweening on
+    // think of an interface to simplify the couple of proxy methods that have 6-7 tweener calls in the UIAnimator
+    
     public class AlphaTweener : PropertyTweener<float, UI.UIComponent> {
         
         public AlphaTweener(MonoBehaviour owner) : base(owner) { }

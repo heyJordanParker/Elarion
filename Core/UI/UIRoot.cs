@@ -4,21 +4,26 @@ using Elarion.UI.Animation;
 using Elarion.Utility;
 using UnityEngine;
 using UnityEngine.EventSystems;
+using UnityEngine.Serialization;
 using UnityEngine.UI;
 
 namespace Elarion.UI {
     // TODO add canvas scaler when creating presets
     // TODO use this (as the converging and final point of the UI hierarchy) to handle the blur; when a UI element Opens, all other elements on the same hierarchical level can blur (optional open/close parameter); maybe blur by default, but only when calling Open manually (not when it's called automagically in the children components)
     
-    // TODO with the same hierarchical level thing, the fullscreen property will most likely be unnecessary
-    // TODO remove the fullscreen property
     // TODO add a fullscreen checkbox to panels (to easily set them to cover the full screen (only in editor.onValidate))
+    
+    // TODO remove this component 
+    // TODO move the initial scene (as a boolean) to the scene class (make sure just one scene is the initialScene in OnValidate())
+    // TODO Use a Canvas reference to reference the root objects' parent
+    // TODO create the root camera (rename to Blur Camera) in the EditorMenu scripts or lazy load it in the Effects class if it doesn't exist)
     [RequireComponent(typeof(Canvas))]
     [RequireComponent(typeof(GraphicRaycaster))] // to propagate input events
     public class UIRoot : UIBehaviour {
 
         [SerializeField]
-        private UIScene _initialScene;
+        [FormerlySerializedAs("_initialScene")]
+        public UIScene initialScene;
         
         private UIScene _currentScene;
 
@@ -48,15 +53,27 @@ namespace Elarion.UI {
         protected override void Start() {
             base.Start();
 
-            if(!_initialScene) {
-                _initialScene = GetComponentInChildren<UIScene>();
+            var scenes = GetComponentsInChildren<UIScene>();
+
+            if(!initialScene) {
+                initialScene = scenes.Length > 0 ? scenes[0] : null;
+            }
+
+            // TODO this shouldn't be necessary when UIScenes automatically set themselves as the CurrentScene
+            foreach(var scene in scenes) {
+                if(scene == initialScene) {
+                    continue;
+                }
+                
+                scene.Close(skipAnimation: true);
             }
             
-            CurrentScene = _initialScene;
+            CurrentScene = initialScene;
         }
 
         protected override void OnValidate() {
             base.OnValidate();
+            
             var animator = GetComponent<UIAnimator>();
             if(animator) {
                 Debug.LogWarning("UIRoot objects cannot be animated. Deleting Animator component.", this);

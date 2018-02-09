@@ -18,13 +18,19 @@ namespace Elarion.UI {
         
         protected override void Awake() {
             base.Awake();
-            canvas.enabled = false;
-            Fullscreen = true;
+//            canvas.enabled = false;
         }
+        
+        // TODO When opening set this to the CurrentScene and close all other opened scenes in the parent (UIRoot)
 
         protected override void OnValidate() {
             base.OnValidate();
+
+            var rectTransform = transform as RectTransform;
             
+            rectTransform.anchorMin = Vector2.zero;
+            rectTransform.anchorMax = Vector2.one;
+            rectTransform.sizeDelta = Vector2.zero;
             // TODO find the UIRoot in the parent hierarchy and make sure it's set to the Parent property; if it isn't - change the transform's parent to the UIRoot
             
         }

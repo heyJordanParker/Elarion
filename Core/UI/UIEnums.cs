@@ -50,13 +50,12 @@ namespace Elarion.UI {
     public enum UIState {
         NotInitialized = 0 << 0, // the element is off (in the hierarchy)
         Opened = 1 << 0, // is this element supposed to be visible on screen
-        Fullscreen = 1 << 1, // is this element fullscreen
-        InTransition = 1 << 2, // is this element in transition (maybe rename to InAnimation)
-        HasFocus = 1 << 3, // is this element focused - usually yes, but might not be if there's an edgemenu for example
-        Hovered = 1 << 4,
-        Clicked = 1 << 5,
-        Disabled = 1 << 6, // not interactable while visible; hook UI effects to make it sexy
-        VisibleChild = 1 << 7, // a child element is currently active
+        InTransition = 1 << 1, // is this element in transition (maybe rename to InAnimation)
+        HasFocus = 1 << 2, // is this element focused - usually yes, but might not be if there's an edgemenu for example
+        Hovered = 1 << 3,
+        Clicked = 1 << 4,
+        Disabled = 1 << 5, // not interactable while visible; hook UI effects to make it sexy
+        VisibleChild = 1 << 6, // a child element is currently active
     }
 
     [Serializable]

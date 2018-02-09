@@ -31,6 +31,10 @@ namespace Elarion.UI {
                 }
             }
 
+            if(!text) {
+                text = GetComponent<Text>();
+            }
+
             var parentComponent = startingElement;
 
             Breadcrumb = string.Empty;

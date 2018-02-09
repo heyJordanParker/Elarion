@@ -2,7 +2,7 @@
 using UnityEngine.SceneManagement;
 
 namespace Elarion.Utility {
-    public static class Tools {
+    public static class SceneTools {
         
         public static List<T> FindSceneObjectsOfType<T>() {
             

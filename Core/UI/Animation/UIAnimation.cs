@@ -7,6 +7,7 @@ namespace Elarion.UI.Animation {
 
     // Animations modify the properties of an object. They're used to move one or more properties from point A to point B.
     [Serializable]
+    [CreateAssetMenu(order = 250)]
     public partial class UIAnimation : ScriptableObject {
 
         // TODO animation delay

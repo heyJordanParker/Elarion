@@ -12,9 +12,11 @@ using UnityEngine.UI;
 namespace Elarion.UI.Animation {
     // TODO add effects here; duplicate the animation editor for them but use state dropdown + effect
     
-    // TODO handle state effects & animation effects
+    // TODO handle effects?
     
-    // TODO log a warning if two animations are of the same type
+    // TODO log a warning if two animations are of the same type (start iterating from the last animation and change/remove animations until this is satisfied)
+    
+    // TODO decouple with UIComponent; make the Target a RectTransform (and use GameObject tweeners that fetch the components they need themselves)
     
     [RequireComponent(typeof(UIComponent))]
     public class UIAnimator : MonoBehaviour {
@@ -46,7 +48,7 @@ namespace Elarion.UI.Animation {
         private AlphaTweener _alphaTweener;
         
         private RectTransform _targetParent;
-        
+
         public UIComponent Target {
             get {
                 if(_target == null) {
@@ -113,9 +115,26 @@ namespace Elarion.UI.Animation {
                        RotationTweener.Tweening || SizeTweener.Tweening;
             }
         }
+        
+        protected virtual void OnEnable() {
+            if(_currentAnimation != null) {
+                OnAnimationEnd(_currentAnimation);
+            }
+        }
+
+        protected virtual void OnDisable() {
+            if(_currentAnimation != null) {
+                _currentAnimation.Stop(this);
+            }
+            
+            ResetToSavedProperties();
+        }
+
+        private void OnDestroy() {
+            ResetToSavedProperties();
+        }
 
         protected virtual void OnAnimationStart(UIAnimation animation) {
-            
             // TODO concurrent animations; hover & click at the same time
             // track all animations; some animations stop other animations (e.g. close stops open)
             if(_currentAnimation != null) {
@@ -163,18 +182,15 @@ namespace Elarion.UI.Animation {
         }
 
         protected virtual void OnAnimationEnd(UIAnimation animation) {
+            if(!gameObject.activeInHierarchy) {
+                // can't do this if the game object is inactive - handle it in OnEnable
+                return;
+            }
+            
             Target.Transform.SetParent(_targetParent, true);
             Target.Transform.SetSiblingIndex(_canvasTransform.GetSiblingIndex());
 
             _currentAnimation = null;
-        }
-
-        private void OnDisable() {
-            ResetToSavedProperties();
-        }
-
-        private void OnDestroy() {
-            ResetToSavedProperties();
         }
 
         public void Play(UIAnimationType animationType, bool resetToSavedProperties = false, Action callback = null) {
