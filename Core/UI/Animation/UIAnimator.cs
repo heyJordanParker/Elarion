@@ -135,12 +135,6 @@ namespace Elarion.UI.Animation {
         }
 
         protected virtual void OnAnimationStart(UIAnimation animation) {
-            // TODO concurrent animations; hover & click at the same time
-            // track all animations; some animations stop other animations (e.g. close stops open)
-            if(_currentAnimation != null) {
-                _currentAnimation.Stop(this);
-            }
-            
             if(_canvas == null) {
                 _canvas = UIHelper.CreateAnimatorCanvas(out _canvasTransform, Target.gameObject.name + " (Animator Canvas)", transform);
             }
@@ -198,15 +192,27 @@ namespace Elarion.UI.Animation {
         }
 
         public void Play(UIAnimation animation, bool resetToSavedProperties = false, Action callback = null) {
-            if(resetToSavedProperties) {
-                ResetToSavedProperties();
+            
+            // TODO concurrent animations; hover & click at the same time
+            // track all animations; some animations stop other animations (e.g. close stops open)
+            if(_currentAnimation != null) {
+                if(animation == GetAnimation(UIAnimationType.OnOpen) ||
+                   animation == GetAnimation(UIAnimationType.OnClose)) {
+                    _currentAnimation.Stop(this);    
+                } else {
+                    return;
+                }
             }
-
+            
             if(animation == null) {
                 if(callback != null) {
                     callback();
                 }
                 return;
+            }
+            
+            if(resetToSavedProperties) {
+                ResetToSavedProperties();
             }
             
             OnAnimationStart(animation);

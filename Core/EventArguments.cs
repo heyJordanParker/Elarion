@@ -1,6 +1,6 @@
 ﻿using UnityEngine;
 
-namespace Elarion.EventSystem {
+namespace Elarion {
 	public class EventArguments {
 		private readonly GameObject _sender;
 

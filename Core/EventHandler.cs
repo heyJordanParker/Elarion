@@ -1,7 +1,8 @@
 ﻿using System.Collections.Generic;
+using Elarion.Managers;
 using UnityEngine;
 
-namespace Elarion.EventSystem {
+namespace Elarion {
 	public sealed class EventHandler : MonoBehaviour {
 
 		private Dictionary<string, List<string>> _events;

@@ -7,11 +7,20 @@ namespace Elarion.UI {
         OnOpen,
         OnClose,
         OnFocus,
-        OnBlur,
-        OnHover,
-        OnUnhover,
-        OnPointerDown,
-        OnPointerUp,
+        OnUnfocus,
+    }
+
+    [Serializable]
+    [Flags]
+    public enum UIEffectTrigger {
+        Visible = 1 << 0,
+        NotVisible = 1 << 1,
+        Opened = 1 << 2,
+        NotOpened = 1 << 3,
+        InTransition = 1 << 4,
+        NotInTransition = 1 << 5,
+        Focused = 1 << 6,
+        NotFocused = 1 << 7
     }
 
     [Serializable]
@@ -51,11 +60,10 @@ namespace Elarion.UI {
         NotInitialized = 0 << 0, // the element is off (in the hierarchy)
         Opened = 1 << 0, // is this element supposed to be visible on screen
         InTransition = 1 << 1, // is this element in transition (maybe rename to InAnimation)
-        HasFocus = 1 << 2, // is this element focused - usually yes, but might not be if there's an edgemenu for example
-        Hovered = 1 << 3,
-        Clicked = 1 << 4,
-        Disabled = 1 << 5, // not interactable while visible; hook UI effects to make it sexy
-        VisibleChild = 1 << 6, // a child element is currently active
+        FocusedThis = 1 << 2, // is this element focused - usually yes, but might not be if there's an edgemenu for example
+        FocusedChild = 1 << 3, // a child element is currently active
+        Disabled = 1 << 4, // not interactable while visible; hook UI effects to make it sexy
+        VisibleChild = 1 << 5, // a child element is currently active
     }
 
     [Serializable]

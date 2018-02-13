@@ -15,12 +15,22 @@ namespace Elarion.UI {
         // TODO Button, panel, etc prefabs similar to the popup prefab; add editor menus for all of those (and *not* the base element) so the user can easily setup a UI
         
         // TODO snapping scroll for android-homescreen animations
+
+        protected override bool OpenOnEnable {
+            get { return false; }
+        }
+        
+        // override open - automatically close all other scenes when opening and focus this while opening (clear this when the animation ends)
         
         protected override void Awake() {
             base.Awake();
 //            canvas.enabled = false;
         }
-        
+
+        protected override void OpenInternal(bool resetToSavedProperties, bool skipAnimation, UIAnimation overrideAnimation, bool autoEnable) {
+            base.OpenInternal(resetToSavedProperties, skipAnimation, overrideAnimation, autoEnable);
+            ThisFocused = true;
+        }
         // TODO When opening set this to the CurrentScene and close all other opened scenes in the parent (UIRoot)
 
         protected override void OnValidate() {

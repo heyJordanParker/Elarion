@@ -1,4 +1,3 @@
-using Elarion.EventSystem;
 using Elarion.Managers;
 using UnityEngine;
 

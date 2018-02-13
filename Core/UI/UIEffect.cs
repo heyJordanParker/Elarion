@@ -1,5 +1,6 @@
 using System;
 using System.Collections;
+using System.Linq;
 using System.Security.Cryptography;
 using Elarion.Attributes;
 using Elarion.Extensions;
@@ -22,8 +23,11 @@ namespace Elarion.UI {
         // TODO show/hide something effect (show loaders & such)
 
         // TODO flags attribute (so that multiple states can be selected from the inspector); make sure it works with the conditional visibility
+        // TODO inverse states - effect only when it's NOT hovered
+
+        [EnumMultipleDropdown]
         [Header("In which UIState should the effect activate")]
-        public UIState state = UIState.InTransition;
+        public UIEffectTrigger effectTrigger;
 
         [Header("Effect Configuration")]
         public UIEffectType type = UIEffectType.Overlay;
@@ -54,7 +58,6 @@ namespace Elarion.UI {
         [ConditionalVisibility("fadeOutDuration == UIAnimationDuration.Custom")]
         public float customFadeOutDuration = 0.5f;
 
-
         private ECoroutine _startCoroutine;
         private ECoroutine _stopCoroutine;
 
@@ -63,6 +66,8 @@ namespace Elarion.UI {
         public Image Shadow { get; set; }
 
         private Image Blur { get; set; }
+        
+        public bool Active { get; private set; }
 
         public float FadeInDuration {
             get {
@@ -126,10 +131,64 @@ namespace Elarion.UI {
             }
         }
 
+        public bool ShouldBeActive(UIComponent owner) {
+            var result = false;
+
+            var currentState = owner.State;
+
+            foreach(var effectTriggerValue in Enum.GetValues(typeof(UIEffectTrigger))) {
+                if(!effectTrigger.HasFlag(effectTriggerValue)) continue;
+                
+                
+                switch((UIEffectTrigger) effectTriggerValue) {
+                    case UIEffectTrigger.Focused:
+                        result = result ||
+                                 currentState.HasFlag(UIState.FocusedThis) ||
+                                 currentState.HasFlag(UIState.FocusedChild);
+                        break;
+                    case UIEffectTrigger.NotFocused:
+                        result = result ||
+                                 !currentState.HasFlag(UIState.FocusedThis) ||
+                                 !currentState.HasFlag(UIState.FocusedChild);
+                        break;
+                    case UIEffectTrigger.InTransition:
+                        result = result || currentState.HasFlag(UIState.InTransition);
+                        break;
+                    case UIEffectTrigger.NotInTransition:
+                        result = result || !currentState.HasFlag(UIState.InTransition);
+                        break;
+                    case UIEffectTrigger.Opened:
+                        result = result || currentState.HasFlag(UIState.Opened);
+                        break;
+                    case UIEffectTrigger.NotOpened:
+                        result = result || !currentState.HasFlag(UIState.Opened);
+                        break;
+                    case UIEffectTrigger.Visible:
+                        result = result || owner.ShouldRender;
+                        break;
+                    case UIEffectTrigger.NotVisible:
+                        result = result || !owner.ShouldRender;
+                        break;
+                }
+            }
+            
+            return result;
+        }
+
         // TODO move those to the UIAnimator version for UIEffects
         public void Start(UIComponent targetComponent) {
+            if(Active) {
+                return;
+            }
+            
             if(_stopCoroutine != null && _stopCoroutine.Running) {
                 _stopCoroutine.Stop();
+            }
+
+            Active = true;
+            
+            if(!targetComponent.gameObject.activeInHierarchy) {
+                return;
             }
             
             CurrentEffect.rectTransform.SetParent(targetComponent.Transform, false);
@@ -140,8 +199,18 @@ namespace Elarion.UI {
         }
 
         public void Stop(UIComponent targetComponent) {
+            if(!Active) {
+                return;
+            }
+            
             if(_startCoroutine != null && _startCoroutine.Running) {
                 _startCoroutine.Stop();
+            }
+            
+            Active = false;
+
+            if(!targetComponent.gameObject.activeInHierarchy) {
+                return;
             }
 
             CurrentEffect.rectTransform.SetParent(targetComponent.Transform, false);

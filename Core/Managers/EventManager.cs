@@ -2,7 +2,7 @@
 using System.Linq;
 using UnityEngine;
 
-namespace Elarion.EventSystem {
+namespace Elarion.Managers {
 
 	internal class EventManager : Singleton {
 		private static List<EventHandler> _eventHandlersIndex;

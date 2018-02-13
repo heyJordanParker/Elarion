@@ -15,16 +15,6 @@ namespace Elarion.Editor.Menus {
         // TODO customize those so that they'll create intuitive to use objects
         // add animators, base hierarchy and so on (if it's missing)
         // add a TestClassUIRoot if there isn't one on the scene already
-//        [MenuItem("GameObject/UI/UI Button", false, -10)]
-        private static void CreateUIElement() {
-            var uiElement = Create<UIElement>("Button");
-
-            uiElement.gameObject.AddComponent<Image>();
-
-            uiElement.gameObject.AddComponent<Button>();
-
-            // creates a UIScenes object -> UIScene -> UIElement/
-        }
 
         [MenuItem("GameObject/UI/Animated Panel", false, -10)]
         private static void CreateUIPanel() {
@@ -84,8 +74,6 @@ namespace Elarion.Editor.Menus {
 
             CreateEventSystem();
             
-            // TODO create blur camera; UIHelper.CreateUICamera("UI Root Camera", transform);
-
             return scene.gameObject;
         }
 
