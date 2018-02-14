@@ -1,6 +1,4 @@
-using System;
 using UnityEngine;
-using UnityEngine.EventSystems;
 using UnityEngine.UI;
 
 namespace Elarion.UI {
@@ -47,8 +45,8 @@ namespace Elarion.UI {
             }
         }
 
-        protected override void OnOpen() {
-            base.OnOpen();
+        public override void Focus() {
+            base.Focus();
             
             var selectable = GetComponentInChildren<Selectable>();
 

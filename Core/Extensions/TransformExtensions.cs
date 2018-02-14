@@ -13,5 +13,16 @@ namespace Elarion.Extensions {
 			ResetScale(transform);
 		}
 
+		public static bool IsChildOf(this Transform child, GameObject parent) {
+			return child.IsChildOf(parent.transform);
+		}
+
+		public static bool IsParentOf(this Transform parent, GameObject child) {
+			return IsParentOf(parent, child.transform);
+		}
+		
+		public static bool IsParentOf(this Transform parent, Transform child) {
+			return child.IsChildOf(parent);
+		}
 	}
 }

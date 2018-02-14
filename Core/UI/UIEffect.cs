@@ -1,10 +1,7 @@
 using System;
 using System.Collections;
-using System.Linq;
-using System.Security.Cryptography;
 using Elarion.Attributes;
 using Elarion.Extensions;
-using Elarion.Managers;
 using Elarion.Utility;
 using UnityEngine;
 using UnityEngine.UI;
@@ -148,7 +145,7 @@ namespace Elarion.UI {
                         break;
                     case UIEffectTrigger.NotFocused:
                         result = result ||
-                                 !currentState.HasFlag(UIState.FocusedThis) ||
+                                 !currentState.HasFlag(UIState.FocusedThis) &&
                                  !currentState.HasFlag(UIState.FocusedChild);
                         break;
                     case UIEffectTrigger.InTransition:

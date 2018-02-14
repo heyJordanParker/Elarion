@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Text;
 using Elarion.Extensions;
 using Elarion.UI.Animation;
 using UnityEngine;
@@ -16,7 +17,7 @@ namespace Elarion.UI {
 
         // TODO hide/lock the canvas, canvas group, and other components the user shouldn't modify; HideFlags/Custom Editors?
 
-        public event Action OnStateChanged = () => { };
+        public event Action<UIState,UIState> OnStateChanged = (currentState, oldState) => { };
         
         // TODO open with parent option (currently it's always true)
 
@@ -71,10 +72,10 @@ namespace Elarion.UI {
         }
 
         public bool Focused {
-            get { return ThisFocused || FocusedChild; }
+            get { return FocusedThis || FocusedChild; }
         }
 
-        protected bool ThisFocused {
+        protected bool FocusedThis {
             get { return State.HasFlag(UIState.FocusedThis); }
             set { State = State.SetFlag(UIState.FocusedThis, value); }
         }
@@ -161,18 +162,18 @@ namespace Elarion.UI {
             UIComponentCache.Remove(this);
         }
 
-        public void Focus() {
+        public virtual void Focus() {
             UnfocusAll();
 
-            ThisFocused = true;
+            FocusedThis = true;
 
             if(EventSystem.current.currentSelectedGameObject == null) {
                 EventSystem.current.SetSelectedGameObject(gameObject);
             }
         }
 
-        public void Unfocus() {
-            ThisFocused = false;
+        public virtual void Unfocus() {
+            FocusedThis = false;
 
             if(EventSystem.current.currentSelectedGameObject == gameObject) {
                 EventSystem.current.SetSelectedGameObject(null);
@@ -263,7 +264,7 @@ namespace Elarion.UI {
             }
             
             Opened = false;
-            ThisFocused = false;
+            FocusedThis = false;
 
             foreach(var child in ChildElements) {
                 child.Close(skipAnimation: skipAnimation);
@@ -307,11 +308,11 @@ namespace Elarion.UI {
                 }
             }
 
-            OnStateChanged();
+            OnStateChanged(_state, _oldState);
             _oldState = _state;
         }
 
-        private void UpdateChildState() {
+        private void UpdateChildState(UIState currentState, UIState oldState) {
             ActiveChild = ChildElements.SingleOrDefault(childElement => childElement.ShouldRender);
             FocusedChild = ChildElements.SingleOrDefault(childElement => childElement.Focused);
         }
@@ -348,7 +349,7 @@ namespace Elarion.UI {
                 childElement.OnStateChanged += UpdateChildState;
             }
             
-            UpdateChildState();
+            UpdateChildState(State, _oldState);
         }
 
         protected override void OnTransformParentChanged() {
@@ -371,6 +372,18 @@ namespace Elarion.UI {
 
             // TODO create UI Manager if missing; Trigger it to create the UI Canvas; Make this a child to the UI Canvas if it's the topmost canvas (too rigid?)
 
+        }
+        
+        public override string ToString() {
+            StringBuilder stringBuilder = new StringBuilder();
+            stringBuilder.AppendLine("<b>Opened: </b>" + Opened);
+            stringBuilder.AppendLine("<b>Rednering: </b>" + ShouldRender);
+            stringBuilder.AppendLine("<b>In Transition: </b>" + InTransition);
+            stringBuilder.AppendLine("<b>Focused: </b>" + FocusedThis);
+            stringBuilder.AppendLine("<b>Disabled: </b>" + Disabled);
+            stringBuilder.AppendLine("<b>Focused Child: </b>" + FocusedChild);
+            stringBuilder.AppendLine("<b>Visible Child: </b>" + ActiveChild);
+            return stringBuilder.ToString();
         }
 
         private static List<UIComponent> _uiComponentCache;

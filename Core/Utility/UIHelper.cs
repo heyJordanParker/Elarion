@@ -1,6 +1,5 @@
 ﻿ using System;
-using Elarion.Managers;
-using UnityEngine;
+ using UnityEngine;
 using UnityEngine.UI;
 
 namespace Elarion.Utility {

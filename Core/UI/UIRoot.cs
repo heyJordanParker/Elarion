@@ -1,6 +1,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using Elarion.Attributes;
+using Elarion.Extensions;
 using Elarion.UI.Animation;
 using Elarion.Utility;
 using UnityEngine;
@@ -43,7 +44,9 @@ namespace Elarion.UI {
                 }
 
                 _currentScene = value;
-                _currentScene.Open();
+                if(!_currentScene.Opened) {
+                    _currentScene.Open();
+                }
             }
         }
 
@@ -76,6 +79,17 @@ namespace Elarion.UI {
 
             if(_scenes == null) {
                 _scenes = GetComponentsInChildren<UIScene>();
+            }
+
+            for(var i = 0; i < _scenes.Length; ++i) {
+                var scene = _scenes[i];
+                
+                scene.OnStateChanged += (state, oldState) => {
+                    if(state.HasFlag(UIState.Opened) && !oldState.HasFlag(UIState.Opened)) {
+                        // Just opened
+                        CurrentScene = scene;
+                    }
+                };
             }
 
             if(!initialScene) {
@@ -112,7 +126,6 @@ namespace Elarion.UI {
                     component.gameObject == focusedTransform.gameObject);
 
                 if(selectedComponent != null) {
-                    // cache this and unfocus this
                     selectedComponent.Focus();
                     _focusedComponent = selectedComponent;
                     return;
