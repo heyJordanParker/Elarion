@@ -135,6 +135,7 @@ namespace Elarion.UI {
             }
         }
 
+        // off-clicks aren't consistent in unfocusing
         private void HandleTabNavigation() {
             if(!enableTabNavigation) {
                 return;
@@ -147,11 +148,23 @@ namespace Elarion.UI {
             
             if(EventSystem.currentSelectedGameObject) {
                 selectable = EventSystem.currentSelectedGameObject.GetComponentInChildren<Selectable>();
+
+                UINavigationElement navigationElement;
+                    
+                UINavigationElement.NavigationElementsCache.TryGetValue(selectable.gameObject, out navigationElement);
                 
                 if(Input.GetKey(KeyCode.LeftShift) || Input.GetKey(KeyCode.RightShift)) {
-                    nextSelectable = selectable.FindSelectableOnUp();
+                    if(navigationElement && navigationElement.previousSelectable != null) {
+                        nextSelectable = navigationElement.previousSelectable;
+                    } else {
+                        nextSelectable = selectable.FindSelectableOnUp();
+                    }
                 } else {
-                    nextSelectable = selectable.FindSelectableOnDown();
+                    if(navigationElement && navigationElement.nextSelectable != null) {
+                        nextSelectable = navigationElement.nextSelectable;
+                    } else {
+                        nextSelectable = selectable.FindSelectableOnDown();
+                    }
                 }
             }
 
@@ -163,12 +176,35 @@ namespace Elarion.UI {
 
             if(nextSelectable == null || !nextSelectable.IsInteractable()) return;
             
-            nextSelectable.Select();
-
-            var inputfield = nextSelectable as InputField;
             
-            if(inputfield != null)
-                inputfield.ActivateInputField();
+            Focus(nextSelectable);
+        }
+        
+        public void Focus(Selectable selectable) {
+            if(!selectable) {
+                return;
+            }
+            
+            selectable.Select();
+
+            var input = selectable as InputField;
+
+            if(input != null) {
+                // doesn't work if the object is disabled
+                input.ActivateInputField();
+            }
+            
+            // TODO test with TMP
+
+            _focusedObject = selectable.gameObject;
+        }
+
+        public void FocusComponent(UIComponent component, bool value) {
+            if(!component) {
+                return;
+            }
+
+            _focusedComponent = value ? component : null;
         }
 
         protected override void OnValidate() {

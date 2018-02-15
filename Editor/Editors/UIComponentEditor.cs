@@ -1,4 +1,5 @@
 ﻿using Elarion.UI;
+using Elarion.UI.Animation;
 using UnityEditor;
 using UnityEngine;
 
@@ -9,9 +10,21 @@ namespace Elarion.Editor.Editors {
         
         private GUIStyle _previewStyle;
 
+        private UIAnimator _animator;
+
         protected UIComponent Target {
             get {
                 return target as UIComponent;
+            }
+        }
+
+        protected UIAnimator Animator {
+            get {
+                if(_animator == null) {
+                    _animator = Target.GetComponent<UIAnimator>();
+                }
+
+                return _animator;
             }
         }
 
@@ -32,32 +45,46 @@ namespace Elarion.Editor.Editors {
         public override void OnInspectorGUI() {
             base.OnInspectorGUI();
 
-            EditorGUI.BeginDisabledGroup(!Application.isPlaying);
-            
-            // TODO two columns for those
-            
-            var label = Target.Opened ? "Close" : "Open";
-            if(GUILayout.Button(label)) {
-                if(Target.Opened) {
-                    Target.Close();
-                } else {
-                    Target.Open();
-                }
+            if(!Application.isPlaying && Animator) {
+                return;
             }
+            
+            GUILayout.Space(10);
 
-            label = Target.Focused ? "Unfocus" : "Focus";
-            if(GUILayout.Button(label)) {
-                if(Target.Focused) {
-                    Target.Unfocus();
-                } else {
-                    Target.Focus();
+            GUILayout.BeginHorizontal();
+            
+            GUILayout.FlexibleSpace();
+
+            if(Application.isPlaying) {
+                var label = Target.Opened ? "Close" : "Open";
+                if(GUILayout.Button(label, GUILayout.MaxWidth(180))) {
+                    if(Target.Opened) {
+                        Target.Close();
+                    } else {
+                        Target.Open();
+                    }
+                }
+
+                label = Target.Focused ? "Unfocus" : "Focus";
+                if(GUILayout.Button(label, GUILayout.MaxWidth(180))) {
+                    if(Target.Focused) {
+                        Target.Unfocus();
+                    } else {
+                        Target.Focus();
+                    }
+                }
+            } else if(!Animator) {
+                if(GUILayout.Button("Add Animator", GUILayout.MaxWidth(250))) {
+                    Undo.RecordObject(Target.gameObject, "Add UIAnimator");
+                    Target.gameObject.AddComponent<UIAnimator>();
                 }
             }
             
-            EditorGUI.EndDisabledGroup();
+            GUILayout.FlexibleSpace();
             
-            // record undo
-            // Add Animator
+            GUILayout.EndHorizontal();
+            
+            GUILayout.Space(10);
         }
 
         public override bool HasPreviewGUI() {

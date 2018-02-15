@@ -9,6 +9,9 @@ namespace Elarion.UI.Animation {
     [CreateAssetMenu(order = 250)]
     public partial class UIAnimation : ScriptableObject {
 
+        // TODO apply/remove overlay options replacing the UIEffects; the animator can add/remove overlays of different type (blur, color, etc)
+        // TODO autoRemove overlay - automatically removes the overlay when the animation finishes (by default, but could be unchecked for the overlay to persist)
+        
         // TODO animation delay
         
         // TODO animation sound

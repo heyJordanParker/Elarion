@@ -9,8 +9,6 @@ namespace Elarion.UI {
         // TODO UIForm inheritor - add error checking submitting and so on builtin (submit with enter/submit input (in unity))
         // TODO UIDialog inheritor - dynamic amount of (getcomponent; onchildren changed), extensible; dialog skins?
         
-        // TODO interactable and disabled states - one disables raycasts by disabling the GraphicRaycaster and the other sets the canvas interactable to false
-
         private Canvas _canvas;
         private CanvasGroup _canvasGroup;
 
@@ -51,14 +49,7 @@ namespace Elarion.UI {
             var selectable = GetComponentInChildren<Selectable>();
 
             if(selectable) {
-                
-                selectable.Select();
-
-                var input = selectable as InputField;
-
-                if(input != null) {
-                    input.ActivateInputField();
-                }
+                UIRoot.Focus(selectable);
             }
         }
     }

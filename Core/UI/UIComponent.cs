@@ -9,23 +9,19 @@ using UnityEngine.EventSystems;
 
 namespace Elarion.UI {
     [RequireComponent(typeof(RectTransform))]
+    [DisallowMultipleComponent]
     public abstract class UIComponent : UIBehaviour {
         // TODO visibility options (in another component) - mobile only, landscape only, portrait only, desktop only, depending on parent State etc
         // TODO visibility options (screen/parent size based - use the OnParentChanged thing)
         // TODO visibility options component can work with a manually-settable Hidden flag (no enabling/disabling conflicts)
         // TODO visibility options require a canvas - they turn off the canvas when the condition isn't met (in this manner they can work on any object in the hierarchy and it's children)
 
-        // TODO hide/lock the canvas, canvas group, and other components the user shouldn't modify; HideFlags/Custom Editors?
-
         public event Action<UIState,UIState> OnStateChanged = (currentState, oldState) => { };
         
-        // TODO open with parent option (currently it's always true)
-
         [SerializeField]
         protected UIEffect[] effects;
 
         // TODO dynamically update components because it's currently only in OnValidate
-        // TODO interactable should be false when closed
         [SerializeField]
         private bool _interactable = true;
 
@@ -48,9 +44,27 @@ namespace Elarion.UI {
         }
 
         public virtual bool ShouldRender {
-            get { return Opened || InTransition || ActiveChild; }
-        }
+            get {
+                if(Opened || InTransition || ActiveChild) {
+                    return true;
+                }
+                
+                // TODO find a more elegant solution
+                // Hack: render if both this and the parent are closing, but this doesn't have a close animation (otherwise this just disappears while the parent is animating)
+                var parentComponent = Parent as UIComponent;
 
+                if(parentComponent == null || parentComponent.Opened) {
+                    return false;
+                }
+
+                if(animator != null && animator.HasAnimation(UIAnimationType.OnClose)) {
+                    return false;
+                }
+                
+                return parentComponent.ShouldRender;
+            }
+        }
+        
         public bool ActiveChild {
             get { return State.HasFlag(UIState.VisibleChild); }
             set { State = State.SetFlag(UIState.VisibleChild, value); }
@@ -77,7 +91,17 @@ namespace Elarion.UI {
 
         protected bool FocusedThis {
             get { return State.HasFlag(UIState.FocusedThis); }
-            set { State = State.SetFlag(UIState.FocusedThis, value); }
+            set {
+                if(FocusedThis == value) {
+                    return;
+                }
+                
+                State = State.SetFlag(UIState.FocusedThis, value);
+
+                if(UIRoot) {
+                    UIRoot.FocusComponent(this, value);
+                }
+            }
         }
 
         protected bool FocusedChild {
@@ -96,10 +120,6 @@ namespace Elarion.UI {
                 var interactableParent = parentComponent == null || parentComponent.Interactable;
                 return interactableParent && SelfInteractable;
             }
-        }
-
-        protected virtual bool OpenOnEnable {
-            get { return true; }
         }
 
         public UIAnimator Animator {
@@ -123,39 +143,26 @@ namespace Elarion.UI {
             base.OnEnable();
 
             UpdateParent();
-
-            if(!gameObject.activeInHierarchy) {
-                return;
-            }
-
-            if(!Opened) {
-                Opened = OpenOnEnable;
-            }
-            
-            UpdateState();
         }
 
         protected override void OnDisable() {
             base.OnDisable();
+
+            if(!Opened) return;
             
-            ActiveChild = false;
-
-            if(Opened) {
-                Opened = false;
-            }
-
+            Close(true);
             UpdateState();
         }
         
         /// <summary>
         /// Called after the object has been opened and all open animations have finished playing (if any)
         /// </summary>
-        protected virtual void OnOpen() { }
+        protected virtual void AfterOpen() { }
 
         /// <summary>
         /// Called after the object has been closed and all close animations have finished playing (if any)
         /// </summary>
-        protected virtual void OnClose() { }
+        protected virtual void AfterClose() { }
 
         protected override void OnDestroy() {
             base.OnDestroy();
@@ -166,18 +173,10 @@ namespace Elarion.UI {
             UnfocusAll();
 
             FocusedThis = true;
-
-            if(EventSystem.current.currentSelectedGameObject == null) {
-                EventSystem.current.SetSelectedGameObject(gameObject);
-            }
         }
 
         public virtual void Unfocus() {
             FocusedThis = false;
-
-            if(EventSystem.current.currentSelectedGameObject == gameObject) {
-                EventSystem.current.SetSelectedGameObject(null);
-            }
         }
 
         public static void UnfocusAll() {
@@ -190,20 +189,15 @@ namespace Elarion.UI {
             if(Opened) {
                 return;
             }
-            
-            // returns and fires a warning if the parent object isn't open && active
-            
-            // TODO move this to the scene's OpenInternal
-            Transform.SetAsLastSibling();
+
+            var parentComponent = Parent as UIComponent;
+
+            if(!Parent.isActiveAndEnabled ||
+               parentComponent != null && !parentComponent.Opened) {
+                    return;
+            }
 
             OpenInternal(resetToSavedProperties, skipAnimation, overrideAnimation, true);
-        }
-
-        public void OpenRecursive() {
-            // traverse transform hierachy and enable objects
-            // open the parent (everything else that's enabled below will open automatically)
-            
-            // opens object and its' parents
         }
 
         public void Close(bool skipAnimation = false, UIAnimation overrideAnimation = null) {
@@ -222,7 +216,7 @@ namespace Elarion.UI {
             if(!gameObject.activeSelf && !autoEnable) {
                 Debug.LogWarning("Opening a UIComponent that's disabled.", gameObject);
             }
-            
+             
             if(!gameObject.activeSelf && autoEnable) {
                 gameObject.SetActive(true);
             }
@@ -243,7 +237,7 @@ namespace Elarion.UI {
             }
 
             if(animator == null || skipAnimation) {
-                OnOpen();
+                AfterOpen();
                 return;
             }
 
@@ -252,13 +246,14 @@ namespace Elarion.UI {
             }
 
             if(overrideAnimation != null) {
-                animator.Play(overrideAnimation, callback: OnOpen);
+                animator.Play(overrideAnimation, callback: AfterOpen);
             } else {
-                animator.Play(UIAnimationType.OnOpen, callback: OnOpen);
+                animator.Play(UIAnimationType.OnOpen, callback: AfterOpen);
             }
         }
 
-        protected virtual void CloseInternal(bool skipAnimation = false, UIAnimation overrideAnimation = null) {
+        protected virtual void CloseInternal(bool skipAnimation = false, UIAnimation overrideAnimation = null, bool closeChildren = true) {
+            
             if(!Opened) {
                 Debug.LogWarning("Closing a UIComponent that's already closed.", gameObject);
             }
@@ -266,19 +261,21 @@ namespace Elarion.UI {
             Opened = false;
             FocusedThis = false;
 
-            foreach(var child in ChildElements) {
-                child.Close(skipAnimation: skipAnimation);
+            if(closeChildren) {
+                foreach(var child in ChildElements) {
+                    child.Close(skipAnimation: skipAnimation);
+                }
             }
 
             if(animator == null || skipAnimation) {
-                OnClose();
+                AfterClose();
                 return;
             }
 
             if(overrideAnimation != null) {
-                animator.Play(overrideAnimation, callback: OnClose);
+                animator.Play(overrideAnimation, callback: AfterClose);
             } else {
-                animator.Play(UIAnimationType.OnClose, callback: OnClose);
+                animator.Play(UIAnimationType.OnClose, callback: AfterClose);
             }
         }
 
@@ -300,21 +297,22 @@ namespace Elarion.UI {
             Render.enabled = ShouldRender;
 
             foreach(var effect in effects) {
-
                 if(effect.ShouldBeActive(this) && !effect.Active) {
                     effect.Start(this);
                 } else if(!effect.ShouldBeActive(this) && effect.Active) {
                     effect.Stop(this);
                 }
             }
+            
+            // TODO play focus/unfocus animations
 
             OnStateChanged(_state, _oldState);
             _oldState = _state;
         }
 
         private void UpdateChildState(UIState currentState, UIState oldState) {
-            ActiveChild = ChildElements.SingleOrDefault(childElement => childElement.ShouldRender);
-            FocusedChild = ChildElements.SingleOrDefault(childElement => childElement.Focused);
+            ActiveChild = ChildElements.SingleOrDefault(childElement => childElement.ShouldRender && childElement.gameObject.activeInHierarchy);
+            FocusedChild = ChildElements.SingleOrDefault(childElement => childElement.Focused && childElement.gameObject.activeInHierarchy);
         }
 
         private void UpdateParent() {
@@ -326,9 +324,7 @@ namespace Elarion.UI {
 
             if(parentComponents == null || parentComponents.Length < 2) {
 
-                var parentRoot = GetComponentInParent<UIRoot>();
-
-                if(parentRoot == null) {
+                if(UIRoot == null) {
                     if(!gameObject.activeInHierarchy) {
                         return;
                     }
@@ -339,7 +335,7 @@ namespace Elarion.UI {
                     return;
                 }
 
-                Parent = parentRoot;
+                Parent = UIRoot;
             } else {
                 // GetComponentsInParent operates recursively - the first member is this object, the second is the first parent with the component
                 Parent = parentComponents[1];
@@ -369,21 +365,30 @@ namespace Elarion.UI {
             
             UpdateParent();
             // TODO make sure this lives under a UIScene (what about popups?)
-
-            // TODO create UI Manager if missing; Trigger it to create the UI Canvas; Make this a child to the UI Canvas if it's the topmost canvas (too rigid?)
-
         }
         
         public override string ToString() {
             StringBuilder stringBuilder = new StringBuilder();
             stringBuilder.AppendLine("<b>Opened: </b>" + Opened);
-            stringBuilder.AppendLine("<b>Rednering: </b>" + ShouldRender);
+            stringBuilder.AppendLine("<b>Rendering: </b>" + ShouldRender);
             stringBuilder.AppendLine("<b>In Transition: </b>" + InTransition);
             stringBuilder.AppendLine("<b>Focused: </b>" + FocusedThis);
             stringBuilder.AppendLine("<b>Disabled: </b>" + Disabled);
             stringBuilder.AppendLine("<b>Focused Child: </b>" + FocusedChild);
             stringBuilder.AppendLine("<b>Visible Child: </b>" + ActiveChild);
             return stringBuilder.ToString();
+        }
+
+        protected UIRoot UIRoot {
+            get {
+                var uiRoot = UIRoot.UIRootCache.SingleOrDefault(root => root.transform.IsParentOf(transform));
+
+                if(uiRoot == null) {
+                    uiRoot = GetComponentInParent<UIRoot>();
+                }
+
+                return uiRoot;
+            }
         }
 
         private static List<UIComponent> _uiComponentCache;

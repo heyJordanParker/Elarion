@@ -1,4 +1,5 @@
 using System;
+using System.Linq;
 using Elarion.Attributes;
 using Elarion.Utility;
 using Elarion.Utility.PropertyTweeners.RectTransform;
@@ -237,6 +238,11 @@ namespace Elarion.UI.Animation {
             RotationTweener.StopTween(reset);
             SizeTweener.StopTween(reset);
             AlphaTweener.StopTween(reset);
+        }
+
+        public bool HasAnimation(UIAnimationType animationType) {
+            return _animations.Any(typedAnimation => typedAnimation.type == animationType);
+
         }
 
         private UIAnimation GetAnimation(UIAnimationType type) {

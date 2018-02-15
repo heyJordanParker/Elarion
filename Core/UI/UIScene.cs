@@ -1,6 +1,7 @@
 using System.Linq;
 using Elarion.Extensions;
 using Elarion.UI.Animation;
+using Microsoft.Win32;
 using UnityEngine;
 
 namespace Elarion.UI {
@@ -16,19 +17,27 @@ namespace Elarion.UI {
         [SerializeField]
         private UIComponent _firstFocused;
 
-        protected override bool OpenOnEnable {
-            get { return false; }
+        // override this to ignore the ActiveChild flag
+        public override bool ShouldRender {
+            get { return Opened || InTransition; }
         }
-        
-        protected override void OpenInternal(bool resetToSavedProperties, bool skipAnimation, UIAnimation overrideAnimation, bool autoEnable) {
-            base.OpenInternal(resetToSavedProperties, skipAnimation, overrideAnimation, autoEnable);
-            Focus();
 
+        protected override void OpenInternal(bool resetToSavedProperties, bool skipAnimation, UIAnimation overrideAnimation, bool autoEnable) {
+            transform.SetAsLastSibling();
+            
+            base.OpenInternal(resetToSavedProperties, skipAnimation, overrideAnimation, autoEnable);
+        }
+
+        protected override void AfterOpen() {
+            base.AfterOpen();
+            
             if(_firstFocused != null) {
                 _firstFocused.Focus();
+            } else {
+                Focus();
             }
         }
-        
+
         // TODO move the hierarchy validation to the Editor.Update method (via [InitializeOnLoad] script); or any other method that'll run when the hierarchy updates
         protected override void OnValidate() {
             base.OnValidate();
