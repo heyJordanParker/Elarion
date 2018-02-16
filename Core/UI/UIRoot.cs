@@ -10,13 +10,15 @@ using UnityEngine.Serialization;
 using UnityEngine.UI;
 
 namespace Elarion.UI {
+    // TODO make this an invisible manager (initializeOnLoad + a hidden MonoBehaviour that updates it)
+    
     // TODO add canvas scaler when creating presets
     // TODO use this (as the converging and final point of the UI hierarchy) to handle the blur; when a UI element Opens, all other elements on the same hierarchical level can blur (optional open/close parameter); maybe blur by default, but only when calling Open manually (not when it's called automagically in the children components)
 
     // TODO add a fullscreen checkbox to panels (to easily set them to cover the full screen (only in editor.onValidate))
 
     [RequireComponent(typeof(Canvas))]
-    [RequireComponent(typeof(GraphicRaycaster))] // to propagate input events
+    [RequireComponent(typeof(GraphicRaycaster))]
     public class UIRoot : UIBehaviour {
         [SerializeField]
         [FormerlySerializedAs("_initialScene")]
@@ -29,6 +31,8 @@ namespace Elarion.UI {
 
         private GameObject _focusedObject;
         private UIComponent _focusedComponent;
+        
+        private BaseEventData _baseEventData;
 
         private UIScene _currentScene;
 
@@ -47,6 +51,51 @@ namespace Elarion.UI {
                 if(!_currentScene.Opened) {
                     _currentScene.Open();
                 }
+            }
+        }
+        
+        protected BaseEventData BaseEventData {
+            get {
+                if(_baseEventData == null)
+                    _baseEventData = new BaseEventData(EventSystem.current);
+                _baseEventData.Reset();
+                return _baseEventData;
+            }
+        }
+
+        protected string SubmitButton {
+            get {
+                var button = "Submit";
+
+                if(EventSystem == null) return button;
+                
+                var inputModule = EventSystem.currentInputModule == null
+                    ? null
+                    : EventSystem.currentInputModule as StandaloneInputModule;
+
+                if(inputModule != null) {
+                    button = inputModule.submitButton;
+                }
+
+                return button;
+            }
+        }
+        
+        protected string CancelButton {
+            get {
+                var button = "Cancel";
+
+                if(EventSystem == null) return button;
+                
+                var inputModule = EventSystem.currentInputModule == null
+                    ? null
+                    : EventSystem.currentInputModule as StandaloneInputModule;
+
+                if(inputModule != null) {
+                    button = inputModule.cancelButton;
+                }
+
+                return button;
             }
         }
 
@@ -101,7 +150,10 @@ namespace Elarion.UI {
 
         protected virtual void Update() {
             HandleTabNavigation();
-            
+
+            SendNavigationEventsToFocusedComponent();
+
+            // process the events just once and only if focused
             if(_current != this || !EventSystem.isFocused) {
                 return;
             }
@@ -143,27 +195,36 @@ namespace Elarion.UI {
 
             if(!Input.GetKeyDown(KeyCode.Tab)) return;
 
-            Selectable selectable = null;
+            var selectable = EventSystem.currentSelectedGameObject ? EventSystem.currentSelectedGameObject.GetFirstSelectableChild() : null;
             Selectable nextSelectable = null;
             
-            if(EventSystem.currentSelectedGameObject) {
-                selectable = EventSystem.currentSelectedGameObject.GetComponentInChildren<Selectable>();
+            if(selectable) {
+                var reverseNavigationDirection = Input.GetKey(KeyCode.LeftShift) || Input.GetKey(KeyCode.RightShift);
 
-                UINavigationElement navigationElement;
-                    
-                UINavigationElement.NavigationElementsCache.TryGetValue(selectable.gameObject, out navigationElement);
-                
-                if(Input.GetKey(KeyCode.LeftShift) || Input.GetKey(KeyCode.RightShift)) {
-                    if(navigationElement && navigationElement.previousSelectable != null) {
-                        nextSelectable = navigationElement.previousSelectable;
-                    } else {
-                        nextSelectable = selectable.FindSelectableOnUp();
+                bool horizontalNavigation = selectable.navigation.mode.HasFlag(Navigation.Mode.Horizontal);
+                bool verticalNavigation = selectable.navigation.mode.HasFlag(Navigation.Mode.Vertical);
+
+                if(verticalNavigation) {
+                    nextSelectable = reverseNavigationDirection
+                        ? selectable.navigation.selectOnUp
+                        : selectable.navigation.selectOnDown;
+
+                    if(nextSelectable == null) {
+                        nextSelectable = reverseNavigationDirection
+                            ? selectable.FindSelectableOnUp()
+                            : selectable.FindSelectableOnDown();
                     }
-                } else {
-                    if(navigationElement && navigationElement.nextSelectable != null) {
-                        nextSelectable = navigationElement.nextSelectable;
-                    } else {
-                        nextSelectable = selectable.FindSelectableOnDown();
+                }
+                
+                if(horizontalNavigation && nextSelectable == null) {
+                    nextSelectable = reverseNavigationDirection
+                        ? selectable.navigation.selectOnLeft
+                        : selectable.navigation.selectOnRight;
+
+                    if(nextSelectable == null) {
+                        nextSelectable = reverseNavigationDirection
+                            ? selectable.FindSelectableOnLeft()
+                            : selectable.FindSelectableOnRight();
                     }
                 }
             }
@@ -171,13 +232,33 @@ namespace Elarion.UI {
             if(!selectable) {
                 if(!_focusedComponent) return;
 
-                nextSelectable = _focusedComponent.GetComponentInChildren<Selectable>();
+                nextSelectable = _focusedComponent.gameObject.GetFirstSelectableChild();
             }
 
-            if(nextSelectable == null || !nextSelectable.IsInteractable()) return;
+            if(nextSelectable == null || !nextSelectable.IsInteractable() || nextSelectable.navigation.mode == Navigation.Mode.None) return;
             
             
             Focus(nextSelectable);
+        }
+        
+        protected bool SendNavigationEventsToFocusedComponent() {
+            if(!EventSystem.isFocused ||
+               !EventSystem.sendNavigationEvents ||
+               _focusedComponent == null) {
+                return false;
+            }
+
+            var baseEventData = BaseEventData;
+            
+            if(EventSystem.currentInputModule.input.GetButtonDown(SubmitButton))
+                ExecuteEvents.Execute(_focusedComponent.gameObject, baseEventData,
+                    ExecuteEvents.submitHandler);
+            
+            if(EventSystem.currentInputModule.input.GetButtonDown(CancelButton))
+                ExecuteEvents.Execute(_focusedComponent.gameObject, baseEventData,
+                    ExecuteEvents.cancelHandler);
+            
+            return baseEventData.used;
         }
         
         public void Focus(Selectable selectable) {

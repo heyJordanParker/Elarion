@@ -1,16 +1,20 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Runtime.CompilerServices;
 using System.Text;
 using Elarion.Extensions;
 using Elarion.UI.Animation;
 using UnityEngine;
 using UnityEngine.EventSystems;
+using UnityEngine.iOS;
 
 namespace Elarion.UI {
     [RequireComponent(typeof(RectTransform))]
     [DisallowMultipleComponent]
-    public abstract class UIComponent : UIBehaviour {
+    public abstract class UIComponent : UIBehaviour, ISubmitHandler, ICancelHandler {
+        // TODO button behavior - a behavior controlling a builtin button, adding onClick handlers - button type dropdown - open/close panel/popup, switch scene etc
+        
         // TODO visibility options (in another component) - mobile only, landscape only, portrait only, desktop only, depending on parent State etc
         // TODO visibility options (screen/parent size based - use the OnParentChanged thing)
         // TODO visibility options component can work with a manually-settable Hidden flag (no enabling/disabling conflicts)
@@ -311,8 +315,28 @@ namespace Elarion.UI {
         }
 
         private void UpdateChildState(UIState currentState, UIState oldState) {
-            ActiveChild = ChildElements.SingleOrDefault(childElement => childElement.ShouldRender && childElement.gameObject.activeInHierarchy);
-            FocusedChild = ChildElements.SingleOrDefault(childElement => childElement.Focused && childElement.gameObject.activeInHierarchy);
+            ActiveChild = false;
+            FocusedChild = false;
+            
+            foreach(var child in ChildElements) {
+                if(!child.isActiveAndEnabled) {
+                    continue;
+                }
+
+                if(!ActiveChild && child.ShouldRender) {
+                    ActiveChild = true;
+                }
+
+                if(!FocusedChild && child.Focused) {
+                    FocusedChild = true;
+                }
+            }
+            
+//            ActiveChild = ChildElements.SingleOrDefault(childElement =>
+//                childElement.ShouldRender && childElement.gameObject.activeInHierarchy);
+//            
+//            FocusedChild = ChildElements.SingleOrDefault(childElement =>
+//                childElement.Focused && childElement.gameObject.activeInHierarchy);
         }
 
         private void UpdateParent() {
@@ -369,6 +393,7 @@ namespace Elarion.UI {
         
         public override string ToString() {
             StringBuilder stringBuilder = new StringBuilder();
+            stringBuilder.AppendLine("<b>" + GetType().Name + ": </b>" + name);
             stringBuilder.AppendLine("<b>Opened: </b>" + Opened);
             stringBuilder.AppendLine("<b>Rendering: </b>" + ShouldRender);
             stringBuilder.AppendLine("<b>In Transition: </b>" + InTransition);
@@ -377,6 +402,14 @@ namespace Elarion.UI {
             stringBuilder.AppendLine("<b>Focused Child: </b>" + FocusedChild);
             stringBuilder.AppendLine("<b>Visible Child: </b>" + ActiveChild);
             return stringBuilder.ToString();
+        }
+
+        public void OnCancel(BaseEventData eventData) {
+            Debug.Log("Cancelled", gameObject);
+        }
+
+        public virtual void OnSubmit(BaseEventData eventData) {
+            Debug.Log("Submitted", gameObject);
         }
 
         protected UIRoot UIRoot {

@@ -12,8 +12,6 @@ namespace Elarion.UI.Animation {
         // TODO apply/remove overlay options replacing the UIEffects; the animator can add/remove overlays of different type (blur, color, etc)
         // TODO autoRemove overlay - automatically removes the overlay when the animation finishes (by default, but could be unchecked for the overlay to persist)
         
-        // TODO animation delay
-        
         // TODO animation sound
         
         // TODO Animate interface (containing the animate method); maybe add a target field (useful for other scripts)
@@ -35,9 +33,13 @@ namespace Elarion.UI.Animation {
         private AnimationFadePreset _fade = AnimationFadePreset.FadeIn;
         #endif
         
-        #endregion 
-        
+        #endregion
+
         [Space(10)]
+        [SerializeField]
+        [Tooltip("Delay in seconds")]
+        private float _delay = 0f;
+        
         [SerializeField]
         private UIAnimationDuration _duration = UIAnimationDuration.Normal;
 
@@ -119,6 +121,10 @@ namespace Elarion.UI.Animation {
         [Tooltip("Save the position after the movement finishes.", order = 0)]
         [ConditionalVisibility("_movement == AnimationMovementPreset.Custom", order = 1)]
         public bool savePosition = false;
+
+        public float Delay {
+            get { return _delay; }
+        }
         
         public float Duration {
             get {
@@ -142,13 +148,11 @@ namespace Elarion.UI.Animation {
 
         private UIAnimationOptions AnimationOptions {
             get {
-                return new UIAnimationOptions(savePosition, Duration == 0, _customEaseFunction, Duration);
+                return new UIAnimationOptions(savePosition, Duration == 0, _customEaseFunction, Duration, Delay);
             }
         }
         
         public void Animate(UIAnimator animator, Action callback = null) {
-            // animation delay?
-            
             Action syncedCallback = null;
 
             if(callback != null) {

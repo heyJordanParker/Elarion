@@ -68,7 +68,7 @@ namespace Elarion.Utility.PropertyTweeners {
 
             Tweening = true;
 
-            tweenerCoroutine = _owner.CreateCoroutine(TweenCoroutine(animationOptions.EaseFunction, animationOptions.Duration));
+            tweenerCoroutine = _owner.CreateCoroutine(TweenCoroutine(animationOptions.EaseFunction, animationOptions.Duration, animationOptions.Delay));
             tweenerCoroutine.OnFinished += stopped => {
                 if(!stopped) {
                     CurrentValue = TargetValue;
@@ -104,9 +104,13 @@ namespace Elarion.Utility.PropertyTweeners {
             Tween(SavedValue, UIAnimationDirection.To, ResetProperty, new UIAnimationOptions(duration: duration));
         }
         
-        protected IEnumerator TweenCoroutine(Ease ease, float duration) {
+        protected IEnumerator TweenCoroutine(Ease ease, float duration, float delay) {
             var movementProgress = 0.0f;
             var startingAnchors = CurrentValue;
+
+            if(delay > 0) {
+                yield return new WaitForSeconds(delay);
+            }
             
             while(movementProgress <= 1) {
                 CurrentValue = UpdateValue(startingAnchors, movementProgress, ease);

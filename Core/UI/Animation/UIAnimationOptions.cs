@@ -4,6 +4,7 @@ namespace Elarion.UI.Animation {
         private readonly bool _instant;
         private readonly Ease? _easeFunction;
         private readonly float _duration;
+        private readonly float _delay;
 
         public bool SavePosition {
             get { return _savePosition; }
@@ -33,12 +34,17 @@ namespace Elarion.UI.Animation {
             }
         }
 
+        public float Delay {
+            get { return _delay; }
+        }
+
         public UIAnimationOptions(bool savePosition = false, bool instant = false, Ease? easeFunction = null,
-            float duration = 1) {
+            float duration = 1, float delay = 0) {
             _savePosition = savePosition;
             _instant = instant;
             _duration = duration;
             _easeFunction = easeFunction;
+            _delay = delay;
         }
     }
 }

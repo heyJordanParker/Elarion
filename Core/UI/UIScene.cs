@@ -13,9 +13,8 @@ namespace Elarion.UI {
         // TODO Popup prefabs - create a default one (and auto load it when instantiating via EditorMenus) and leave it as a public field so users can change it with their own; Back functionality for popups (to close)
             
         // TODO snapping scroll for android-homescreen animations
-
-        [SerializeField]
-        private UIComponent _firstFocused;
+        
+        // TODO selected scene boolean; add custom editor showing the selected scene below the boolean (if it isn't the current scene)
 
         // override this to ignore the ActiveChild flag
         public override bool ShouldRender {
@@ -28,35 +27,9 @@ namespace Elarion.UI {
             base.OpenInternal(resetToSavedProperties, skipAnimation, overrideAnimation, autoEnable);
         }
 
-        protected override void AfterOpen() {
-            base.AfterOpen();
-            
-            if(_firstFocused != null) {
-                _firstFocused.Focus();
-            } else {
-                Focus();
-            }
-        }
-
         // TODO move the hierarchy validation to the Editor.Update method (via [InitializeOnLoad] script); or any other method that'll run when the hierarchy updates
         protected override void OnValidate() {
             base.OnValidate();
-            
-            if(_firstFocused != null) {
-                if(!_firstFocused.transform.IsChildOf(transform) || _firstFocused.gameObject == gameObject) {
-                    _firstFocused = null;
-                }
-            }
-
-            if(_firstFocused == null) {
-                foreach(var component in gameObject.GetComponentsInChildren<UIComponent>()) {
-                    if(component != this) {
-                        _firstFocused = component;
-                        break;
-                    }
-                }
-            }
-
             var uiRoot = FindObjectsOfType<UIRoot>().SingleOrDefault(root => root.transform.IsParentOf(transform));
 
             if(uiRoot != null) {

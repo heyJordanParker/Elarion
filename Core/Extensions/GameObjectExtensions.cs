@@ -1,5 +1,8 @@
+using System.Collections.Generic;
+using System.Linq;
 using Elarion.Managers;
 using UnityEngine;
+using UnityEngine.UI;
 
 namespace Elarion.Extensions {
 	public static class GameObjectExtensions {
@@ -57,6 +60,16 @@ namespace Elarion.Extensions {
 		public static Pool Pool(this GameObject go, uint amount) {
 			var poolingManager = Singleton.Get<PoolingManager>();
 			return poolingManager.Pool(go, amount);
+		}
+
+		public static IEnumerable<Selectable> GetSelectableChildren(this GameObject go) {
+			var selectables = go.GetComponentsInChildren<Selectable>();
+			return selectables.Where(selectable =>
+				selectable.IsInteractable() && selectable.navigation.mode != Navigation.Mode.None);
+		}
+
+		public static Selectable GetFirstSelectableChild(this GameObject go) {
+			return go.GetSelectableChildren().FirstOrDefault();
 		}
 
 	}

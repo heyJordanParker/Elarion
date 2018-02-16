@@ -1,4 +1,6 @@
-﻿using Elarion.UI;
+﻿using System.Collections.Generic;
+using System.Linq;
+using Elarion.UI;
 using Elarion.UI.Animation;
 using UnityEditor;
 using UnityEngine;
@@ -75,8 +77,12 @@ namespace Elarion.Editor.Editors {
                 }
             } else if(!Animator) {
                 if(GUILayout.Button("Add Animator", GUILayout.MaxWidth(250))) {
-                    Undo.RecordObject(Target.gameObject, "Add UIAnimator");
-                    Target.gameObject.AddComponent<UIAnimator>();
+                    var components = targets.OfType<UIComponent>().ToList();
+
+                    Undo.RecordObjects(components.Select(t => t.gameObject).ToArray(), "Add UIAnimator");
+                    foreach(var component in components) {
+                        component.gameObject.AddComponent<UIAnimator>();
+                    }
                 }
             }
             
