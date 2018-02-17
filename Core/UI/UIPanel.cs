@@ -8,7 +8,7 @@ namespace Elarion.UI {
     public class UIForm : UIPopup { }
 
     public class UIPopup : UIPanel {
-        public override void OnSubmit(BaseEventData eventData) {
+        protected override void OnSubmitInternal(BaseEventData eventData) {
             base.OnSubmit(eventData);
             
             // TODO click submit button
@@ -27,20 +27,25 @@ namespace Elarion.UI {
         [SerializeField]
         private GameObject _firstFocused;
 
+        [SerializeField]
+        private bool _interactable = true;
+
         private Canvas _canvas;
         private CanvasGroup _canvasGroup;
-
-        public override bool Disabled {
-            get { return base.Disabled; }
-            set {
-                base.Disabled = value;
-                CanvasGroup.interactable = !value;
-            }
-        }
 
         public override float Alpha {
             get { return CanvasGroup.alpha; }
             set { CanvasGroup.alpha = Mathf.Clamp01(value); }
+        }
+
+        public override GameObject FirstFocused {
+            get { return _firstFocused; }
+            set { _firstFocused = value; }
+        }
+
+        protected override bool InteractableSelf {
+            get { return _interactable; }
+            set { _interactable = value; }
         }
 
         protected override Behaviour Render {
@@ -63,42 +68,46 @@ namespace Elarion.UI {
             }
         }
 
-        protected override void AfterOpen() {
-            base.AfterOpen();
-
-            if(_firstFocused == null) {
-                return;
+        protected override bool UpdateState() {
+            if(!base.UpdateState()) {
+                return false;
             }
 
-            var component = _firstFocused.GetComponent<UIComponent>();
+            CanvasGroup.interactable = !Disabled;
 
-            if(component) {
-                component.Focus();
-            }
-            
-            var selectable = _firstFocused.gameObject.GetFirstSelectableChild();
-
-            if(selectable) {
-                UIRoot.Focus(selectable);
-            }
+            CanvasGroup.blocksRaycasts = Interactable;
+            return true;
         }
 
         protected override void OnValidate() {
             base.OnValidate();
 
             if(_firstFocused != null) {
-                if(!_firstFocused.transform.IsChildOf(transform) || _firstFocused.gameObject == gameObject) {
+                if(!_firstFocused.transform.IsChildOf(transform)) {
                     _firstFocused = null;
                 }
             }
 
-            if(_firstFocused == null) {
-                foreach(var component in gameObject.GetComponentsInChildren<UIComponent>()) {
-                    if(component != this) {
-                        _firstFocused = component.gameObject;
-                        break;
-                    }
+            if(_firstFocused != null) {
+                return;
+            }
+            
+            foreach(var component in gameObject.GetComponentsInChildren<UIComponent>()) {
+                if(component == this) {
+                    continue;
                 }
+                
+                _firstFocused = component.gameObject;
+                return;
+            }
+
+            if(_firstFocused != null) {
+                return;
+            }
+            
+            var selectable = GetComponentInChildren<Selectable>();
+            if(selectable != null) {
+                _firstFocused = selectable.gameObject;
             }
         }
     }

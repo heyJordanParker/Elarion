@@ -63,9 +63,7 @@ namespace Elarion.Extensions {
 		}
 
 		public static IEnumerable<Selectable> GetSelectableChildren(this GameObject go) {
-			var selectables = go.GetComponentsInChildren<Selectable>();
-			return selectables.Where(selectable =>
-				selectable.IsInteractable() && selectable.navigation.mode != Navigation.Mode.None);
+			return go.GetComponentsInChildren<Selectable>();
 		}
 
 		public static Selectable GetFirstSelectableChild(this GameObject go) {

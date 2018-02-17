@@ -1,6 +1,13 @@
 using System;
 
 namespace Elarion.UI {
+
+    [Serializable]
+    public enum UIOpenType {
+        OpenWithParent,
+        OpenAfterParent,
+        OpenManually
+    }
     
     [Serializable]
     public enum UIAnimationType {
@@ -64,6 +71,7 @@ namespace Elarion.UI {
         FocusedChild = 1 << 3, // a child element is currently active
         Disabled = 1 << 4, // not interactable while visible; hook UI effects to make it sexy
         VisibleChild = 1 << 5, // a child element is currently active
+        Interactable = 1 << 6, // is this element interactable (accepting input events)
     }
 
     [Serializable]

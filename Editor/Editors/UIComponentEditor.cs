@@ -4,6 +4,7 @@ using Elarion.UI;
 using Elarion.UI.Animation;
 using UnityEditor;
 using UnityEngine;
+using UnityEngine.EventSystems;
 
 namespace Elarion.Editor.Editors {
     [CustomEditor(typeof(UIComponent), true)]
@@ -71,8 +72,10 @@ namespace Elarion.Editor.Editors {
                 if(GUILayout.Button(label, GUILayout.MaxWidth(180))) {
                     if(Target.Focused) {
                         Target.Unfocus();
+                        EventSystem.current.SetSelectedGameObject(null);
                     } else {
                         Target.Focus();
+                        EventSystem.current.SetSelectedGameObject(Target.gameObject);
                     }
                 }
             } else if(!Animator) {

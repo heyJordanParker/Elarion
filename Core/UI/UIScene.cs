@@ -21,10 +21,10 @@ namespace Elarion.UI {
             get { return Opened || InTransition; }
         }
 
-        protected override void OpenInternal(bool resetToSavedProperties, bool skipAnimation, UIAnimation overrideAnimation, bool autoEnable) {
+        protected override void OpenInternal(bool skipAnimation, UIAnimation overrideAnimation) {
             transform.SetAsLastSibling();
             
-            base.OpenInternal(resetToSavedProperties, skipAnimation, overrideAnimation, autoEnable);
+            base.OpenInternal(skipAnimation, overrideAnimation);
         }
 
         // TODO move the hierarchy validation to the Editor.Update method (via [InitializeOnLoad] script); or any other method that'll run when the hierarchy updates

@@ -29,7 +29,9 @@ namespace Elarion.UI {
         [SerializeField, ReadOnly]
         private UIScene[] _scenes;
 
+        [SerializeField, ReadOnly]
         private GameObject _focusedObject;
+        [SerializeField, ReadOnly]
         private UIComponent _focusedComponent;
         
         private BaseEventData _baseEventData;
@@ -195,7 +197,7 @@ namespace Elarion.UI {
 
             if(!Input.GetKeyDown(KeyCode.Tab)) return;
 
-            var selectable = EventSystem.currentSelectedGameObject ? EventSystem.currentSelectedGameObject.GetFirstSelectableChild() : null;
+            var selectable = EventSystem.currentSelectedGameObject ? GetValidSelectable(EventSystem.currentSelectedGameObject) : null;
             Selectable nextSelectable = null;
             
             if(selectable) {
@@ -232,13 +234,17 @@ namespace Elarion.UI {
             if(!selectable) {
                 if(!_focusedComponent) return;
 
-                nextSelectable = _focusedComponent.gameObject.GetFirstSelectableChild();
+                nextSelectable = GetValidSelectable(_focusedComponent.gameObject);
             }
 
             if(nextSelectable == null || !nextSelectable.IsInteractable() || nextSelectable.navigation.mode == Navigation.Mode.None) return;
             
             
             Focus(nextSelectable);
+        }
+
+        private Selectable GetValidSelectable(GameObject go) {
+            return go.GetSelectableChildren().SingleOrDefault(s => s.IsInteractable() && s.navigation.mode != Navigation.Mode.None);
         }
         
         protected bool SendNavigationEventsToFocusedComponent() {
@@ -278,6 +284,7 @@ namespace Elarion.UI {
             // TODO test with TMP
 
             _focusedObject = selectable.gameObject;
+            EventSystem.SetSelectedGameObject(_focusedObject);
         }
 
         public void FocusComponent(UIComponent component, bool value) {
