@@ -234,7 +234,7 @@ namespace Elarion.UI {
         protected virtual void OnSubmitInternal(BaseEventData eventData) { }
         protected virtual void OnCancelInternal(BaseEventData eventData) { }
 
-        public void Open(bool resetToSavedProperties = true, bool skipAnimation = false, UIAnimation overrideAnimation = null) {
+        public void Open(bool resetToSavedProperties = true, bool skipAnimation = false, UIAnimation overrideAnimation = null, bool focus = true) {
             if(Opened) {
                 return;
             }
@@ -251,8 +251,10 @@ namespace Elarion.UI {
             }
 
             OpenInternal(skipAnimation, overrideAnimation);
-            
-            UpdateFocus();
+
+            if(focus) {
+                FocusThis();
+            }
         }
 
         public void Close(bool skipAnimation = false, UIAnimation overrideAnimation = null) {
@@ -424,7 +426,7 @@ namespace Elarion.UI {
             UpdateChildState(State, _oldState);
         }
 
-        protected virtual void UpdateFocus() {
+        protected virtual void FocusThis() {
             // Get the bottom focused component
             if(FirstFocused == null) {
                 return;
