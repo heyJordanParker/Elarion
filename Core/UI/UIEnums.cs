@@ -64,7 +64,8 @@ namespace Elarion.UI {
     // loading state?
     [Serializable, Flags]
     public enum UIState {
-        NotInitialized = 0 << 0, // the element is off (in the hierarchy)
+        NotInitialized = -1,
+        None = 0 << 0, // the element is off (in the hierarchy)
         Opened = 1 << 0, // is this element supposed to be visible on screen
         InTransition = 1 << 1, // is this element in transition (maybe rename to InAnimation)
         FocusedThis = 1 << 2, // is this element focused - usually yes, but might not be if there's an edgemenu for example

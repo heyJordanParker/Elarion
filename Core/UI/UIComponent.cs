@@ -12,11 +12,6 @@ namespace Elarion.UI {
     [RequireComponent(typeof(RectTransform))]
     [DisallowMultipleComponent]
     public abstract class UIComponent : UIBehaviour, ISubmitHandler, ICancelHandler {
-        // TODO button behavior - a behavior controlling a builtin button, adding onClick handlers - button type dropdown - open/close panel/popup, switch scene etc
-        
-        // TODO difference between interactable and disabled (always not interactable while disabled, but not always disabled when no interactable)
-        // TODO disable interactions while animating - the user can type/submit while the UI is animating
-        
         // TODO visibility options (in another component) - mobile only, landscape only, portrait only, desktop only, depending on parent State etc
         // TODO visibility options (screen/parent size based - use the OnParentChanged thing)
         // TODO visibility options component can work with a manually-settable Hidden flag (no enabling/disabling conflicts)
@@ -32,8 +27,10 @@ namespace Elarion.UI {
 
         protected UIAnimator animator;
 
-        private UIState _oldState;
-        private UIState _state;
+        private UIRoot _uiRoot;
+        
+        private UIState _oldState = UIState.NotInitialized;
+        private UIState _state = UIState.None;
 
         public RectTransform Transform { get; private set; }
 
@@ -120,10 +117,10 @@ namespace Elarion.UI {
             get { return State.HasFlag(UIState.FocusedChild); }
             set { State = State.SetFlag(UIState.FocusedChild, value); }
         }
-        
-        protected bool Interactable {
+
+        public bool Interactable {
             get { return State.HasFlag(UIState.Interactable); }
-            set { State = State.SetFlag(UIState.Interactable, value); }
+            protected set { State = State.SetFlag(UIState.Interactable, value); }
         }
 
         protected virtual bool InteractableSelf {
@@ -139,6 +136,7 @@ namespace Elarion.UI {
             }
         }
 
+        // TODO HasComponent function in utils
         protected bool HasAnimator {
             get { return animator != null && animator.enabled; }
         }
@@ -234,7 +232,7 @@ namespace Elarion.UI {
         protected virtual void OnSubmitInternal(BaseEventData eventData) { }
         protected virtual void OnCancelInternal(BaseEventData eventData) { }
 
-        public void Open(bool resetToSavedProperties = true, bool skipAnimation = false, UIAnimation overrideAnimation = null, bool focus = true) {
+        public void Open(bool skipAnimation = false, UIAnimation overrideAnimation = null, bool focus = true) {
             if(Opened) {
                 return;
             }
@@ -255,14 +253,6 @@ namespace Elarion.UI {
             if(focus) {
                 FocusThis();
             }
-        }
-
-        public void Close(bool skipAnimation = false, UIAnimation overrideAnimation = null) {
-            if(!Opened) {
-                return;
-            }
-
-            CloseInternal(skipAnimation, overrideAnimation);
         }
         
         protected virtual void OpenInternal(bool skipAnimation, UIAnimation overrideAnimation) {
@@ -305,6 +295,14 @@ namespace Elarion.UI {
                 child.OpenInternal(skipAnimation, null);
             }
         }
+        
+        public void Close(bool skipAnimation = false, UIAnimation overrideAnimation = null) {
+            if(!Opened) {
+                return;
+            }
+
+            CloseInternal(skipAnimation, overrideAnimation);
+        }
 
         protected virtual void CloseInternal(bool skipAnimation = false, UIAnimation overrideAnimation = null, bool closeChildren = true) {
             if(!Opened) {
@@ -312,7 +310,10 @@ namespace Elarion.UI {
             }
             
             Opened = false;
-            FocusedThis = false;
+
+            if(FocusedThis) {
+                FocusParent();
+            }
 
             if(closeChildren) {
                 foreach(var child in ChildElements) {
@@ -432,8 +433,20 @@ namespace Elarion.UI {
                 return;
             }
 
+            if(!Opened) {
+                var parentComponent = Parent as UIComponent;
+                if(parentComponent) {
+                    parentComponent.FocusThis();
+                    return;
+                }
+                
+                UIRoot.CurrentScene.FocusThis();
+                return;
+            }
+
             var focusedComponent = this;
 
+            // Traverse hierarchy down
             while(true) {
                 if(focusedComponent.FirstFocused == null) {
                     break;
@@ -441,29 +454,53 @@ namespace Elarion.UI {
                 
                 var nextComponent = focusedComponent.FirstFocused.GetComponent<UIComponent>();
 
-                if(nextComponent == null || nextComponent == focusedComponent) {
+                if(nextComponent == null || nextComponent == focusedComponent || !nextComponent.Opened) {
                     break;
                 }
 
                 focusedComponent = nextComponent;
             }
-
+            
             focusedComponent.Focus();
 
-            var target = focusedComponent.FirstFocused;
+            var firstFocused = focusedComponent.FirstFocused;
 
-            if(target == null) {
-                target = focusedComponent.gameObject;
+            var firstFocusedComponent = firstFocused.GetComponent<UIComponent>();
+
+            // don't focus a child component that's not opened
+            if(firstFocusedComponent != null && !firstFocusedComponent.Opened) {
+                firstFocused = ChildElements.Where(child => child.Opened).Select(child => child.gameObject)
+                    .FirstOrDefault();
+            }
+            
+            if(firstFocused == null) {
+                firstFocused = focusedComponent.gameObject;
             }
 
-            var selectable = target.GetFirstSelectableChild();
+            var selectable = firstFocused.GetFirstSelectableChild();
 
             if(selectable) {
                 UIRoot.Focus(selectable);
             }
         }
 
+        private void FocusParent() {
+            var parent = Parent as UIComponent;
+
+            if(parent == null || !parent.Opened) {
+                parent = UIRoot.CurrentScene;
+            }
+
+            if(parent == null || !parent.Opened) {
+                return;
+            }
+            
+            parent.Focus();
+            parent.FocusThis();
+        }
+
         protected override void OnTransformParentChanged() {
+            base.OnTransformParentChanged();
             UpdateParent();
         }
 
@@ -490,19 +527,24 @@ namespace Elarion.UI {
             return stringBuilder.ToString();
         }
 
-        protected UIRoot UIRoot {
+        public UIRoot UIRoot {
             get {
-                var uiRoot = UIRoot.UIRootCache.SingleOrDefault(root => root.transform.IsParentOf(transform));
+                if(_uiRoot == null) {
+                    _uiRoot = UIRoot.UIRootCache.SingleOrDefault(root => root.transform.IsParentOf(transform));
 
-                if(uiRoot == null) {
-                    uiRoot = GetComponentInParent<UIRoot>();
+                    if(_uiRoot == null) {
+                        _uiRoot = GetComponentInParent<UIRoot>();
+                    }
                 }
 
-                return uiRoot;
+                return _uiRoot;
             }
         }
 
+        // TODO implement a hierarchy interface containing transform, parent, and children in UIComponent and UIRoot
+        // TODO create a smarter & faster search using the fields from the hierarchy interface
         private static List<UIComponent> _uiComponentCache;
+
         internal static List<UIComponent> UIComponentCache {
             get {
                 if(_uiComponentCache == null) {
@@ -512,5 +554,20 @@ namespace Elarion.UI {
                 return _uiComponentCache;
             }
         }
+
+        public static UIComponent GetUIComponentParent(Transform t) {
+            var target = t;
+
+            while(target != null) {
+                var component = UIComponentCache.SingleOrDefault(c => c.gameObject == target.gameObject);
+                if(component != null) {
+                    return component;
+                }
+
+                target = target.transform.parent;
+            }
+            
+            return null;
+        } 
     }
 }

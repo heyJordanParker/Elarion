@@ -12,9 +12,6 @@ using UnityEngine.UI;
 namespace Elarion.UI {
     // TODO make this an invisible manager (initializeOnLoad + a hidden MonoBehaviour that updates it)
     
-    // TODO add canvas scaler when creating presets
-    // TODO use this (as the converging and final point of the UI hierarchy) to handle the blur; when a UI element Opens, all other elements on the same hierarchical level can blur (optional open/close parameter); maybe blur by default, but only when calling Open manually (not when it's called automagically in the children components)
-
     // TODO add a fullscreen checkbox to panels (to easily set them to cover the full screen (only in editor.onValidate))
 
     [RequireComponent(typeof(Canvas))]
@@ -38,6 +35,15 @@ namespace Elarion.UI {
 
         private UIScene _currentScene;
 
+        protected BaseEventData BaseEventData {
+            get {
+                if(_baseEventData == null)
+                    _baseEventData = new BaseEventData(EventSystem.current);
+                _baseEventData.Reset();
+                return _baseEventData;
+            }
+        }
+        
         public UIScene CurrentScene {
             get { return _currentScene; }
             set {
@@ -55,14 +61,13 @@ namespace Elarion.UI {
                 }
             }
         }
-        
-        protected BaseEventData BaseEventData {
-            get {
-                if(_baseEventData == null)
-                    _baseEventData = new BaseEventData(EventSystem.current);
-                _baseEventData.Reset();
-                return _baseEventData;
-            }
+
+        public GameObject FocusedObject {
+            get { return _focusedObject; }
+        }
+
+        public UIComponent FocusedComponent {
+            get { return _focusedComponent; }
         }
 
         protected string SubmitButton {
@@ -171,6 +176,7 @@ namespace Elarion.UI {
             }
 
             UIComponent.UnfocusAll();
+            
             _focusedComponent = null;
 
             var focusedTransform = _focusedObject.transform;
@@ -191,13 +197,15 @@ namespace Elarion.UI {
 
         // off-clicks aren't consistent in unfocusing
         private void HandleTabNavigation() {
-            if(!enableTabNavigation) {
+            if(!enableTabNavigation ||
+               !EventSystem.isFocused ||
+               !EventSystem.sendNavigationEvents) {
                 return;
             }
 
             if(!Input.GetKeyDown(KeyCode.Tab)) return;
 
-            var selectable = EventSystem.currentSelectedGameObject ? GetValidSelectable(EventSystem.currentSelectedGameObject) : null;
+            var selectable = EventSystem.currentSelectedGameObject ? GetValidSelectableChild(EventSystem.currentSelectedGameObject) : null;
             Selectable nextSelectable = null;
             
             if(selectable) {
@@ -234,17 +242,25 @@ namespace Elarion.UI {
             if(!selectable) {
                 if(!_focusedComponent) return;
 
-                nextSelectable = GetValidSelectable(_focusedComponent.gameObject);
+                nextSelectable = GetValidSelectableChild(_focusedComponent.gameObject);
             }
-
+            
             if(nextSelectable == null || !nextSelectable.IsInteractable() || nextSelectable.navigation.mode == Navigation.Mode.None) return;
             
+            // check if the parent UIComponent is interactable
+            var parentComponent = UIComponent.GetUIComponentParent(nextSelectable.transform);
+                
+            if(parentComponent != null && !parentComponent.Interactable) {
+                return;
+            }
             
+            FocusComponent(parentComponent, true);
             Focus(nextSelectable);
         }
 
-        private Selectable GetValidSelectable(GameObject go) {
-            return go.GetSelectableChildren().SingleOrDefault(s => s.IsInteractable() && s.navigation.mode != Navigation.Mode.None);
+        private Selectable GetValidSelectableChild(GameObject go) {
+            return go.GetSelectableChildren().FirstOrDefault(child => child.IsInteractable() && child.navigation.mode != Navigation.Mode.None);
+
         }
         
         protected bool SendNavigationEventsToFocusedComponent() {
@@ -255,20 +271,22 @@ namespace Elarion.UI {
             }
 
             var baseEventData = BaseEventData;
-            
-            if(EventSystem.currentInputModule.input.GetButtonDown(SubmitButton))
+
+            if(EventSystem.currentInputModule.input.GetButtonDown(SubmitButton)) {
                 ExecuteEvents.Execute(_focusedComponent.gameObject, baseEventData,
                     ExecuteEvents.submitHandler);
-            
-            if(EventSystem.currentInputModule.input.GetButtonDown(CancelButton))
+            }
+
+            if(EventSystem.currentInputModule.input.GetButtonDown(CancelButton)) {
                 ExecuteEvents.Execute(_focusedComponent.gameObject, baseEventData,
                     ExecuteEvents.cancelHandler);
+            }
             
             return baseEventData.used;
         }
         
         public void Focus(Selectable selectable) {
-            if(!selectable) {
+            if(!selectable || !EventSystem) {
                 return;
             }
             
