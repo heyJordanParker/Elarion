@@ -12,32 +12,44 @@ namespace Elarion.UI {
     [RequireComponent(typeof(RectTransform))]
     [DisallowMultipleComponent]
     public abstract class UIComponent : UIBehaviour, ISubmitHandler, ICancelHandler {
-        // TODO visibility options (in another component) - mobile only, landscape only, portrait only, desktop only, depending on parent State etc
-        // TODO visibility options (screen/parent size based - use the OnParentChanged thing)
-        // TODO visibility options component can work with a manually-settable Hidden flag (no enabling/disabling conflicts)
-        // TODO visibility options require a canvas - they turn off the canvas when the condition isn't met (in this manner they can work on any object in the hierarchy and it's children)
+        // TODO Add ExecuteInEditMode to simplify things, break down the awake method to Initialize (called both in and out of play mode) and OnInitialize (called only in play mode); do the same for the destroy method 
+        
+        // TODO open component if it's closed and the visibility options changed; hook to a conditionalvisibility event
 
         public event Action<UIState,UIState> OnStateChanged = (currentState, oldState) => { };
         
-        [SerializeField]
-        protected UIEffect[] effects;
+        protected UIEffect[] effects = new UIEffect[0];
 
         [SerializeField]
         private UIOpenType _openType = UIOpenType.OpenWithParent;
 
-        protected UIAnimator animator;
+        private UIAnimator _animator;
 
         private UIRoot _uiRoot;
         
         private UIState _oldState = UIState.NotInitialized;
         private UIState _state = UIState.None;
+        private RectTransform _transform;
 
-        public RectTransform Transform { get; private set; }
+        public RectTransform Transform {
+            get {
+                if(_transform == null) {
+                    _transform = GetComponent<RectTransform>();
+                }
+
+                return _transform;
+            }
+        }
 
         public UIBehaviour Parent { get; protected set; }
 
         protected IEnumerable<UIComponent> ChildElements {
             get { return UIComponentCache.Where(component => component.Parent == this); }
+        }
+        
+        public UIAnimator Animator {
+            get { return _animator; }
+            protected set { _animator = value; }
         }
 
         public UIState State {
@@ -65,7 +77,7 @@ namespace Elarion.UI {
                     return false;
                 }
 
-                if(HasAnimator && animator.HasAnimation(UIAnimationType.OnClose)) {
+                if(HasAnimator && Animator.HasAnimation(UIAnimationType.OnClose)) {
                     return false;
                 }
                 
@@ -137,12 +149,18 @@ namespace Elarion.UI {
         }
 
         // TODO HasComponent function in utils
-        protected bool HasAnimator {
-            get { return animator != null && animator.enabled; }
+        public bool HasAnimator {
+            get {
+                if(Animator == null) {
+                    Animator = GetComponent<UIAnimator>();
+                }
+                
+                return Animator != null && Animator.enabled;
+            }
         }
 
         public bool IsAnimating {
-            get { return HasAnimator && animator.Animating; }
+            get { return HasAnimator && Animator.Animating; }
         }
 
         public abstract float Alpha { get; set; }
@@ -151,9 +169,7 @@ namespace Elarion.UI {
 
         protected override void Awake() {
             base.Awake();
-            
-            Transform = GetComponent<RectTransform>();
-            animator = GetComponent<UIAnimator>();
+            Animator = GetComponent<UIAnimator>();
 
             UIComponentCache.Add(this);
         }
@@ -193,10 +209,14 @@ namespace Elarion.UI {
             UIComponentCache.Remove(this);
         }
 
-        public virtual void Focus() {
+        public virtual void Focus(bool setSelection = false) {
             UnfocusAll();
 
             FocusedThis = true;
+
+            if(setSelection) {
+                SelectDefaultChild();
+            }
         }
 
         public virtual void Unfocus() {
@@ -209,7 +229,7 @@ namespace Elarion.UI {
             }
         }
         
-        // TODO consider using a UnityEvent for handling those 
+        // TODO create UISubmitable and UICancelable helper components (add them to the menu) 
         public void OnSubmit(BaseEventData eventData) {
             if(!Interactable) {
                 return;
@@ -232,7 +252,8 @@ namespace Elarion.UI {
         protected virtual void OnSubmitInternal(BaseEventData eventData) { }
         protected virtual void OnCancelInternal(BaseEventData eventData) { }
 
-        public void Open(bool skipAnimation = false, UIAnimation overrideAnimation = null, bool focus = true) {
+        // TODO leave just one inheritable open/close/submit/cancel method
+        public virtual void Open(bool skipAnimation = false, UIAnimation overrideAnimation = null, bool focus = true) {
             if(Opened) {
                 return;
             }
@@ -251,7 +272,7 @@ namespace Elarion.UI {
             OpenInternal(skipAnimation, overrideAnimation);
 
             if(focus) {
-                FocusThis();
+                SelectDefaultChild();
             }
         }
         
@@ -272,15 +293,17 @@ namespace Elarion.UI {
 
             if(!HasAnimator || skipAnimation) {
                 AfterOpen();
+
+                // reset to saved properties?
                 return;
             }
             
-            animator.ResetToSavedProperties();
+            Animator.ResetToSavedProperties();
 
             if(overrideAnimation != null) {
-                animator.Play(overrideAnimation, callback: AfterOpen);
+                Animator.Play(overrideAnimation, callback: AfterOpen);
             } else {
-                animator.Play(UIAnimationType.OnOpen, callback: AfterOpen);
+                Animator.Play(UIAnimationType.OnOpen, callback: AfterOpen);
             }
         }
 
@@ -327,9 +350,9 @@ namespace Elarion.UI {
             }
 
             if(overrideAnimation != null) {
-                animator.Play(overrideAnimation, callback: AfterClose);
+                Animator.Play(overrideAnimation, callback: AfterClose);
             } else {
-                animator.Play(UIAnimationType.OnClose, callback: AfterClose);
+                Animator.Play(UIAnimationType.OnClose, callback: AfterClose);
             }
         }
 
@@ -427,7 +450,7 @@ namespace Elarion.UI {
             UpdateChildState(State, _oldState);
         }
 
-        protected virtual void FocusThis() {
+        protected virtual void SelectDefaultChild() {
             // Get the bottom focused component
             if(FirstFocused == null) {
                 return;
@@ -436,11 +459,11 @@ namespace Elarion.UI {
             if(!Opened) {
                 var parentComponent = Parent as UIComponent;
                 if(parentComponent) {
-                    parentComponent.FocusThis();
+                    parentComponent.SelectDefaultChild();
                     return;
                 }
                 
-                UIRoot.CurrentScene.FocusThis();
+                UIRoot.CurrentScene.SelectDefaultChild();
                 return;
             }
 
@@ -479,8 +502,8 @@ namespace Elarion.UI {
 
             var selectable = firstFocused.GetFirstSelectableChild();
 
-            if(selectable) {
-                UIRoot.Focus(selectable);
+            if(selectable && UIRoot) {
+                UIRoot.SetSelection(selectable);
             }
         }
 
@@ -496,7 +519,7 @@ namespace Elarion.UI {
             }
             
             parent.Focus();
-            parent.FocusThis();
+            parent.SelectDefaultChild();
         }
 
         protected override void OnTransformParentChanged() {

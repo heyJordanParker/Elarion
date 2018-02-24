@@ -21,6 +21,14 @@ namespace Elarion.UI {
             get { return Opened || InTransition; }
         }
 
+        public override void Open(bool skipAnimation = false, UIAnimation overrideAnimation = null, bool focus = true) {
+            if(UIRoot.CurrentScene != this) {
+                UIRoot.OpenScene(this, skipAnimation, overrideAnimation);
+                return;
+            }
+            base.Open(skipAnimation, overrideAnimation, focus);
+        }
+
         protected override void OpenInternal(bool skipAnimation, UIAnimation overrideAnimation) {
             transform.SetAsLastSibling();
             

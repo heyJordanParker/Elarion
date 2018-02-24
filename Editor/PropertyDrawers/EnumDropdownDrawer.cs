@@ -6,10 +6,13 @@ using UnityEngine;
 namespace Elarion.Editor.PropertyDrawers {
     [CustomPropertyDrawer(typeof(EnumDropdownAttribute))]
     public class EnumDropdownDrawer : PropertyDrawer {
+        private EnumDropdownAttribute EnumAttribute {
+            get { return ((EnumDropdownAttribute) attribute); }
+        }
 
-        private EnumDropdownAttribute EnumAttribute { get { return ((EnumDropdownAttribute)attribute); } }
-
-        public override float GetPropertyHeight(SerializedProperty property, GUIContent label) { return base.GetPropertyHeight(property, label); }
+        public override float GetPropertyHeight(SerializedProperty property, GUIContent label) {
+            return base.GetPropertyHeight(property, label);
+        }
 
         public override void OnGUI(Rect position, SerializedProperty property, GUIContent label) {
 
@@ -26,12 +29,12 @@ namespace Elarion.Editor.PropertyDrawers {
             if(EditorGUI.EndChangeCheck()) {
                 property.intValue = enumValueIndex;
             }
+
             EditorGUI.EndProperty();
         }
 
         public string[] GetEnumerationNames(Type type) {
             return Enum.GetNames(type);
         }
-
     }
 }

@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using Elarion.UI;
 using Elarion.UI.Animation;
@@ -11,13 +12,43 @@ namespace Elarion.Editor.Editors {
     [CanEditMultipleObjects]
     public class UIComponentEditor : UnityEditor.Editor {
         
+        private static readonly Type[] HelperComponents = {
+            typeof(UIAnimator),
+            typeof(UIConditionalVisibility),
+        };
+
+        private Dictionary<Type, Component> _helpers;
+        
         private GUIStyle _previewStyle;
 
         private UIAnimator _animator;
-
+        
         protected UIComponent Target {
             get {
                 return target as UIComponent;
+            }
+        }
+
+        protected Dictionary<Type, Component> Helpers {
+            get {
+                if(_helpers == null) {
+                    _helpers = new Dictionary<Type, Component>();
+                    UpdateHelpers();
+                }
+
+                return _helpers;
+            }
+        }
+
+        protected bool HasAllHelpers {
+            get {
+                foreach(var helperComponent in Helpers.Values) {
+                    if(!helperComponent) {
+                        return false;
+                    } 
+                }
+
+                return true;
             }
         }
 
@@ -48,7 +79,7 @@ namespace Elarion.Editor.Editors {
         public override void OnInspectorGUI() {
             base.OnInspectorGUI();
 
-            if(!Application.isPlaying && Animator) {
+            if(!Application.isPlaying && HasAllHelpers || targets.Length > 1) {
                 return;
             }
             
@@ -78,14 +109,38 @@ namespace Elarion.Editor.Editors {
                         EventSystem.current.SetSelectedGameObject(Target.gameObject);
                     }
                 }
-            } else if(!Animator) {
-                if(GUILayout.Button("Add Animator", GUILayout.MaxWidth(250))) {
-                    var components = targets.OfType<UIComponent>().ToList();
 
-                    Undo.RecordObjects(components.Select(t => t.gameObject).ToArray(), "Add UIAnimator");
-                    foreach(var component in components) {
-                        component.gameObject.AddComponent<UIAnimator>();
+                if(Target.HasAnimator) {
+                    label = "Reset";
+                    if(GUILayout.Button(label, GUILayout.MaxWidth(180))) {
+                        Animator.ResetToSavedPropertiesGraceful();
+                        EventSystem.current.SetSelectedGameObject(Target.gameObject);
                     }
+                }
+            } else {
+                var dropdownItems = new Dictionary<Type, string>();
+                
+                dropdownItems.Add(typeof(int), "Add Helper Component");
+
+                foreach(var helper in Helpers) {
+                    if(helper.Value != null) {
+                        // No need to add existing components
+                        continue;
+                    }
+                    
+                    dropdownItems.Add(helper.Key, ObjectNames.NicifyVariableName(helper.Key.Name.Replace("UI", "")));
+                }
+                
+                var index = EditorGUILayout.Popup(0, dropdownItems.Values.ToArray(), new GUIStyle("DropDownButton"), GUILayout.MaxWidth(250));
+
+                if(index != 0) {
+                    var component = dropdownItems.ElementAt(index).Key;
+                    
+                    Undo.RecordObject(target, "Add " + component.Name);
+                    
+                    Target.gameObject.AddComponent(component);
+                    
+                    UpdateHelpers();
                 }
             }
             
@@ -94,6 +149,13 @@ namespace Elarion.Editor.Editors {
             GUILayout.EndHorizontal();
             
             GUILayout.Space(10);
+        }
+
+        private void UpdateHelpers() {
+            Helpers.Clear();
+            foreach(var helperComponent in HelperComponents) {
+                Helpers.Add(helperComponent, Target.GetComponent(helperComponent));
+            }
         }
 
         public override bool HasPreviewGUI() {

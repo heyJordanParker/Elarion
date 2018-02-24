@@ -1,66 +1,68 @@
-﻿using UnityEngine;
+﻿using System.Runtime.InteropServices;
+using UnityEngine;
 
-public class ClipboardHelper {
-    private static IBoard _board;
+namespace Elarion.Utility {
+    public class ClipboardHelper {
+        private static IBoard _board;
 
-    private static IBoard Board {
-        get {
-            if(_board == null) {
+        private static IBoard Board {
+            get {
+                if(_board == null) {
 #if UNITY_EDITOR || UNITY_STANDALONE
-                _board = new StandaloneBoard();
+                    _board = new StandaloneBoard();
 #elif UNITY_ANDROID
                 _board = new AndroidBoard();
                 #elif UNITY_IOS
                 _board = new IOSBoard ();
                 #endif
+                }
+                return _board;
             }
-            return _board;
+        }
+
+        public static void SetText(string str) {
+            Board.SetText(str);
+        }
+
+        public static string GetText() {
+            return Board.GetText();
         }
     }
 
-    public static void SetText(string str) {
-        Board.SetText(str);
+    internal interface IBoard {
+        void SetText(string str);
+        string GetText();
     }
-
-    public static string GetText() {
-        return Board.GetText();
-    }
-}
-
-internal interface IBoard {
-    void SetText(string str);
-    string GetText();
-}
 
 #if UNITY_EDITOR || UNITY_STANDALONE
-internal class StandaloneBoard : IBoard {
-    public void SetText(string str) {
-        GUIUtility.systemCopyBuffer = str;
-    }
+    internal class StandaloneBoard : IBoard {
+        public void SetText(string str) {
+            GUIUtility.systemCopyBuffer = str;
+        }
 
-    public string GetText() {
-        return GUIUtility.systemCopyBuffer;
+        public string GetText() {
+            return GUIUtility.systemCopyBuffer;
+        }
     }
-}
 #endif
 
 #if UNITY_IOS
-class IOSBoard : IBoard {
-    [DllImport("__Internal")]
-    static extern void SetText_ (string str);
-    [DllImport("__Internal")]
-    static extern string GetText_();
+    class IOSBoard : IBoard {
+        [DllImport("__Internal")]
+        static extern void SetText_ (string str);
+        [DllImport("__Internal")]
+        static extern string GetText_();
 
-    public void SetText(string str){
-        if (Application.platform != RuntimePlatform.OSXEditor) {
-            SetText_ (str);
+        public void SetText(string str){
+            if (Application.platform != RuntimePlatform.OSXEditor) {
+                SetText_ (str);
+            }
+        }
+
+        public string GetText(){
+            return GetText_();
         }
     }
-
-    public string GetText(){
-        return GetText_();
-    }
-}
 #endif
 
 #if UNITY_ANDROID
@@ -77,3 +79,4 @@ internal class AndroidBoard : IBoard {
     }
 }
 #endif
+}

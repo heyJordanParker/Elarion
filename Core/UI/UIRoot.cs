@@ -46,20 +46,6 @@ namespace Elarion.UI {
         
         public UIScene CurrentScene {
             get { return _currentScene; }
-            set {
-                if(value == null || value == _currentScene) {
-                    return;
-                }
-
-                if(_currentScene != null) {
-                    _currentScene.Close();
-                }
-
-                _currentScene = value;
-                if(!_currentScene.Opened) {
-                    _currentScene.Open();
-                }
-            }
         }
 
         public GameObject FocusedObject {
@@ -106,6 +92,21 @@ namespace Elarion.UI {
             }
         }
 
+        public void OpenScene(UIScene scene, bool skipAnimation = false, UIAnimation overrideOpenAnimation = null, UIAnimation overrideCloseAnimation = null) {
+            if(scene == null || scene == _currentScene) {
+                return;
+            }
+
+            if(_currentScene != null) {
+                _currentScene.Close(skipAnimation, overrideCloseAnimation);
+            }
+
+            _currentScene = scene;
+            if(!_currentScene.Opened) {
+                _currentScene.Open(skipAnimation, overrideOpenAnimation);
+            }
+        }
+
         // override all the unneeded fields (and make them useless); make fields that shouldn't be used here virtual and override them with empty values as well
         protected override void Awake() {
             base.Awake();
@@ -135,24 +136,16 @@ namespace Elarion.UI {
 
             if(_scenes == null) {
                 _scenes = GetComponentsInChildren<UIScene>();
+                if(_scenes == null) {
+                    return;
+                }
             }
-
-            for(var i = 0; i < _scenes.Length; ++i) {
-                var scene = _scenes[i];
-                
-                scene.OnStateChanged += (state, oldState) => {
-                    if(state.HasFlag(UIState.Opened) && !oldState.HasFlag(UIState.Opened)) {
-                        // Just opened
-                        CurrentScene = scene;
-                    }
-                };
-            }
-
+            
             if(!initialScene) {
                 initialScene = _scenes.Length > 0 ? _scenes[0] : null;
             }
 
-            CurrentScene = initialScene;
+            OpenScene(initialScene);
         }
 
         protected virtual void Update() {
@@ -255,7 +248,7 @@ namespace Elarion.UI {
             }
             
             FocusComponent(parentComponent, true);
-            Focus(nextSelectable);
+            SetSelection(nextSelectable);
         }
 
         private Selectable GetValidSelectableChild(GameObject go) {
@@ -285,7 +278,7 @@ namespace Elarion.UI {
             return baseEventData.used;
         }
         
-        public void Focus(Selectable selectable) {
+        public void SetSelection(Selectable selectable) {
             if(!selectable || !EventSystem) {
                 return;
             }

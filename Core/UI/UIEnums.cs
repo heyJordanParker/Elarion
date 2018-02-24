@@ -18,19 +18,6 @@ namespace Elarion.UI {
     }
 
     [Serializable]
-    [Flags]
-    public enum UIEffectTrigger {
-        Visible = 1 << 0,
-        NotVisible = 1 << 1,
-        Opened = 1 << 2,
-        NotOpened = 1 << 3,
-        InTransition = 1 << 4,
-        NotInTransition = 1 << 5,
-        Focused = 1 << 6,
-        NotFocused = 1 << 7
-    }
-
-    [Serializable]
     public enum UIAnimationEase {
         Linear = Ease.Linear,
         Smooth = Ease.InOutCubic,

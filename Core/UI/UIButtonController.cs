@@ -1,4 +1,5 @@
 using System;
+using System.Net.Sockets;
 using Elarion.Attributes;
 using Elarion.UI.Animation;
 using UnityEngine;
@@ -79,7 +80,11 @@ namespace Elarion.UI {
             }
 
             if(openComponent) {
-                openComponent.Open(overrideAnimation: _openAnimationOverride);
+                if(openComponent.Opened) {
+                    openComponent.Focus(true);
+                } else {
+                    openComponent.Open(overrideAnimation: _openAnimationOverride);
+                }
             }
 
             if(closeComponent) {

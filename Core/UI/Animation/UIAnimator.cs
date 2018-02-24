@@ -192,6 +192,13 @@ namespace Elarion.UI.Animation {
 
         public void Play(UIAnimation animation, bool resetToSavedProperties = false, Action callback = null) {
             
+            if(animation == null) {
+                if(callback != null) {
+                    callback();
+                }
+                return;
+            }
+            
             // TODO concurrent animations; hover & click at the same time
             // track all animations; some animations stop other animations (e.g. close stops open)
             if(_currentAnimation != null) {
@@ -201,13 +208,6 @@ namespace Elarion.UI.Animation {
                 } else {
                     return;
                 }
-            }
-            
-            if(animation == null) {
-                if(callback != null) {
-                    callback();
-                }
-                return;
             }
             
             if(resetToSavedProperties) {
@@ -303,12 +303,12 @@ namespace Elarion.UI.Animation {
             AlphaTweener.ResetProperty();
         }
         
-        public void ResetToSavedPropertiesGraceful() {
-            PositionTweener.ResetPropertyGraceful();
-            AnchorsTweener.ResetPropertyGraceful();
-            RotationTweener.ResetPropertyGraceful();
-            SizeTweener.ResetPropertyGraceful();
-            AlphaTweener.ResetPropertyGraceful();
+        public void ResetToSavedPropertiesGraceful(float duration = 0.3f) {
+            PositionTweener.ResetPropertyGraceful(duration);
+            AnchorsTweener.ResetPropertyGraceful(duration);
+            RotationTweener.ResetPropertyGraceful(duration);
+            SizeTweener.ResetPropertyGraceful(duration);
+            AlphaTweener.ResetPropertyGraceful(duration);
         }
 
 #if UNITY_EDITOR

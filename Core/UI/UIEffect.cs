@@ -20,11 +20,10 @@ namespace Elarion.UI {
         // TODO show/hide something effect (show loaders & such)
 
         // TODO flags attribute (so that multiple states can be selected from the inspector); make sure it works with the conditional visibility
-        // TODO inverse states - effect only when it's NOT hovered
 
         [EnumMultipleDropdown]
         [Header("In which UIState should the effect activate")]
-        public UIEffectTrigger effectTrigger;
+        public UIConditionalVisibility.StateFilter effectTrigger;
 
         [Header("Effect Configuration")]
         public UIEffectType type = UIEffectType.Overlay;
@@ -133,37 +132,37 @@ namespace Elarion.UI {
 
             var currentState = owner.State;
 
-            foreach(var effectTriggerValue in Enum.GetValues(typeof(UIEffectTrigger))) {
+            foreach(var effectTriggerValue in Enum.GetValues(typeof(UIConditionalVisibility.StateFilter))) {
                 if(!effectTrigger.HasFlag(effectTriggerValue)) continue;
                 
                 
-                switch((UIEffectTrigger) effectTriggerValue) {
-                    case UIEffectTrigger.Focused:
+                switch((UIConditionalVisibility.StateFilter) effectTriggerValue) {
+                    case UIConditionalVisibility.StateFilter.Focused:
                         result = result ||
                                  currentState.HasFlag(UIState.FocusedThis) ||
                                  currentState.HasFlag(UIState.FocusedChild);
                         break;
-                    case UIEffectTrigger.NotFocused:
+                    case UIConditionalVisibility.StateFilter.NotFocused:
                         result = result ||
                                  !currentState.HasFlag(UIState.FocusedThis) &&
                                  !currentState.HasFlag(UIState.FocusedChild);
                         break;
-                    case UIEffectTrigger.InTransition:
+                    case UIConditionalVisibility.StateFilter.InTransition:
                         result = result || currentState.HasFlag(UIState.InTransition);
                         break;
-                    case UIEffectTrigger.NotInTransition:
+                    case UIConditionalVisibility.StateFilter.NotInTransition:
                         result = result || !currentState.HasFlag(UIState.InTransition);
                         break;
-                    case UIEffectTrigger.Opened:
+                    case UIConditionalVisibility.StateFilter.Opened:
                         result = result || currentState.HasFlag(UIState.Opened);
                         break;
-                    case UIEffectTrigger.NotOpened:
+                    case UIConditionalVisibility.StateFilter.NotOpened:
                         result = result || !currentState.HasFlag(UIState.Opened);
                         break;
-                    case UIEffectTrigger.Visible:
+                    case UIConditionalVisibility.StateFilter.Visible:
                         result = result || owner.ShouldRender;
                         break;
-                    case UIEffectTrigger.NotVisible:
+                    case UIConditionalVisibility.StateFilter.NotVisible:
                         result = result || !owner.ShouldRender;
                         break;
                 }

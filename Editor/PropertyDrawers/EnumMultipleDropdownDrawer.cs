@@ -14,16 +14,17 @@ namespace Elarion.Editor.PropertyDrawers {
         public override void OnGUI(Rect position, SerializedProperty property, GUIContent label) {
             var targetEnum = property.GetBaseProperty<Enum>();
 
-            string propName = MultipleDropdownAttribute.name;
-            if(string.IsNullOrEmpty(propName))
-                propName = property.name;
+            var name = MultipleDropdownAttribute.name;
+            if(!string.IsNullOrEmpty(name)) {
+                label.text = name;
+            }
 
             EditorGUI.BeginProperty(position, label, property);
             EditorGUI.BeginChangeCheck();
             
             var newEnum = EditorGUI.EnumMaskField(position, label, targetEnum);
             if(EditorGUI.EndChangeCheck()) {
-                property.intValue = (int)Convert.ChangeType(newEnum, targetEnum.GetType());
+                property.intValue = (int) Convert.ChangeType(newEnum, targetEnum.GetType());
             }
             EditorGUI.EndProperty();
         }
