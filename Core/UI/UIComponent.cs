@@ -6,7 +6,6 @@ using Elarion.Extensions;
 using Elarion.UI.Animation;
 using UnityEngine;
 using UnityEngine.EventSystems;
-using UnityEngine.UI;
 
 namespace Elarion.UI {
     [RequireComponent(typeof(RectTransform))]
@@ -18,28 +17,13 @@ namespace Elarion.UI {
 
         public event Action<UIState,UIState> OnStateChanged = (currentState, oldState) => { };
         
-        protected UIEffect[] effects = new UIEffect[0];
-
         [SerializeField]
         private UIOpenType _openType = UIOpenType.OpenWithParent;
-
-        private UIAnimator _animator;
 
         private UIRoot _uiRoot;
         
         private UIState _oldState = UIState.NotInitialized;
         private UIState _state = UIState.None;
-        private RectTransform _transform;
-
-        public RectTransform Transform {
-            get {
-                if(_transform == null) {
-                    _transform = GetComponent<RectTransform>();
-                }
-
-                return _transform;
-            }
-        }
 
         public UIBehaviour Parent { get; protected set; }
 
@@ -47,17 +31,16 @@ namespace Elarion.UI {
             get { return UIComponentCache.Where(component => component.Parent == this); }
         }
         
-        public UIAnimator Animator {
-            get { return _animator; }
-            protected set { _animator = value; }
-        }
+        public UIAnimator Animator { get; protected set; }
+        
+        public UIOpenCondition OpenCondition { get; protected set; }
 
         public UIState State {
             get { return _state; }
             protected set { _state = value; }
         }
 
-        protected virtual UIOpenType OpenType {
+        public virtual UIOpenType OpenType {
             get { return _openType; }
         }
 
@@ -148,7 +131,6 @@ namespace Elarion.UI {
             }
         }
 
-        // TODO HasComponent function in utils
         public bool HasAnimator {
             get {
                 if(Animator == null) {
@@ -170,6 +152,7 @@ namespace Elarion.UI {
         protected override void Awake() {
             base.Awake();
             Animator = GetComponent<UIAnimator>();
+            OpenCondition = GetComponent<UIOpenCondition>();
 
             UIComponentCache.Add(this);
         }
@@ -253,7 +236,10 @@ namespace Elarion.UI {
         protected virtual void OnCancelInternal(BaseEventData eventData) { }
 
         // TODO leave just one inheritable open/close/submit/cancel method
-        public virtual void Open(bool skipAnimation = false, UIAnimation overrideAnimation = null, bool focus = true) {
+        // TODO create PreOpen (and rename AfterOpen to PostOpen) methods to handle other cases (like setting this to the last child before opening [UIScene])
+        public virtual void Open(bool skipAnimation = false, UIAnimation overrideAnimation = null, bool focus = true, bool enable = true) {
+            
+            // TODO CanOpen method (and CanClose method)
             if(Opened) {
                 return;
             }
@@ -264,11 +250,21 @@ namespace Elarion.UI {
                parentComponent != null && !parentComponent.Opened) {
                     return;
             }
+
+            if(!gameObject.activeSelf && !enable) {
+                return;
+            }
             
-            if(!gameObject.activeSelf) {
+            if(OpenCondition && !OpenCondition.CanOpen) {
+                return;
+            }
+            // End CanOpen method
+            
+            if(enable && !gameObject.activeSelf) {
                 gameObject.SetActive(true);
             }
 
+            // pre open
             OpenInternal(skipAnimation, overrideAnimation);
 
             if(focus) {
@@ -283,8 +279,6 @@ namespace Elarion.UI {
             
             Opened = true;
             
-            // TODO register opens/closes in a static stack for undo functionality
-
             OpenChildren(UIOpenType.OpenWithParent, skipAnimation);
 
             if(skipAnimation) {
@@ -315,7 +309,7 @@ namespace Elarion.UI {
                     continue;
                 }
                 
-                child.OpenInternal(skipAnimation, null);
+                child.Open(skipAnimation, enable: false);
             }
         }
         
@@ -376,14 +370,6 @@ namespace Elarion.UI {
             }
             
             Render.enabled = ShouldRender;
-
-            foreach(var effect in effects) {
-                if(effect.ShouldBeActive(this) && !effect.Active) {
-                    effect.Start(this);
-                } else if(!effect.ShouldBeActive(this) && effect.Active) {
-                    effect.Stop(this);
-                }
-            }
             
             // TODO play focus/unfocus animations
 

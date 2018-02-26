@@ -22,7 +22,8 @@ namespace Elarion.Editor.PropertyDrawers {
             EditorGUI.BeginProperty(position, label, property);
             EditorGUI.BeginChangeCheck();
             
-            var newEnum = EditorGUI.EnumMaskField(position, label, targetEnum);
+            var newEnum = EditorGUI.EnumFlagsField(position, label, targetEnum);
+            
             if(EditorGUI.EndChangeCheck()) {
                 property.intValue = (int) Convert.ChangeType(newEnum, targetEnum.GetType());
             }

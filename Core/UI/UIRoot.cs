@@ -16,6 +16,7 @@ namespace Elarion.UI {
 
     [RequireComponent(typeof(Canvas))]
     [RequireComponent(typeof(GraphicRaycaster))]
+    [RequireComponent(typeof(CanvasScaler))]
     public class UIRoot : UIBehaviour {
         [SerializeField]
         [FormerlySerializedAs("_initialScene")]
@@ -54,6 +55,16 @@ namespace Elarion.UI {
 
         public UIComponent FocusedComponent {
             get { return _focusedComponent; }
+        }
+
+        // A properly scaled UIRoot is a better indication of the screen width than Screen.width
+        public float Width {
+            get { return Transform.sizeDelta.x; }
+        }
+        
+        // A properly scaled UIRoot is a better indication of the screen height than Screen.height
+        public float Height {
+            get { return Transform.sizeDelta.y; }
         }
 
         protected string SubmitButton {

@@ -1,10 +1,11 @@
-﻿using Elarion.UI;
+﻿using System.Text;
+using Elarion.UI;
 using UnityEditor;
 using UnityEngine;
 
 namespace Elarion.Editor.Editors {
-    [CustomEditor(typeof(UIConditionalVisibility), true)]
-    public class UIConditionalVisibilityEditor : UnityEditor.Editor {
+    [CustomEditor(typeof(UIOpenCondition), true)]
+    public class UIOpenConditionsEditor : UnityEditor.Editor {
 
         protected SerializedProperty platformProperty;
         protected SerializedProperty screenWidthProperty;
@@ -14,8 +15,8 @@ namespace Elarion.Editor.Editors {
         protected SerializedProperty parentStateProperty;
         protected SerializedProperty screenOrientationProperty;
         
-        protected UIConditionalVisibility Target {
-            get { return target as UIConditionalVisibility; }
+        protected UIOpenCondition Target {
+            get { return target as UIOpenCondition; }
         }
 
         private void OnEnable() {
@@ -33,54 +34,54 @@ namespace Elarion.Editor.Editors {
             
             var boldLabel = new GUIStyle("BoldLabel");
 
-            EditorGUILayout.LabelField("Visible only on the specified platforms", boldLabel);
+            EditorGUILayout.LabelField("Opens only on the specified platforms", boldLabel);
             
-            Target.platformFilter = EditorGUILayout.Toggle("Platform Filter", Target.platformFilter);
+            Target.platformCondition = EditorGUILayout.Toggle("Platform Condition", Target.platformCondition);
 
-            if(Target.platformFilter) {
+            if(Target.platformCondition) {
                 EditorGUILayout.PropertyField(platformProperty, new GUIContent("Show on Platforms"));
             }
             
-            EditorGUILayout.LabelField("Visible only on some screen sizes", boldLabel);
+            EditorGUILayout.LabelField("Opens only on some screen sizes", boldLabel);
             
-            Target.screenSizeFilter = EditorGUILayout.Toggle("Screen Size Filter", Target.screenSizeFilter);
+            Target.screenSizeCondition = EditorGUILayout.Toggle("Screen Size Condition", Target.screenSizeCondition);
 
-            if(Target.screenSizeFilter) {
+            if(Target.screenSizeCondition) {
                 EditorGUILayout.PropertyField(screenWidthProperty, new GUIContent("Min/Max Screen Width"));
                 EditorGUILayout.PropertyField(screenHeightProperty, new GUIContent("Min/Max Screen Height"));
             }
             
-            EditorGUILayout.LabelField("Visible only on some parent sizes", boldLabel);
+            EditorGUILayout.LabelField("Opens only on some parent sizes", boldLabel);
             
-            Target.parentSizeFilter = EditorGUILayout.Toggle("Parent Size Filter", Target.parentSizeFilter);
+            Target.parentSizeCondition = EditorGUILayout.Toggle("Parent Size Condition", Target.parentSizeCondition);
 
-            if(Target.parentSizeFilter) {
+            if(Target.parentSizeCondition) {
                 EditorGUILayout.PropertyField(parentWidthProperty, new GUIContent("Min/Max Parent Width"));
                 EditorGUILayout.PropertyField(parentHeightProperty, new GUIContent("Min/Max Parent Height"));
             }
             
-            EditorGUILayout.LabelField("Visible only in some parent states", boldLabel);
+            EditorGUILayout.LabelField("Opens only in some parent states", boldLabel);
             
-            Target.parentStateFilter = EditorGUILayout.Toggle("Parent State Filter", Target.parentStateFilter);
+            Target.parentStateCondition = EditorGUILayout.Toggle("Parent State Condition", Target.parentStateCondition);
 
-            if(Target.parentStateFilter) {
+            if(Target.parentStateCondition) {
                 EditorGUILayout.PropertyField(parentStateProperty, new GUIContent("Show in Parent State"));
             }
             
-            EditorGUILayout.LabelField("Visible only on the specified screen orientation (Mobile Only)", boldLabel);
+            EditorGUILayout.LabelField("Opens only on the specified screen orientation", boldLabel);
             
-            Target.orientationFilter = EditorGUILayout.Toggle("Orientation Filter", Target.orientationFilter);
+            Target.orientationCondition = EditorGUILayout.Toggle("Orientation Condition", Target.orientationCondition);
 
-            if(Target.orientationFilter) {
+            if(Target.orientationCondition) {
                 EditorGUILayout.PropertyField(screenOrientationProperty, new GUIContent("Show on Screen Orientation"));
             }
 
-            EditorGUILayout.HelpBox("This will be visible when...", MessageType.Info, true);
-
-            if(GUILayout.Button("Test")) {
-                Debug.Log(Screen.orientation);
+            if(Application.isPlaying) {
+                var text = new StringBuilder().AppendFormat("With current configuration {0} ", Target.name);
+                text.Append(Target.CanOpen ? "would open." : "would not open.");
+                EditorGUILayout.HelpBox(text.ToString(), MessageType.Info);
             }
-            
+
             serializedObject.ApplyModifiedProperties();
         }
     }

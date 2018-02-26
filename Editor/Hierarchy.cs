@@ -24,7 +24,7 @@ namespace Elarion.Editor {
 		static void OnDoubleClick(string guid, Rect rect) {
 			var now = DateTime.Now;
 			if((now - _lastClick) > new TimeSpan(0, 0, 0, 0, 500)) _clickCount = 0;
-			if(!Event.current.isMouse || Event.current.type != EventType.mouseDown || !rect.Contains(Event.current.mousePosition)) return;
+			if(!Event.current.isMouse || Event.current.type != EventType.MouseDown || !rect.Contains(Event.current.mousePosition)) return;
 			if(!rect.Contains(_clickPosition)) _clickCount = 1;
 			else ++_clickCount;
 			_clickPosition = Event.current.mousePosition;

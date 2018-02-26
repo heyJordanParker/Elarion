@@ -14,7 +14,7 @@ namespace Elarion.Editor.Editors {
         
         private static readonly Type[] HelperComponents = {
             typeof(UIAnimator),
-            typeof(UIConditionalVisibility),
+            typeof(UIOpenCondition),
         };
 
         private Dictionary<Type, Component> _helpers;
@@ -90,6 +90,7 @@ namespace Elarion.Editor.Editors {
             GUILayout.FlexibleSpace();
 
             if(Application.isPlaying) {
+                GUI.enabled = !Target.OpenCondition || Target.OpenCondition.CanOpen;
                 var label = Target.Opened ? "Close" : "Open";
                 if(GUILayout.Button(label, GUILayout.MaxWidth(180))) {
                     if(Target.Opened) {
@@ -98,6 +99,8 @@ namespace Elarion.Editor.Editors {
                         Target.Open();
                     }
                 }
+
+                GUI.enabled = Target.Opened;
 
                 label = Target.Focused ? "Unfocus" : "Focus";
                 if(GUILayout.Button(label, GUILayout.MaxWidth(180))) {
@@ -110,13 +113,15 @@ namespace Elarion.Editor.Editors {
                     }
                 }
 
-                if(Target.HasAnimator) {
-                    label = "Reset";
-                    if(GUILayout.Button(label, GUILayout.MaxWidth(180))) {
-                        Animator.ResetToSavedPropertiesGraceful();
-                        EventSystem.current.SetSelectedGameObject(Target.gameObject);
-                    }
+                GUI.enabled = Target.HasAnimator;
+                
+                label = "Reset";
+                if(GUILayout.Button(label, GUILayout.MaxWidth(180))) {
+                    Animator.ResetToSavedPropertiesGraceful();
+                    EventSystem.current.SetSelectedGameObject(Target.gameObject);
                 }
+
+                GUI.enabled = true;
             } else {
                 var dropdownItems = new Dictionary<Type, string>();
                 

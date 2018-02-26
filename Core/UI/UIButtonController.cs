@@ -12,6 +12,7 @@ namespace Elarion.UI {
         private enum Type {
             OpenComponent,
             CloseComponent,
+            ToggleComponent,
             OpenUIScene,
             Submit,
             Cancel,
@@ -20,7 +21,7 @@ namespace Elarion.UI {
         [SerializeField]
         private Type _type = Type.OpenUIScene;
 
-        [SerializeField, ConditionalVisibility("_type == Type.OpenComponent || Type.CloseComponent || Type.Submit || Type.Cancel")]
+        [SerializeField, ConditionalVisibility("_type == Type.OpenComponent || Type.CloseComponent || Type.Submit || Type.Cancel || _type == Type.ToggleComponent")]
         private UIComponent _targetComponent;
         [SerializeField, ConditionalVisibility("_type == Type.OpenUIScene")]
         private UIScene _targetScene;
@@ -61,6 +62,11 @@ namespace Elarion.UI {
                 case Type.CloseComponent:
                     closeComponent = _targetComponent;
                     break;
+                case Type.ToggleComponent:
+                    if(_targetComponent != null && _targetComponent.Opened) {
+                        goto case Type.CloseComponent;
+                    }
+                    goto case Type.OpenComponent;
                 case Type.OpenUIScene:
                     openComponent = _targetScene;
                     closeComponent = _targetScene.UIRoot ? _targetScene.UIRoot.CurrentScene : null;

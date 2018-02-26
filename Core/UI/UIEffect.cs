@@ -23,7 +23,7 @@ namespace Elarion.UI {
 
         [EnumMultipleDropdown]
         [Header("In which UIState should the effect activate")]
-        public UIConditionalVisibility.StateFilter effectTrigger;
+        public UIOpenCondition.StateCondition effectTrigger;
 
         [Header("Effect Configuration")]
         public UIEffectType type = UIEffectType.Overlay;
@@ -132,37 +132,37 @@ namespace Elarion.UI {
 
             var currentState = owner.State;
 
-            foreach(var effectTriggerValue in Enum.GetValues(typeof(UIConditionalVisibility.StateFilter))) {
+            foreach(var effectTriggerValue in Enum.GetValues(typeof(UIOpenCondition.StateCondition))) {
                 if(!effectTrigger.HasFlag(effectTriggerValue)) continue;
                 
                 
-                switch((UIConditionalVisibility.StateFilter) effectTriggerValue) {
-                    case UIConditionalVisibility.StateFilter.Focused:
+                switch((UIOpenCondition.StateCondition) effectTriggerValue) {
+                    case UIOpenCondition.StateCondition.Focused:
                         result = result ||
                                  currentState.HasFlag(UIState.FocusedThis) ||
                                  currentState.HasFlag(UIState.FocusedChild);
                         break;
-                    case UIConditionalVisibility.StateFilter.NotFocused:
+                    case UIOpenCondition.StateCondition.NotFocused:
                         result = result ||
                                  !currentState.HasFlag(UIState.FocusedThis) &&
                                  !currentState.HasFlag(UIState.FocusedChild);
                         break;
-                    case UIConditionalVisibility.StateFilter.InTransition:
+                    case UIOpenCondition.StateCondition.InTransition:
                         result = result || currentState.HasFlag(UIState.InTransition);
                         break;
-                    case UIConditionalVisibility.StateFilter.NotInTransition:
+                    case UIOpenCondition.StateCondition.NotInTransition:
                         result = result || !currentState.HasFlag(UIState.InTransition);
                         break;
-                    case UIConditionalVisibility.StateFilter.Opened:
+                    case UIOpenCondition.StateCondition.Opened:
                         result = result || currentState.HasFlag(UIState.Opened);
                         break;
-                    case UIConditionalVisibility.StateFilter.NotOpened:
+                    case UIOpenCondition.StateCondition.NotOpened:
                         result = result || !currentState.HasFlag(UIState.Opened);
                         break;
-                    case UIConditionalVisibility.StateFilter.Visible:
+                    case UIOpenCondition.StateCondition.Visible:
                         result = result || owner.ShouldRender;
                         break;
-                    case UIConditionalVisibility.StateFilter.NotVisible:
+                    case UIOpenCondition.StateCondition.NotVisible:
                         result = result || !owner.ShouldRender;
                         break;
                 }

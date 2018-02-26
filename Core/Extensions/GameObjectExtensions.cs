@@ -7,6 +7,26 @@ using UnityEngine.UI;
 namespace Elarion.Extensions {
 	public static class GameObjectExtensions {
 
+		public static bool HasComponent<T>(this GameObject gameObject) where T : MonoBehaviour {
+			T component;
+			if(!gameObject) {
+				return false;
+			}
+			
+			return gameObject.HasComponent<T>(out component);
+		}
+		
+		public static bool HasComponent<T>(this GameObject gameObject, out T component) where T : MonoBehaviour {
+			if(!gameObject) {
+				component = null;
+				return false;
+			}
+			
+			component = gameObject.GetComponent<T>();
+
+			return component && component.enabled;
+		}
+
 		public static T Component<T>(this GameObject go) where T : Component {
 			var component = go.GetComponent<T>();
 			if(component == null)
