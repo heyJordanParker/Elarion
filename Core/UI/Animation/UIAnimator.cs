@@ -1,4 +1,5 @@
 using System;
+using System.Collections;
 using System.Linq;
 using Elarion.Attributes;
 using Elarion.Utility;
@@ -191,7 +192,6 @@ namespace Elarion.UI.Animation {
         }
 
         public void Play(UIAnimation animation, bool resetToSavedProperties = false, Action callback = null) {
-            
             if(animation == null) {
                 if(callback != null) {
                     callback();
@@ -204,7 +204,7 @@ namespace Elarion.UI.Animation {
             if(_currentAnimation != null) {
                 if(animation == GetAnimation(UIAnimationType.OnOpen) ||
                    animation == GetAnimation(UIAnimationType.OnClose)) {
-                    _currentAnimation.Stop(this);    
+                    _currentAnimation.Stop(this);
                 } else {
                     return;
                 }
@@ -265,7 +265,7 @@ namespace Elarion.UI.Animation {
             UIAnimationOptions animationOptions = null) {
 
             var anchors = new Vector4(anchorMin.x, anchorMin.y, anchorMax.x, anchorMax.y);
-
+            
             AnchorsTweener.Tween(anchors, animationDirection, callback, animationOptions);
         }
 

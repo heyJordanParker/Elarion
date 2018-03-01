@@ -1,4 +1,3 @@
-using System;
 using System.Collections;
 using Elarion.Attributes;
 using Elarion.Extensions;
@@ -7,23 +6,13 @@ using UnityEngine;
 using UnityEngine.UI;
 
 namespace Elarion.UI {
-    // Effects are used for a temporary alteration of the object. Effects leave the object back in its' initial state when they end.
-    [Serializable]
-    public class UIEffect {
-        // TODO setup effects from the UIAnimator
-        // TODO UIEffects for animations
+    [RequireComponent(typeof(UIComponent))]
+    public class UIEffect : MonoBehaviour {
+        // TODO this a helper component that gracefully shows/hides an effect when the main element is opened/closed
         
-        // TODO make this a scriptable object
+        // TODO no trigger; use paired with the open conditions helper to achieve the same result
         
-        // Move/MoveAnchor, Scale, and Rotate effects - e.g. a note can scale down while moving
-        
-        // TODO show/hide something effect (show loaders & such)
-
-        // TODO flags attribute (so that multiple states can be selected from the inspector); make sure it works with the conditional visibility
-
-        [EnumMultipleDropdown]
-        [Header("In which UIState should the effect activate")]
-        public UIOpenCondition.StateCondition effectTrigger;
+        // TODO hook with the UIComponent's state changed event (& activate/ deactivate accordingly)
 
         [Header("Effect Configuration")]
         public UIEffectType type = UIEffectType.Overlay;
@@ -127,52 +116,8 @@ namespace Elarion.UI {
             }
         }
 
-        public bool ShouldBeActive(UIComponent owner) {
-            var result = false;
-
-            var currentState = owner.State;
-
-            foreach(var effectTriggerValue in Enum.GetValues(typeof(UIOpenCondition.StateCondition))) {
-                if(!effectTrigger.HasFlag(effectTriggerValue)) continue;
-                
-                
-                switch((UIOpenCondition.StateCondition) effectTriggerValue) {
-                    case UIOpenCondition.StateCondition.Focused:
-                        result = result ||
-                                 currentState.HasFlag(UIState.FocusedThis) ||
-                                 currentState.HasFlag(UIState.FocusedChild);
-                        break;
-                    case UIOpenCondition.StateCondition.NotFocused:
-                        result = result ||
-                                 !currentState.HasFlag(UIState.FocusedThis) &&
-                                 !currentState.HasFlag(UIState.FocusedChild);
-                        break;
-                    case UIOpenCondition.StateCondition.InTransition:
-                        result = result || currentState.HasFlag(UIState.InTransition);
-                        break;
-                    case UIOpenCondition.StateCondition.NotInTransition:
-                        result = result || !currentState.HasFlag(UIState.InTransition);
-                        break;
-                    case UIOpenCondition.StateCondition.Opened:
-                        result = result || currentState.HasFlag(UIState.Opened);
-                        break;
-                    case UIOpenCondition.StateCondition.NotOpened:
-                        result = result || !currentState.HasFlag(UIState.Opened);
-                        break;
-                    case UIOpenCondition.StateCondition.Visible:
-                        result = result || owner.ShouldRender;
-                        break;
-                    case UIOpenCondition.StateCondition.NotVisible:
-                        result = result || !owner.ShouldRender;
-                        break;
-                }
-            }
-            
-            return result;
-        }
-
-        // TODO move those to the UIAnimator version for UIEffects
-        public void Start(UIComponent targetComponent) {
+        public void Start() {
+            var targetComponent = GetComponent<UIComponent>();
             if(Active) {
                 return;
             }

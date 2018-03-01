@@ -4,7 +4,7 @@ using UnityEngine.UI;
 
 namespace Elarion.UI {
     [RequireComponent(typeof(Text))]
-    public class UIBreadcrumb : UIBehaviour {
+    public class UIBreadcrumb : BaseUIBehaviour {
 
         public UIComponent startingElement;
         public string elementSeparator = " - ";

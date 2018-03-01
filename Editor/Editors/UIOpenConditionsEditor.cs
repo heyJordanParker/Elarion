@@ -4,7 +4,7 @@ using UnityEditor;
 using UnityEngine;
 
 namespace Elarion.Editor.Editors {
-    [CustomEditor(typeof(UIOpenCondition), true)]
+    [CustomEditor(typeof(UIOpenConditions), true)]
     public class UIOpenConditionsEditor : UnityEditor.Editor {
 
         protected SerializedProperty platformProperty;
@@ -15,8 +15,8 @@ namespace Elarion.Editor.Editors {
         protected SerializedProperty parentStateProperty;
         protected SerializedProperty screenOrientationProperty;
         
-        protected UIOpenCondition Target {
-            get { return target as UIOpenCondition; }
+        protected UIOpenConditions Target {
+            get { return target as UIOpenConditions; }
         }
 
         private void OnEnable() {

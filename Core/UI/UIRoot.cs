@@ -8,16 +8,20 @@ using UnityEngine;
 using UnityEngine.EventSystems;
 using UnityEngine.Serialization;
 using UnityEngine.UI;
+using Debug = UnityEngine.Debug;
 
 namespace Elarion.UI {
-    // TODO make this an invisible manager (initializeOnLoad + a hidden MonoBehaviour that updates it)
+    // TODO make this an invisible manager (initializeOnLoad + a hidden MonoBehaviour that updates it); add the initial scene as a checkbox to scenes and a readonly gameobject field (to easily find the actual one)
     
-    // TODO add a fullscreen checkbox to panels (to easily set them to cover the full screen (only in editor.onValidate))
+    // focus UIComponents in their OnClick function? (don't select anything, but still process tab navigation events & submit/cancel events)
+    
+    // focus doesn't focus first component (scene 2)
+    // open button submits the newly opened component (add _nextFocusedComponent and set the current one to it after the input events)
 
     [RequireComponent(typeof(Canvas))]
     [RequireComponent(typeof(GraphicRaycaster))]
     [RequireComponent(typeof(CanvasScaler))]
-    public class UIRoot : UIBehaviour {
+    public class UIRoot : BaseUIBehaviour {
         [SerializeField]
         [FormerlySerializedAs("_initialScene")]
         public UIScene initialScene;
@@ -28,9 +32,7 @@ namespace Elarion.UI {
         private UIScene[] _scenes;
 
         [SerializeField, ReadOnly]
-        private GameObject _focusedObject;
-        [SerializeField, ReadOnly]
-        private UIComponent _focusedComponent;
+        private GameObject _selectedObject;
         
         private BaseEventData _baseEventData;
 
@@ -49,12 +51,17 @@ namespace Elarion.UI {
             get { return _currentScene; }
         }
 
-        public GameObject FocusedObject {
-            get { return _focusedObject; }
+        public GameObject SelectedObject {
+            get { return _selectedObject; }
+            private set {
+                _selectedObject = value;
+                EventSystem.SetSelectedGameObject(null);
+                EventSystem.SetSelectedGameObject(_selectedObject);
+            }
         }
-
+        
         public UIComponent FocusedComponent {
-            get { return _focusedComponent; }
+            get { return UIComponent.FocusedComponent; }
         }
 
         // A properly scaled UIRoot is a better indication of the screen width than Screen.width
@@ -160,42 +167,28 @@ namespace Elarion.UI {
         }
 
         protected virtual void Update() {
-            HandleTabNavigation();
-
-            SendNavigationEventsToFocusedComponent();
-
             // process the events just once and only if focused
             if(_current != this || !EventSystem.isFocused) {
                 return;
             }
-
-            if(EventSystem.currentSelectedGameObject == _focusedObject) {
-                return;
-            }
-
-            _focusedObject = EventSystem.currentSelectedGameObject;
-
-            if(_focusedObject == null) {
-                return;
-            }
-
-            UIComponent.UnfocusAll();
             
-            _focusedComponent = null;
+            HandleTabNavigation();
 
-            var focusedTransform = _focusedObject.transform;
+            // the user can change the selected game object - if he does, update the selected component accodringly
+            if(EventSystem.currentSelectedGameObject == SelectedObject) {
+                return;
+            }
 
-            while(focusedTransform != null) {
-                var selectedComponent = UIComponent.UIComponentCache.SingleOrDefault(component =>
-                    component.gameObject == focusedTransform.gameObject);
+            SelectedObject = EventSystem.currentSelectedGameObject;
 
-                if(selectedComponent != null) {
-                    selectedComponent.Focus();
-                    _focusedComponent = selectedComponent;
-                    return;
-                }
+            if(SelectedObject == null) {
+                return;
+            }
 
-                focusedTransform = focusedTransform.parent;
+            var selectedComponent = SelectedObject.GetComponentInParent<UIComponent>();
+
+            if(selectedComponent != null) {
+                selectedComponent.Focus();
             }
         }
 
@@ -203,11 +196,10 @@ namespace Elarion.UI {
         private void HandleTabNavigation() {
             if(!enableTabNavigation ||
                !EventSystem.isFocused ||
-               !EventSystem.sendNavigationEvents) {
+               !EventSystem.sendNavigationEvents ||
+               !Input.GetKeyDown(KeyCode.Tab)) {
                 return;
             }
-
-            if(!Input.GetKeyDown(KeyCode.Tab)) return;
 
             var selectable = EventSystem.currentSelectedGameObject ? GetValidSelectableChild(EventSystem.currentSelectedGameObject) : null;
             Selectable nextSelectable = null;
@@ -244,22 +236,24 @@ namespace Elarion.UI {
             }
 
             if(!selectable) {
-                if(!_focusedComponent) return;
+                if(!FocusedComponent) return;
 
-                nextSelectable = GetValidSelectableChild(_focusedComponent.gameObject);
+                nextSelectable = GetValidSelectableChild(FocusedComponent.gameObject);
             }
             
             if(nextSelectable == null || !nextSelectable.IsInteractable() || nextSelectable.navigation.mode == Navigation.Mode.None) return;
             
-            // check if the parent UIComponent is interactable
-            var parentComponent = UIComponent.GetUIComponentParent(nextSelectable.transform);
+            var parentComponent = nextSelectable.GetComponentInParent<UIComponent>();
                 
             if(parentComponent != null && !parentComponent.Interactable) {
                 return;
             }
             
-            FocusComponent(parentComponent, true);
-            SetSelection(nextSelectable);
+            if(parentComponent) {
+                parentComponent.Focus();
+            }
+            
+            Select(nextSelectable);
         }
 
         private Selectable GetValidSelectableChild(GameObject go) {
@@ -267,33 +261,17 @@ namespace Elarion.UI {
 
         }
         
-        protected bool SendNavigationEventsToFocusedComponent() {
-            if(!EventSystem.isFocused ||
-               !EventSystem.sendNavigationEvents ||
-               _focusedComponent == null) {
-                return false;
-            }
-
-            var baseEventData = BaseEventData;
-
-            if(EventSystem.currentInputModule.input.GetButtonDown(SubmitButton)) {
-                ExecuteEvents.Execute(_focusedComponent.gameObject, baseEventData,
-                    ExecuteEvents.submitHandler);
-            }
-
-            if(EventSystem.currentInputModule.input.GetButtonDown(CancelButton)) {
-                ExecuteEvents.Execute(_focusedComponent.gameObject, baseEventData,
-                    ExecuteEvents.cancelHandler);
-            }
-            
-            return baseEventData.used;
-        }
-        
-        public void SetSelection(Selectable selectable) {
-            if(!selectable || !EventSystem) {
+        public void Select(Selectable selectable) {
+            if(!EventSystem) {
                 return;
             }
-            
+
+            // Deselect
+            if(!selectable) {
+                SelectedObject = null;
+                return;
+            }
+
             selectable.Select();
 
             var input = selectable as InputField;
@@ -305,28 +283,12 @@ namespace Elarion.UI {
             
             // TODO test with TMP
 
-            _focusedObject = selectable.gameObject;
-            EventSystem.SetSelectedGameObject(_focusedObject);
-        }
-
-        public void FocusComponent(UIComponent component, bool value) {
-            if(!component) {
-                return;
-            }
-
-            _focusedComponent = value ? component : null;
+            SelectedObject = selectable.gameObject;
         }
 
         protected override void OnValidate() {
             base.OnValidate();
-
             _scenes = GetComponentsInChildren<UIScene>();
-
-            var animator = GetComponent<UIAnimator>();
-            if(animator) {
-                Debug.LogWarning("UIRoot objects cannot be animated. Deleting Animator component.", this);
-                DestroyImmediate(animator);
-            }
         }
 
         // this is to prevent multiple update calls

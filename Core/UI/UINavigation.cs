@@ -6,7 +6,7 @@ using UnityEngine.UI;
 
 namespace Elarion.UI {
     [RequireComponent(typeof(Selectable))]
-    public class UINavigation : UIBehaviour {
+    public class UINavigation : BaseUIBehaviour {
 
         [Serializable, Flags]
         private enum NavigationMode {

@@ -4,14 +4,10 @@ using UnityEngine;
 
 namespace Elarion.UI.Animation {
 
-    // Animations modify the properties of an object. They're used to move one or more properties from point A to point B.
     [Serializable]
     [CreateAssetMenu(order = 250)]
     public partial class UIAnimation : ScriptableObject {
 
-        // TODO apply/remove overlay options replacing the UIEffects; the animator can add/remove overlays of different type (blur, color, etc)
-        // TODO autoRemove overlay - automatically removes the overlay when the animation finishes (by default, but could be unchecked for the overlay to persist)
-        
         // TODO animation sound
         
         // TODO Animate interface (containing the animate method); maybe add a target field (useful for other scripts)

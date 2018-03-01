@@ -7,11 +7,9 @@ using UnityEngine;
 using UnityEngine.EventSystems;
 
 namespace Elarion.UI {
-    // manually check for the conditional visibility flag before opening any element (and don't if it's not met); auto-open the element if the conditions change
-    
     // TODO break this down - it's way too big of a mess
     [RequireComponent(typeof(UIComponent))]
-    public class UIOpenCondition : UIBehaviour {
+    public class UIOpenConditions : BaseUIBehaviour {
         protected const int MaxScreenSize = 2000;
 
         [Serializable, Flags]

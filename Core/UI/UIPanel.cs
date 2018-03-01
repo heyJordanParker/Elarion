@@ -1,3 +1,4 @@
+using System.Linq;
 using Elarion.Extensions;
 using NUnit.Framework.Constraints;
 using UnityEngine;
@@ -5,16 +6,36 @@ using UnityEngine.EventSystems;
 using UnityEngine.UI;
 
 namespace Elarion.UI {
-    public class UIForm : UIPopup { }
+    
+    // TODO input validator component - a few builtin options and a custom regex option (as enum) and a length validator (with minmax slider)
+    
+    // TODO use the OnSubmit/OnCancel handlers to add cancelation/submitting to regular unity input fields and such - just add them on runtime and hook the appropriate events
 
-    public class UIPopup : UIPanel {
-        protected override void OnSubmitInternal(BaseEventData eventData) {
-            base.OnSubmit(eventData);
-            
-            // TODO click submit button
-            
-            // TODO click cancel button
-        }
+    public class UIPopup : UIDialog {
+        // basic info dialog - both submit and cancel close it; minimal inputs
+    }
+    
+    public class UIForm : UIDialog {
+        // Add those below on the first update
+        // input field class - key and value (both strings for easy www calls), optional validation, etc
+        // auto-focus invalid input fields
+        // show errors
+        
+        // TODO get all inputfields and button children on awake
+        // TODO add onsubmit event to all inputfields and add a submit event to the button
+    }
+
+    public class UIDialog : UIPanel {
+        
+        // TODO cache the object that was last focused before opening this and focus it back when closing
+
+        // dropdown
+        public bool submitOnDeselect;
+        public bool cancelOnDeselect;
+
+
+        // TODO add submit, cancel hanlders here
+
     }
 
     [RequireComponent(typeof(CanvasGroup))]
@@ -25,9 +46,6 @@ namespace Elarion.UI {
         // TODO UIDialog inheritor - dynamic amount of (getcomponent; onchildren changed), extensible; dialog skins?
 
         [SerializeField]
-        private GameObject _firstFocused;
-
-        [SerializeField]
         private bool _interactable = true;
 
         private Canvas _canvas;
@@ -36,11 +54,6 @@ namespace Elarion.UI {
         public override float Alpha {
             get { return CanvasGroup.alpha; }
             set { CanvasGroup.alpha = Mathf.Clamp01(value); }
-        }
-
-        public override GameObject FirstFocused {
-            get { return _firstFocused; }
-            set { _firstFocused = value; }
         }
 
         protected override bool InteractableSelf {
@@ -77,38 +90,6 @@ namespace Elarion.UI {
 
             CanvasGroup.blocksRaycasts = Interactable;
             return true;
-        }
-
-        protected override void OnValidate() {
-            base.OnValidate();
-
-            if(_firstFocused != null) {
-                if(!_firstFocused.transform.IsChildOf(transform)) {
-                    _firstFocused = null;
-                }
-            }
-
-            if(_firstFocused != null) {
-                return;
-            }
-            
-            foreach(var component in gameObject.GetComponentsInChildren<UIComponent>()) {
-                if(component == this) {
-                    continue;
-                }
-                
-                _firstFocused = component.gameObject;
-                return;
-            }
-
-            if(_firstFocused != null) {
-                return;
-            }
-            
-            var selectable = GetComponentInChildren<Selectable>();
-            if(selectable != null) {
-                _firstFocused = selectable.gameObject;
-            }
         }
     }
 }

@@ -4,10 +4,12 @@ using Elarion.Attributes;
 using Elarion.UI.Animation;
 using UnityEngine;
 using UnityEngine.EventSystems;
+using UnityEngine.UI;
 
 namespace Elarion.UI {
     // TODO open popup option
-    public class UIButtonController : UIBehaviour, IPointerClickHandler, ISubmitHandler {
+    // TODO focus option (default true)
+    public class UIButtonController : BaseUIBehaviour, IPointerClickHandler, ISubmitHandler, ICancelHandler {
         [Serializable]
         private enum Type {
             OpenComponent,
@@ -43,15 +45,18 @@ namespace Elarion.UI {
         }
 
         public void OnPointerClick(PointerEventData eventData) {
-            ClickHandler(false);
+            ClickHandler(true);
         }
 
         public void OnSubmit(BaseEventData eventData) {
-            Debug.Log("Submit");
-            ClickHandler(true);
+            ClickHandler(false);
         }
         
-        private void ClickHandler(bool submitEvent) {
+        public void OnCancel(BaseEventData eventData) {
+            ClickHandler(false);
+        }
+        
+        private void ClickHandler(bool clickEvent) {
             UIComponent openComponent = null;
             UIComponent closeComponent = null;
 
@@ -72,22 +77,22 @@ namespace Elarion.UI {
                     closeComponent = _targetScene.UIRoot ? _targetScene.UIRoot.CurrentScene : null;
                     break;
                 case Type.Cancel:
-                    if(_targetComponent != null) {
-                        if(!submitEvent || _targetComponent.UIRoot.FocusedComponent != _targetComponent)
-                            _targetComponent.OnCancel(null);
+                    // TODO use targetdialog
+                    if(_targetComponent != null && !clickEvent) {
+//                        _targetComponent.Cancel();
                     }
 
                     break;
                 case Type.Submit:
-                    if(_targetComponent != null)
-                        if(!submitEvent || _targetComponent.UIRoot.FocusedComponent != _targetComponent)
-                            _targetComponent.OnSubmit(null);
+                    if(_targetComponent != null && !clickEvent) {
+//                        _targetComponent.Submit();
+                    }
                     break;
             }
 
-            if(openComponent) {
+            if(openComponent != null) {
                 if(openComponent.Opened) {
-                    openComponent.Focus(true);
+                    openComponent.Focus(true); // move this to the open method?
                 } else {
                     openComponent.Open(overrideAnimation: _openAnimationOverride);
                 }

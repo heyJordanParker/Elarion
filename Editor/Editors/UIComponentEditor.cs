@@ -14,7 +14,10 @@ namespace Elarion.Editor.Editors {
         
         private static readonly Type[] HelperComponents = {
             typeof(UIAnimator),
-            typeof(UIOpenCondition),
+            typeof(UIOpenConditions),
+            typeof(UISubmitHanlder),
+            typeof(UICancelHandler),
+            // TODO add resize/move components as helpers here (give them a cosmetical refactoring)
         };
 
         private Dictionary<Type, Component> _helpers;
@@ -90,7 +93,7 @@ namespace Elarion.Editor.Editors {
             GUILayout.FlexibleSpace();
 
             if(Application.isPlaying) {
-                GUI.enabled = !Target.OpenCondition || Target.OpenCondition.CanOpen;
+                GUI.enabled = !Target.OpenConditions || Target.OpenConditions.CanOpen;
                 var label = Target.Opened ? "Close" : "Open";
                 if(GUILayout.Button(label, GUILayout.MaxWidth(180))) {
                     if(Target.Opened) {
@@ -173,7 +176,7 @@ namespace Elarion.Editor.Editors {
         }
 
         public override void OnPreviewGUI(Rect rect, GUIStyle background) {
-            GUI.Label(rect, Target.ToString(), PreviewStyle);
+            GUI.Label(rect, Target.Description, PreviewStyle);
         }
     }
 }
