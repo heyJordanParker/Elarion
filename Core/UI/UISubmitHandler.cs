@@ -2,7 +2,7 @@ using UnityEngine;
 using UnityEngine.Events;
 
 namespace Elarion.UI {
-    public class UISubmitHanlder : BaseUIBehaviour {
+    public class UISubmitHandler : BaseUIBehaviour {
         [SerializeField]
         private UnityEvent _onSubmit;
 

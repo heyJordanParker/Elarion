@@ -1,18 +1,29 @@
-using System.Collections;
 using Elarion.Attributes;
 using Elarion.Extensions;
 using Elarion.Utility;
+using Elarion.Utility.PropertyTweeners;
 using UnityEngine;
 using UnityEngine.UI;
 
-namespace Elarion.UI {
+namespace Elarion.UI.Animation {
     [RequireComponent(typeof(UIComponent))]
-    public class UIEffect : MonoBehaviour {
-        // TODO this a helper component that gracefully shows/hides an effect when the main element is opened/closed
-        
-        // TODO no trigger; use paired with the open conditions helper to achieve the same result
-        
-        // TODO hook with the UIComponent's state changed event (& activate/ deactivate accordingly)
+    public class UIEffect : BaseUIBehaviour, IAnimationController {
+        private class UIEffectTweener : PropertyTweener<float, UIEffect> {
+            public UIEffectTweener(MonoBehaviour owner) : base(owner) { }
+
+            public override float CurrentValue {
+                get { return Target.Visibility; }
+                protected set { Target.Visibility = value; }
+            }
+            
+            protected override float UpdateValue(float startingValue, float progress, Ease ease) {
+                return startingValue.EaseTo(TargetValue, progress, ease);
+            }
+
+            protected override float AddValues(float value1, float value2) {
+                return value1 + value2;
+            }
+        }
 
         [Header("Effect Configuration")]
         public UIEffectType type = UIEffectType.Overlay;
@@ -29,22 +40,43 @@ namespace Elarion.UI {
         [ConditionalVisibility("type == UIEffectType.Shadow")]
         public Color shadowColor = Color.black;
 
-        // Fade In
         [Tooltip("How long would the effect fade in view")]
         public UIAnimationDuration fadeInDuration = UIAnimationDuration.Normal;
         
         [ConditionalVisibility("fadeInDuration == UIAnimationDuration.Custom")]
         public float customFadeInDuration = 0.5f;
         
-        // Fade Out
         [Tooltip("How long would the effect fade out of view")]
         public UIAnimationDuration fadeOutDuration = UIAnimationDuration.Normal;
         
         [ConditionalVisibility("fadeOutDuration == UIAnimationDuration.Custom")]
         public float customFadeOutDuration = 0.5f;
 
-        private ECoroutine _startCoroutine;
-        private ECoroutine _stopCoroutine;
+        public bool Animating {
+            get { return Visibility != 0; }
+        }
+
+        private UIComponent _component;
+        private float _visibility;
+        private UIEffectTweener _visibilityTweener;
+
+
+        private float Visibility {
+            get { return _visibility; }
+            set {
+                _visibility = value;
+                SetVisibility(value);
+            }
+        }
+
+        private UIEffectTweener VisibilityTweener {
+            get {
+                if(_visibilityTweener == null) {
+                    _visibilityTweener = new UIEffectTweener(this) { Target = this };
+                }
+                return _visibilityTweener;
+            }
+        }
 
         private Image ColorOverlay { get; set; }
 
@@ -57,22 +89,20 @@ namespace Elarion.UI {
         public float FadeInDuration {
             get {
                 if(fadeInDuration == UIAnimationDuration.Fastest)
-                    // override the fastest duration; some fades make sense to be instantenious
-                    return 0;
+                    return 0; // instant
                 if(fadeInDuration == UIAnimationDuration.Custom)
                     return customFadeInDuration;
-                return (float) fadeInDuration / 300; // 5x faster than regular transitions
+                return (float) fadeInDuration / 300; // faster than usual transitions
             }
         }
         
         public float FadeOutDuration {
             get {
                 if(fadeOutDuration == UIAnimationDuration.Fastest)
-                    // override the fastest duration; some fades make sense to be instantenious
-                    return 0;
+                    return 0; // instant
                 if(fadeOutDuration == UIAnimationDuration.Custom)
                     return customFadeOutDuration;
-                return (float) fadeOutDuration / 300; // 5x faster than regular transitions
+                return (float) fadeOutDuration / 300; // faster than usual transitions
             }
         }
 
@@ -116,72 +146,72 @@ namespace Elarion.UI {
             }
         }
 
-        public void Start() {
-            var targetComponent = GetComponent<UIComponent>();
-            if(Active) {
-                return;
+        protected override void Awake() {
+            base.Awake();
+            
+            _component = GetComponent<UIComponent>();
+        }
+
+        protected override void OnEnable() {
+            base.OnEnable();
+            
+            _component.OnStateChanged += OnStateChanged;
+
+        }
+
+        protected override void OnDisable() {
+            base.OnDisable();
+            
+            _component.OnStateChanged -= OnStateChanged;
+        }
+
+        private void OnStateChanged(UIState currentState, UIState oldState) {
+            if(currentState.HasFlag(UIState.Opened) && !oldState.HasFlag(UIState.Opened)) {
+                OnOpen();
             }
             
-            if(_stopCoroutine != null && _stopCoroutine.Running) {
-                _stopCoroutine.Stop();
+            if(!currentState.HasFlag(UIState.Opened) && oldState.HasFlag(UIState.Opened)) {
+                OnClose();
+            }
+        }
+
+        public void OnOpen() {
+            if(Active) {
+                return;
             }
 
             Active = true;
             
-            if(!targetComponent.gameObject.activeInHierarchy) {
+            if(!_component.isActiveAndEnabled) {
                 return;
             }
             
-            CurrentEffect.rectTransform.SetParent(targetComponent.Transform, false);
+            CurrentEffect.rectTransform.SetParent(_component.Transform, false);
             CurrentEffect.rectTransform.SetAsLastSibling();
             CurrentEffect.enabled = true;
+            
+            SetVisibility(0);
 
-            _startCoroutine = targetComponent.CreateCoroutine(GradualTransition(FadeInDuration, false));
+            VisibilityTweener.Tween(1, UIAnimationDirection.To, animationOptions: new UIAnimationOptions(duration: FadeInDuration));
         }
 
-        public void Stop(UIComponent targetComponent) {
+        public void OnClose() {
             if(!Active) {
                 return;
             }
             
-            if(_startCoroutine != null && _startCoroutine.Running) {
-                _startCoroutine.Stop();
-            }
-            
             Active = false;
 
-            if(!targetComponent.gameObject.activeInHierarchy) {
+            if(!_component.isActiveAndEnabled) {
                 return;
             }
 
-            CurrentEffect.rectTransform.SetParent(targetComponent.Transform, false);
+            CurrentEffect.rectTransform.SetParent(_component.Transform, false);
 
-            _stopCoroutine = targetComponent.CreateCoroutine(GradualTransition(FadeOutDuration, true));
+            VisibilityTweener.Tween(0, UIAnimationDirection.To, () => CurrentEffect.enabled = false, new UIAnimationOptions(duration: FadeOutDuration));
         }
 
-        private IEnumerator GradualTransition(float duration, bool reverse) {
-            if(duration > 0) {
-                var transitionProgress = 0.0f;
-
-                while(transitionProgress <= 1) {
-                    var visibility = reverse ? 1 - transitionProgress : transitionProgress;
-
-                    UpdateEffect(visibility);
-
-                    transitionProgress += Time.deltaTime / duration;
-                    yield return null;
-                }
-            }
-
-            // TODO use coroutine callback
-            if(reverse) {
-                CurrentEffect.enabled = false;
-            } else {
-                UpdateEffect(1);
-            }
-        }
-
-        private void UpdateEffect(float visibility) {
+        private void SetVisibility(float visibility) {
             switch(type) {
                 case UIEffectType.Overlay:
                     var color = ColorOverlay.color;

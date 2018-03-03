@@ -4,7 +4,7 @@ using UnityEngine.SceneManagement;
 namespace Elarion.Utility {
     public static class SceneTools {
         
-        public static List<T> FindSceneObjectsOfType<T>() {
+        public static List<T> FindSceneObjectsOfType<T>(bool includeInactive = true) {
             
             var results = new List<T>();
             
@@ -16,7 +16,7 @@ namespace Elarion.Utility {
                 var rootGameObjects = scene.GetRootGameObjects();
                 
                 foreach(var go in rootGameObjects) {
-                    results.AddRange(go.GetComponentsInChildren<T>(includeInactive: true));
+                    results.AddRange(go.GetComponentsInChildren<T>(includeInactive));
                 }
             }
 

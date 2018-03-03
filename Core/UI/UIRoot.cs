@@ -8,16 +8,10 @@ using UnityEngine;
 using UnityEngine.EventSystems;
 using UnityEngine.Serialization;
 using UnityEngine.UI;
-using Debug = UnityEngine.Debug;
 
 namespace Elarion.UI {
-    // TODO make this an invisible manager (initializeOnLoad + a hidden MonoBehaviour that updates it); add the initial scene as a checkbox to scenes and a readonly gameobject field (to easily find the actual one)
+    // TODO make this a static invisible manager (initializeOnLoad + a hidden MonoBehaviour that updates it); add the initial scene as a checkbox to scenes and a readonly gameobject field (to easily find the actual one)
     
-    // focus UIComponents in their OnClick function? (don't select anything, but still process tab navigation events & submit/cancel events)
-    
-    // focus doesn't focus first component (scene 2)
-    // open button submits the newly opened component (add _nextFocusedComponent and set the current one to it after the input events)
-
     [RequireComponent(typeof(Canvas))]
     [RequireComponent(typeof(GraphicRaycaster))]
     [RequireComponent(typeof(CanvasScaler))]

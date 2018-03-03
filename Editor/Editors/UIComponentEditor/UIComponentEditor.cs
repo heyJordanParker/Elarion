@@ -10,26 +10,28 @@ using UnityEngine.EventSystems;
 namespace Elarion.Editor.Editors {
     [CustomEditor(typeof(UIComponent), true)]
     [CanEditMultipleObjects]
-    public class UIComponentEditor : UnityEditor.Editor {
-        
+    public partial class UIComponentEditor : UnityEditor.Editor {
+        // TODO Scene-specific options (e.g. current scene; hide some of the unnecessary stuff for scenes
+
+        // TODO dynamically load those based on an interface/inheritance 
         private static readonly Type[] HelperComponents = {
             typeof(UIAnimator),
             typeof(UIOpenConditions),
-            typeof(UISubmitHanlder),
+            typeof(UIEffect),
+            typeof(UIResizable),
+            typeof(UIDraggable),
+            typeof(UISubmitHandler),
             typeof(UICancelHandler),
-            // TODO add resize/move components as helpers here (give them a cosmetical refactoring)
         };
 
         private Dictionary<Type, Component> _helpers;
-        
+
         private GUIStyle _previewStyle;
 
         private UIAnimator _animator;
-        
+
         protected UIComponent Target {
-            get {
-                return target as UIComponent;
-            }
+            get { return target as UIComponent; }
         }
 
         protected Dictionary<Type, Component> Helpers {
@@ -40,18 +42,6 @@ namespace Elarion.Editor.Editors {
                 }
 
                 return _helpers;
-            }
-        }
-
-        protected bool HasAllHelpers {
-            get {
-                foreach(var helperComponent in Helpers.Values) {
-                    if(!helperComponent) {
-                        return false;
-                    } 
-                }
-
-                return true;
             }
         }
 
@@ -80,16 +70,31 @@ namespace Elarion.Editor.Editors {
         }
 
         public override void OnInspectorGUI() {
+//            if(Target is UIScene) {
+//                DrawSceneInspectorGUI();
+//                return;
+//            }
+
+            DrawComponentInspectorGUI();
+        }
+
+        private void DrawComponentInspectorGUI() {
             base.OnInspectorGUI();
 
-            if(!Application.isPlaying && HasAllHelpers || targets.Length > 1) {
+            DrawHelpersGUI();
+        }
+
+        private void DrawHelpersGUI() {
+            var hasAllHelpers = Helpers.Values.All(h => h);
+                
+            if(!Application.isPlaying && hasAllHelpers || targets.Length > 1) {
                 return;
             }
-            
+
             GUILayout.Space(10);
 
             GUILayout.BeginHorizontal();
-            
+
             GUILayout.FlexibleSpace();
 
             if(Application.isPlaying) {
@@ -103,21 +108,19 @@ namespace Elarion.Editor.Editors {
                     }
                 }
 
-                GUI.enabled = Target.Opened;
+                GUI.enabled = Target.Focusable;
 
                 label = Target.Focused ? "Unfocus" : "Focus";
                 if(GUILayout.Button(label, GUILayout.MaxWidth(180))) {
                     if(Target.Focused) {
                         Target.Unfocus();
-                        EventSystem.current.SetSelectedGameObject(null);
                     } else {
-                        Target.Focus();
-                        EventSystem.current.SetSelectedGameObject(Target.gameObject);
+                        Target.Focus(true);
                     }
                 }
 
                 GUI.enabled = Target.HasAnimator;
-                
+
                 label = "Reset";
                 if(GUILayout.Button(label, GUILayout.MaxWidth(180))) {
                     Animator.ResetToSavedPropertiesGraceful();
@@ -127,7 +130,7 @@ namespace Elarion.Editor.Editors {
                 GUI.enabled = true;
             } else {
                 var dropdownItems = new Dictionary<Type, string>();
-                
+
                 dropdownItems.Add(typeof(int), "Add Helper Component");
 
                 foreach(var helper in Helpers) {
@@ -135,27 +138,28 @@ namespace Elarion.Editor.Editors {
                         // No need to add existing components
                         continue;
                     }
-                    
+
                     dropdownItems.Add(helper.Key, ObjectNames.NicifyVariableName(helper.Key.Name.Replace("UI", "")));
                 }
-                
-                var index = EditorGUILayout.Popup(0, dropdownItems.Values.ToArray(), new GUIStyle("DropDownButton"), GUILayout.MaxWidth(250));
+
+                var index = EditorGUILayout.Popup(0, dropdownItems.Values.ToArray(), new GUIStyle("DropDownButton"),
+                    GUILayout.MaxWidth(250));
 
                 if(index != 0) {
                     var component = dropdownItems.ElementAt(index).Key;
-                    
+
                     Undo.RecordObject(target, "Add " + component.Name);
-                    
+
                     Target.gameObject.AddComponent(component);
-                    
+
                     UpdateHelpers();
                 }
             }
-            
+
             GUILayout.FlexibleSpace();
-            
+
             GUILayout.EndHorizontal();
-            
+
             GUILayout.Space(10);
         }
 

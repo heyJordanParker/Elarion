@@ -1,7 +1,6 @@
 using System;
 using Elarion.Attributes;
 using UnityEngine;
-using UnityEngine.EventSystems;
 using UnityEngine.UI;
 
 namespace Elarion.UI {

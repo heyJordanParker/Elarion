@@ -1,21 +1,27 @@
-using System.Linq;
-using Elarion.Extensions;
+using System.Collections.Generic;
+using Elarion.Attributes;
 using Elarion.UI.Animation;
-using Microsoft.Win32;
+using Elarion.Utility;
 using UnityEngine;
 
 namespace Elarion.UI {
     
-    // TODO loading scene - an intermediary scene that opens another scene after a preset condition is met
+    // TODO loading condition helper - a helper that switches the scene after a condition returns true (use unity events to hook up)
     
     public class UIScene : UIPanel {
         
-        // TODO Popup prefabs - create a default one (and auto load it when instantiating via EditorMenus) and leave it as a public field so users can change it with their own; Back functionality for popups (to close)
-            
         // TODO snapping scroll for android-homescreen animations
         
         // TODO selected scene boolean; add custom editor showing the selected scene below the boolean (if it isn't the current scene)
 
+        [SerializeField, ReadOnly]
+        private bool _initialScene = false;
+        
+        public bool InitialScene {
+            get { return _initialScene; }
+            set { _initialScene = value; }
+        }
+        
         // override this to ignore the ActiveChild flag
         public override bool ShouldRender {
             get { return Opened || InTransition; }
@@ -29,33 +35,48 @@ namespace Elarion.UI {
             base.Open(skipAnimation, overrideAnimation, focus);
         }
 
-        protected override void OpenInternal(bool skipAnimation, UIAnimation overrideAnimation) {
+        protected override void PreOpen() {
+            base.PreOpen();
             transform.SetAsLastSibling();
-            
-            base.OpenInternal(skipAnimation, overrideAnimation);
         }
 
-        // TODO move the hierarchy validation to the Editor.Update method (via [InitializeOnLoad] script); or any other method that'll run when the hierarchy updates
         protected override void OnValidate() {
             base.OnValidate();
-            var uiRoot = FindObjectsOfType<UIRoot>().SingleOrDefault(root => root.transform.IsParentOf(transform));
 
-            if(uiRoot != null) {
-                foreach(var scene in uiRoot.GetComponentsInChildren<UIScene>(true)) {
-                    if(scene == this) continue;
-                    if(!scene.transform.IsParentOf(transform)) continue;
+            InitialScene = UIRoot.initialScene == this;
 
-                    transform.SetParent(scene.transform.parent, false);
-                    Debug.Log("Nesting scenes is not allowed. Removing nesting.", gameObject);
-                    break;
+            // set the initial scene (restore when I move the initial scene here)
+//            var initialScene = InitialScene ? this : Scenes.FirstOrDefault(s => s.InitialScene);
+//            
+//            if(initialScene == null) {
+//                initialScene = Scenes.FirstOrDefault();
+//                    
+//                if(initialScene != null) {
+//                    initialScene.InitialScene = true;
+//                }
+//            }
+//                
+//            foreach(var scene in Scenes) {
+//                if(scene == initialScene) {
+//                    continue;
+//                }
+//                
+//                if(initialScene != null && scene.InitialScene) {
+//                    scene.InitialScene = false;
+//                }
+//            }
+        }
+
+        private static List<UIScene> _scenes;
+
+        public static List<UIScene> Scenes {
+            get {
+                if(_scenes == null) {
+                    _scenes = SceneTools.FindSceneObjectsOfType<UIScene>();
                 }
+
+                return _scenes;
             }
-                
-            var rectTransform = transform as RectTransform;
-            
-            rectTransform.anchorMin = Vector2.zero;
-            rectTransform.anchorMax = Vector2.one;
-            rectTransform.sizeDelta = Vector2.zero;
         }
     }
 }

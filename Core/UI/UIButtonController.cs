@@ -1,10 +1,8 @@
 using System;
-using System.Net.Sockets;
 using Elarion.Attributes;
 using Elarion.UI.Animation;
 using UnityEngine;
 using UnityEngine.EventSystems;
-using UnityEngine.UI;
 
 namespace Elarion.UI {
     // TODO open popup option

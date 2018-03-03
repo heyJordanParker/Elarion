@@ -1,43 +1,8 @@
-using System.Linq;
-using Elarion.Extensions;
-using NUnit.Framework.Constraints;
 using UnityEngine;
-using UnityEngine.EventSystems;
 using UnityEngine.UI;
 
 namespace Elarion.UI {
     
-    // TODO input validator component - a few builtin options and a custom regex option (as enum) and a length validator (with minmax slider)
-    
-    // TODO use the OnSubmit/OnCancel handlers to add cancelation/submitting to regular unity input fields and such - just add them on runtime and hook the appropriate events
-
-    public class UIPopup : UIDialog {
-        // basic info dialog - both submit and cancel close it; minimal inputs
-    }
-    
-    public class UIForm : UIDialog {
-        // Add those below on the first update
-        // input field class - key and value (both strings for easy www calls), optional validation, etc
-        // auto-focus invalid input fields
-        // show errors
-        
-        // TODO get all inputfields and button children on awake
-        // TODO add onsubmit event to all inputfields and add a submit event to the button
-    }
-
-    public class UIDialog : UIPanel {
-        
-        // TODO cache the object that was last focused before opening this and focus it back when closing
-
-        // dropdown
-        public bool submitOnDeselect;
-        public bool cancelOnDeselect;
-
-
-        // TODO add submit, cancel hanlders here
-
-    }
-
     [RequireComponent(typeof(CanvasGroup))]
     [RequireComponent(typeof(Canvas))]
     [RequireComponent(typeof(GraphicRaycaster))] // to propagate input events

@@ -1,6 +1,4 @@
-﻿using System.Linq;
-using Elarion.Extensions;
-using Elarion.UI;
+﻿using Elarion.UI;
 using Elarion.UI.Animation;
 using Elarion.Utility;
 using UnityEditor;

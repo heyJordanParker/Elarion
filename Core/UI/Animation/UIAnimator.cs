@@ -1,5 +1,4 @@
 using System;
-using System.Collections;
 using System.Linq;
 using Elarion.Attributes;
 using Elarion.Utility;
@@ -10,16 +9,10 @@ using UnityEngine.SceneManagement;
 using UnityEngine.UI;
 
 namespace Elarion.UI.Animation {
-    // TODO add effects here; duplicate the animation editor for them but use state dropdown + effect
-    
-    // TODO handle effects?
-    
-    // TODO log a warning if two animations are of the same type (start iterating from the last animation and change/remove animations until this is satisfied)
-    
     // TODO decouple with UIComponent; make the Target a RectTransform (and use GameObject tweeners that fetch the components they need themselves)
     
     [RequireComponent(typeof(UIComponent))]
-    public class UIAnimator : MonoBehaviour {
+    public class UIAnimator : MonoBehaviour, IAnimationController {
 
         [Serializable]
         public class TypedAnimation {
@@ -35,7 +28,7 @@ namespace Elarion.UI.Animation {
 
         private UIComponent _target;
 
-        [SerializeField, ReadOnly]
+        [SerializeField, ReadOnly(true)]
         private UIAnimation _currentAnimation = null;
         
         private Canvas _canvas;
@@ -176,7 +169,7 @@ namespace Elarion.UI.Animation {
         }
 
         protected virtual void OnAnimationEnd(UIAnimation animation) {
-            if(!gameObject.activeInHierarchy) {
+            if(!isActiveAndEnabled) {
                 // can't do this if the game object is inactive - handle it in OnEnable
                 return;
             }
@@ -245,7 +238,7 @@ namespace Elarion.UI.Animation {
 
         }
 
-        private UIAnimation GetAnimation(UIAnimationType type) {
+        public UIAnimation GetAnimation(UIAnimationType type) {
             foreach(var typedAnimation in _animations) {
                 if(typedAnimation.type == type) {
                     return typedAnimation.animation;
@@ -312,7 +305,6 @@ namespace Elarion.UI.Animation {
         }
 
 #if UNITY_EDITOR
-
         // Editor-only helper field/logic to add a mask to the game object
         [Tooltip("Prevents child animations from overflowing.")]
         public bool maskChildAnimations = false;
@@ -342,11 +334,8 @@ namespace Elarion.UI.Animation {
                     UnityEditor.SceneManagement.EditorSceneManager.MarkSceneDirty(SceneManager.GetActiveScene());
                     DestroyImmediate(gameObject.GetComponent<Mask>());
                 };
-                
             }
-            
         }
-
 #endif
     }
 }

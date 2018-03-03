@@ -1,6 +1,5 @@
 using UnityEngine;
 using UnityEngine.Events;
-using UnityEngine.UI;
 
 namespace Elarion.UI {
     public class UICancelHandler : BaseUIBehaviour {

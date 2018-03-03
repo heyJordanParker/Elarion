@@ -1,10 +1,7 @@
 using System;
-using System.Linq;
-using System.Text;
 using Elarion.Attributes;
 using Elarion.Extensions;
 using UnityEngine;
-using UnityEngine.EventSystems;
 
 namespace Elarion.UI {
     // TODO break this down - it's way too big of a mess
