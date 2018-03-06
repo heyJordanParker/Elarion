@@ -58,16 +58,6 @@ namespace Elarion.UI {
             get { return UIComponent.FocusedComponent; }
         }
 
-        // A properly scaled UIRoot is a better indication of the screen width than Screen.width
-        public float Width {
-            get { return Transform.sizeDelta.x; }
-        }
-        
-        // A properly scaled UIRoot is a better indication of the screen height than Screen.height
-        public float Height {
-            get { return Transform.sizeDelta.y; }
-        }
-
         protected string SubmitButton {
             get {
                 var button = "Submit";
@@ -114,7 +104,7 @@ namespace Elarion.UI {
             }
 
             _currentScene = scene;
-            if(!_currentScene.Opened) {
+            if(!_currentScene.State.IsOpened) {
                 _currentScene.Open(skipAnimation, overrideOpenAnimation);
             }
         }
@@ -239,7 +229,7 @@ namespace Elarion.UI {
             
             var parentComponent = nextSelectable.GetComponentInParent<UIComponent>();
                 
-            if(parentComponent != null && !parentComponent.Interactable) {
+            if(parentComponent != null && !parentComponent.State.IsInteractable) {
                 return;
             }
             

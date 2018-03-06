@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 
 namespace Elarion.Managers {
-	public class PoolingManager : Singleton {
+	public class PoolingManager : Singleton.Singleton {
 		public Dictionary<int, Pool> Pools { get; private set; }
 
 		public Pool Pool(GameObject original, uint amount) {

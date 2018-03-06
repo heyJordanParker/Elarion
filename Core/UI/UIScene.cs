@@ -13,6 +13,8 @@ namespace Elarion.UI {
         // TODO snapping scroll for android-homescreen animations
         
         // TODO selected scene boolean; add custom editor showing the selected scene below the boolean (if it isn't the current scene)
+        
+        // TODO move the currentScene logic here
 
         [SerializeField, ReadOnly]
         private bool _initialScene = false;
@@ -24,7 +26,7 @@ namespace Elarion.UI {
         
         // override this to ignore the ActiveChild flag
         public override bool ShouldRender {
-            get { return Opened || InTransition; }
+            get { return State.IsOpened || State.IsInTransition; }
         }
 
         public override void Open(bool skipAnimation = false, UIAnimation overrideAnimation = null, bool focus = true, bool enable = true) {

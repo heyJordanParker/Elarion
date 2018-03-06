@@ -155,27 +155,19 @@ namespace Elarion.UI.Animation {
         protected override void OnEnable() {
             base.OnEnable();
             
-            _component.OnStateChanged += OnStateChanged;
+            _component.State.Opened += OnOpened;
+            _component.State.Closed += OnClosed;
 
         }
 
         protected override void OnDisable() {
             base.OnDisable();
             
-            _component.OnStateChanged -= OnStateChanged;
+            _component.State.Opened -= OnOpened;
+            _component.State.Closed -= OnClosed;
         }
 
-        private void OnStateChanged(UIState currentState, UIState oldState) {
-            if(currentState.HasFlag(UIState.Opened) && !oldState.HasFlag(UIState.Opened)) {
-                OnOpen();
-            }
-            
-            if(!currentState.HasFlag(UIState.Opened) && oldState.HasFlag(UIState.Opened)) {
-                OnClose();
-            }
-        }
-
-        public void OnOpen() {
+        public void OnOpened() {
             if(Active) {
                 return;
             }
@@ -195,7 +187,7 @@ namespace Elarion.UI.Animation {
             VisibilityTweener.Tween(1, UIAnimationDirection.To, animationOptions: new UIAnimationOptions(duration: FadeInDuration));
         }
 
-        public void OnClose() {
+        public void OnClosed() {
             if(!Active) {
                 return;
             }

@@ -46,21 +46,6 @@ namespace Elarion.UI {
         // show something effect (spawn a prefab)
         // move, resize, rotate effects
     }
-    
-    
-    // loading state?
-    [Serializable, Flags]
-    public enum UIState {
-        NotInitialized = -1,
-        None = 0 << 0, // the element is off (in the hierarchy)
-        Opened = 1 << 0, // is this element supposed to be visible on screen
-        InTransition = 1 << 1, // is this element in transition (maybe rename to InAnimation)
-        FocusedThis = 1 << 2, // is this element focused - usually yes, but might not be if there's an edgemenu for example
-        FocusedChild = 1 << 3, // a child element is currently active
-        Disabled = 1 << 4, // not interactable while visible; hook UI effects to make it sexy
-        VisibleChild = 1 << 5, // a child element is currently active
-        Interactable = 1 << 6, // is this element interactable (accepting input events)
-    }
 
     [Serializable]
     public enum UIAnimationDirection {

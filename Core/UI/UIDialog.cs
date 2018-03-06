@@ -1,4 +1,5 @@
 using UnityEngine;
+using UnityEngine.UI;
 
 namespace Elarion.UI {
     
@@ -18,6 +19,8 @@ namespace Elarion.UI {
         // auto-focus invalid input fields
         // show errors
         
+        // TODO UIForm inheritor - add error checking submitting and so on builtin (submit with enter/submit input (in unity))
+        
         // TODO get all inputfields and button children on awake
         // TODO add onsubmit event to all inputfields and add a submit event to the button
     }
@@ -27,10 +30,20 @@ namespace Elarion.UI {
     public class UIDialog : UIPanel {
         
         // TODO cache the object that was last focused before opening this and focus it back when closing
+        
+        // dialog skins?
 
-        // dropdown
+        // dropdown DeselectAction
         public bool submitOnDeselect;
         public bool cancelOnDeselect;
+
+        private InputField[] _inputs;
+
+        protected override void Awake() {
+            base.Awake();
+
+            _inputs = GetComponentsInChildren<InputField>();
+        }
 
         public override void Focus(bool setSelection = false) {
             // always focus the first dialog child if clicked

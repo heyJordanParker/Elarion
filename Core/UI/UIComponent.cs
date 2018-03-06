@@ -8,35 +8,34 @@ using Elarion.UI.Animation;
 using UnityEngine;
 using UnityEngine.EventSystems;
 using UnityEngine.UI;
+using Debug = UnityEngine.Debug;
 
 namespace Elarion.UI {
-    
-    [RequireComponent(typeof(RectTransform))]
     [DisallowMultipleComponent]
+    [RequireComponent(typeof(UIState))]
+    [RequireComponent(typeof(RectTransform))]
     public abstract class UIComponent : BaseUIBehaviour, IPointerClickHandler {
-        
-        public event Action<UIState,UIState> OnStateChanged = (currentState, oldState) => { };
-        
+        // TODO use a null Parent for the topmost component
         [SerializeField]
         private UIOpenType _openType = UIOpenType.OpenWithParent;
-        
+
         [SerializeField]
         protected bool focusable = true;
-        
+
         [SerializeField]
         [ConditionalVisibility("focusable")]
         private GameObject _firstFocused;
 
         private UIRoot _uiRoot;
-        
-        private UIState _oldState = UIState.NotInitialized;
-        private UIState _state = UIState.None;
+
+        private UIState _state;
 
         private UIComponent _initialFocusedComponent;
         private Selectable _initialFocusedSelectable;
 
         private UIAnimator _animator;
-        
+        private IAnimationController[] _animationControllers;
+
         public BaseUIBehaviour Parent { get; protected set; }
 
         protected List<UIComponent> ChildComponents { get; set; }
@@ -50,12 +49,17 @@ namespace Elarion.UI {
                 return _animator;
             }
         }
-        
+
         public UIOpenConditions OpenConditions { get; protected set; }
 
         public UIState State {
-            get { return _state; }
-            protected set { _state = value; }
+            get {
+                if(!_state) {
+                    _state = gameObject.Component<UIState>();
+                }
+
+                return _state;
+            }
         }
 
         public UIOpenType OpenType {
@@ -67,7 +71,7 @@ namespace Elarion.UI {
                 if(!Focusable) {
                     return null;
                 }
-                
+
                 // recursively we get to the bottom component
                 if(_initialFocusedComponent &&
                    _initialFocusedComponent._initialFocusedComponent &&
@@ -83,71 +87,31 @@ namespace Elarion.UI {
         public Selectable InitialFocusedSelectable {
             get { return _initialFocusedSelectable; }
         }
-        
+
         public virtual bool ShouldRender {
             get {
-                if(Opened || InTransition || ActiveChild) {
+                if(State.IsOpened || State.IsInTransition || State.IsRenderingChild) {
                     return true;
                 }
-                
-                // TODO find an elegant solution
+
+                // TODO more elegant solution described in the OpenInternal method
                 // Hack: render if both this and the parent are closing, but this doesn't have a close animation (otherwise this just disappears while the parent is animating)
                 var parentComponent = Parent as UIComponent;
 
-                if(parentComponent == null || parentComponent.Opened) {
+                if(parentComponent == null || parentComponent.State.IsOpened) {
                     return false;
                 }
 
                 if(HasAnimator && Animator.HasAnimation(UIAnimationType.OnClose)) {
                     return false;
                 }
-                
+
                 return parentComponent.ShouldRender;
             }
         }
-        
-        public bool ActiveChild {
-            get { return State.HasFlag(UIState.VisibleChild); }
-            set { State = State.SetFlag(UIState.VisibleChild, value); }
-        }
-
-        // should this be in transition while the parent is in transition?
-        public bool InTransition {
-            get { return State.HasFlag(UIState.InTransition); }
-            set { State = State.SetFlag(UIState.InTransition, value); }
-        }
-
-        public bool Opened {
-            get { return State.HasFlag(UIState.Opened); }
-            set { State = State.SetFlag(UIState.Opened, value); }
-        }
-
-        public virtual bool Disabled {
-            get { return State.HasFlag(UIState.Disabled); }
-            set { State = State.SetFlag(UIState.Disabled, value); }
-        }
-
-        public bool Focused {
-            get { return FocusedThis || FocusedChild; }
-        }
-
-        protected bool FocusedThis {
-            get { return State.HasFlag(UIState.FocusedThis); }
-            set { State = State.SetFlag(UIState.FocusedThis, value); }
-        }
-
-        protected bool FocusedChild {
-            get { return State.HasFlag(UIState.FocusedChild); }
-            set { State = State.SetFlag(UIState.FocusedChild, value); }
-        }
 
         public virtual bool Focusable {
-            get { return focusable && Opened && !Disabled; }
-        }
-
-        public bool Interactable {
-            get { return State.HasFlag(UIState.Interactable); }
-            protected set { State = State.SetFlag(UIState.Interactable, value); }
+            get { return focusable && State.IsOpened && !State.IsDisabled; }
         }
 
         protected virtual bool InteractableSelf {
@@ -159,14 +123,12 @@ namespace Elarion.UI {
         protected bool InteractableParent {
             get {
                 var parentComponent = Parent as UIComponent;
-                return parentComponent == null || parentComponent.Interactable;
+                return parentComponent == null || parentComponent.State.IsInteractable;
             }
         }
 
         public bool HasAnimator {
-            get {
-                return Animator != null && Animator.enabled;
-            }
+            get { return Animator != null && Animator.enabled; }
         }
 
         public bool IsAnimating {
@@ -175,14 +137,36 @@ namespace Elarion.UI {
 
         public abstract float Alpha { get; set; }
 
-        protected abstract Behaviour Render { get; }
+        public abstract Behaviour Renderer { get; }
 
-        private IAnimationController[] _animationControllers;
+        protected virtual bool CanOpen {
+            get {
+                if(State.IsOpened || !isActiveAndEnabled || !Parent.isActiveAndEnabled) {
+                    return false;
+                }
+
+                var parentComponent = Parent as UIComponent;
+
+                if(parentComponent != null && !parentComponent.State.IsOpened) {
+                    return false;
+                }
+
+                if(OpenConditions && !OpenConditions.CanOpen) {
+                    return false;
+                }
+
+                return true;
+            }
+        }
 
         protected override void Awake() {
             base.Awake();
+            _state = GetComponent<UIState>();
             _animator = GetComponent<UIAnimator>();
             _animationControllers = GetComponents<IAnimationController>();
+            
+            State.StateChanged += OnStateChanged;
+
             OpenConditions = GetComponent<UIOpenConditions>();
 
             if(!_firstFocused) {
@@ -193,47 +177,52 @@ namespace Elarion.UI {
             _initialFocusedSelectable = _firstFocused.GetComponent<Selectable>();
         }
 
+        protected override void OnDestroy() {
+            base.OnDestroy();
+            State.StateChanged -= OnStateChanged;
+        }
+
         protected override void OnEnable() {
             base.OnEnable();
 
             UpdateParent();
             UpdateChildren();
-            UpdateState();
+            OnStateChanged();
         }
 
         protected override void OnDisable() {
             base.OnDisable();
 
-            if(!Opened) return;
-            
+            if(!State.IsOpened) return;
+
             Close(true);
-            
+
             UpdateChildren();
-            UpdateState();
+            OnStateChanged();
         }
-        
+
         public virtual void OnPointerClick(PointerEventData eventData) {
             UIRoot.Select(null);
             Focus();
         }
 
         public virtual void Focus(bool setSelection = false) {
-            if(FocusedThis || !UIRoot || !Focusable) {
+            if(State.IsFocusedThis || !UIRoot || !Focusable) {
                 return;
             }
 
             if(FocusedComponent) {
                 FocusedComponent.Unfocus();
             }
-            
+
             var focusedComponent = FindNextFocusedComponent();
 
             FocusedComponent = focusedComponent;
-            
+
             if(!setSelection) {
                 return;
             }
-            
+
             var selectable = InitialFocusedSelectable;
 
             if(!selectable) {
@@ -244,13 +233,13 @@ namespace Elarion.UI {
                 UIRoot.Select(selectable);
             }
         }
-        
+
         private UIComponent FindNextFocusedComponent() {
             if(Focusable) {
                 // recursively find a focusable child
                 return InitialFocusedComponent;
             }
-            
+
             // find a focusable parent
             var parentComponent = Parent as UIComponent;
             if(parentComponent) {
@@ -260,78 +249,47 @@ namespace Elarion.UI {
             if(UIRoot.CurrentScene == this) {
                 return null;
             }
-                
+
             return UIRoot.CurrentScene.FindNextFocusedComponent();
 
         }
 
         public virtual void Unfocus() {
-            if(!FocusedThis) {
+            if(!State.IsFocusedThis) {
                 return;
             }
 
             FocusedComponent = null;
         }
 
-        /// <summary>
-        /// Called after the object has been closed and all close animations have finished playing (if any)
-        /// </summary>
-        protected virtual void AfterClose() {
-            if(HasAnimator) {
-                Animator.ResetToSavedProperties();
-                UpdateState(); // to instantly hide it; otherwise it'll stay visible for a whole frame with its' properties reset
-            }
-        }
-
         // TODO leave just one inheritable open/close/submit/cancel method
         // TODO create PreOpen (and rename AfterOpen to PostOpen) methods to handle other cases (like setting this to the last child before opening [UIScene])
-        public virtual void Open(bool skipAnimation = false, UIAnimation overrideAnimation = null, bool focus = true, bool enable = true) {
-            
+        public virtual void Open(bool skipAnimation = false, UIAnimation overrideAnimation = null, bool focus = true,
+            bool enable = true) {
+
             if(enable && !gameObject.activeSelf) {
                 gameObject.SetActive(true);
             }
-            
+
             if(!CanOpen) {
                 return;
             }
 
             PreOpen();
-            
+
             OpenInternal(skipAnimation, overrideAnimation);
 
             if(focus) {
                 Focus(true);
             }
         }
-        
-        public virtual bool CanOpen {
-            get {
-                if(Opened || !isActiveAndEnabled || !Parent.isActiveAndEnabled) {
-                    return false;
-                }
-            
-                var parentComponent = Parent as UIComponent;
 
-                if(parentComponent != null && !parentComponent.Opened) {
-                    return false;
-                }
-            
-                if(OpenConditions && !OpenConditions.CanOpen) {
-                    return false;
-                }
+        protected virtual void PreOpen() { }
 
-                return true;
-            }
-        }
-
-        protected virtual void PreOpen() {
-            
-        }
-        
         protected virtual void OpenInternal(bool skipAnimation, UIAnimation overrideAnimation) {
-            
-            Opened = true;
-            
+
+            State.IsOpened = true;
+
             OpenChildren(UIOpenType.OpenWithParent, skipAnimation);
 
             if(skipAnimation) {
@@ -339,10 +297,15 @@ namespace Elarion.UI {
             }
 
             if(!HasAnimator || skipAnimation) {
+                // TODO hook up the transition state to the parent's transition state (set it to true if the parent is transitioning and hook to parent's TransitionEnded event and set the transition to false & unhook)
+                // InTransition = Parent.InTransition
+                // Parent.State.TransitionEnded += OnParentTransitionEnded; 
+                // OnParentTransitionEnded() => { InTransition = false; Parent.State.TransitionEnded -= OnParentTransitionEnded; }
+                // TODO do the same for the OnClose method (when instant)
                 AfterOpen();
                 return;
             }
-            
+
             Animator.ResetToSavedProperties();
 
             var animation = overrideAnimation;
@@ -350,11 +313,11 @@ namespace Elarion.UI {
             if(animation == null) {
                 animation = Animator.GetAnimation(UIAnimationType.OnOpen);
             }
-            
+
             Animator.Play(animation, callback: AfterOpen);
 
         }
-        
+
         /// <summary>
         /// Called after the object has been opened and all open animations have finished playing (if any)
         /// </summary>
@@ -365,32 +328,29 @@ namespace Elarion.UI {
         protected virtual void OpenChildren(UIOpenType openTypeFilter, bool skipAnimation) {
             foreach(var child in ChildComponents) {
                 if(!child.gameObject.activeSelf ||
-                   child.Opened ||
+                   child.State.IsOpened ||
                    child.OpenType != openTypeFilter) {
                     continue;
                 }
-                
+
                 child.Open(skipAnimation, enable: false, focus: false);
             }
         }
-        
-        public virtual bool CanClose {
-            get { return Opened; }
-        }
-        
+
         public void Close(bool skipAnimation = false, UIAnimation overrideAnimation = null) {
-            if(!CanClose) {
+            if(!State.IsOpened) {
                 return;
             }
 
             CloseInternal(skipAnimation, overrideAnimation);
         }
 
-        protected virtual void CloseInternal(bool skipAnimation = false, UIAnimation overrideAnimation = null, bool closeChildren = true) {
-            
-            Opened = false;
+        protected virtual void CloseInternal(bool skipAnimation = false, UIAnimation overrideAnimation = null,
+            bool closeChildren = true) {
 
-            if(FocusedThis) {
+            State.IsOpened = false;
+
+            if(State.IsFocusedThis) {
                 var nextFocused = FindNextFocusedComponent();
                 if(nextFocused) {
                     nextFocused.Focus(true);
@@ -413,55 +373,51 @@ namespace Elarion.UI {
             if(animation == null) {
                 animation = Animator.GetAnimation(UIAnimationType.OnClose);
             }
-            
+
             Animator.Play(animation, callback: AfterClose);
+        }
+        
+        /// <summary>
+        /// Called after the object has been closed and all close animations have finished playing (if any)
+        /// </summary>
+        protected virtual void AfterClose() {
+            if(HasAnimator) {
+                Animator.ResetToSavedProperties();
+                Renderer.enabled = false; // instantly hide this, the state will update on the next frame
+            }
         }
 
         protected virtual void Update() {
-            UpdateState();
+            State.IsInteractable = State.IsOpened && !State.IsDisabled && !State.IsInTransition && InteractableSelf &&
+                                   InteractableParent;
+
+            State.IsInTransition = IsAnimating;
+
+            State.IsFocusedThis = this == FocusedComponent;
         }
 
-        /// <summary>
-        /// Update State Method. Override to add custom state behavior.
-        /// </summary>
-        /// <returns>Returns false if the change wasn't updated (likely because it didn't change).</returns>
-        protected virtual bool UpdateState() {
-            InTransition = IsAnimating;
-            
-            FocusedThis = this == FocusedComponent;
-
-            Interactable = Opened && !Disabled && !InTransition && InteractableSelf && InteractableParent;
-            
-            Render.enabled = ShouldRender;
-
-            if(_state == _oldState) {
-                return false; // state hasn't updated
-            }
-            
-            OnStateChanged(_state, _oldState);
-            _oldState = _state;
-
-            return true; // state updated
+        protected virtual void OnStateChanged() {
+            Renderer.enabled = ShouldRender;
         }
 
-        private void UpdateChildState(UIState currentState, UIState oldState) {
-            ActiveChild = false;
-            FocusedChild = false;
-            
+        private void OnChildStateChanged() {
+            State.IsRenderingChild = false;
+            State.IsFocusedChild = false;
+
             foreach(var child in ChildComponents) {
                 if(!child.isActiveAndEnabled) {
                     continue;
                 }
 
-                if(!ActiveChild && child.ShouldRender) {
-                    ActiveChild = true;
+                if(child.ShouldRender) {
+                    State.IsRenderingChild = true;
                 }
 
-                if(!FocusedChild && child.Focused) {
-                    FocusedChild = true;
+                if(child.State.IsFocused) {
+                    State.IsFocusedChild = true;
                 }
 
-                if(ActiveChild && FocusedChild) {
+                if(State.IsRenderingChild && State.IsFocusedChild) {
                     // no further state changes can happen after both flags are true
                     break;
                 }
@@ -496,7 +452,7 @@ namespace Elarion.UI {
                 ChildComponents = new List<UIComponent>();
             } else {
                 foreach(var childComponent in ChildComponents) {
-                    childComponent.OnStateChanged -= UpdateChildState;
+                    childComponent.State.StateChanged -= OnChildStateChanged;
                 }
             }
 
@@ -505,14 +461,14 @@ namespace Elarion.UI {
                 return;
             }
 
-            // Skip the first UIComponent - it's always the one attached to this game object
-            ChildComponents = GetComponentsInChildren<UIComponent>(includeInactive: true).Skip(1).ToList();
-            
+            ChildComponents = GetComponentsInChildren<UIComponent>(includeInactive: true)
+                .Where(child => child.Parent == this).ToList();
+
             foreach(var childComponent in ChildComponents) {
-                childComponent.OnStateChanged += UpdateChildState;
+                childComponent.State.StateChanged += OnChildStateChanged;
             }
-            
-            UpdateChildState(State, _oldState);
+
+            OnChildStateChanged();
         }
 
         protected override void OnTransformParentChanged() {
@@ -526,7 +482,7 @@ namespace Elarion.UI {
 
         protected override void OnValidate() {
             base.OnValidate();
-            
+
             UpdateParent();
 
             // update first focused
@@ -542,12 +498,13 @@ namespace Elarion.UI {
                 }
             }
 
-            _firstFocused = gameObject.GetComponentsInChildren<UIComponent>().Where(c => c.Focusable && c != this).Select(c => c.gameObject).FirstOrDefault();
-            
+            _firstFocused = gameObject.GetComponentsInChildren<UIComponent>().Where(c => c.Focusable && c != this)
+                .Select(c => c.gameObject).FirstOrDefault();
+
             if(_firstFocused != null) {
                 return;
             }
-            
+
             var selectable = GetComponentInChildren<Selectable>();
             if(selectable != null) {
                 _firstFocused = selectable.gameObject;
@@ -558,18 +515,19 @@ namespace Elarion.UI {
             get {
                 StringBuilder stringBuilder = new StringBuilder();
                 stringBuilder.AppendLine("<b>" + GetType().Name + ": </b>" + name);
-                stringBuilder.AppendLine("<b>Opened: </b>" + Opened);
+                stringBuilder.AppendLine("<b>Opened: </b>" + State.IsOpened);
                 stringBuilder.AppendLine("<b>Rendering: </b>" + ShouldRender);
-                stringBuilder.AppendLine("<b>In Transition: </b>" + InTransition);
-                stringBuilder.AppendLine("<b>Focused: </b>" + FocusedThis);
-                stringBuilder.AppendLine("<b>Disabled: </b>" + Disabled);
-                stringBuilder.AppendLine("<b>Interactable: </b>" + Interactable);
-                stringBuilder.AppendLine("<b>Focused Child: </b>" + FocusedChild);
-                stringBuilder.AppendLine("<b>Visible Child: </b>" + ActiveChild);
+                stringBuilder.AppendLine("<b>In Transition: </b>" + State.IsInTransition);
+                stringBuilder.AppendLine("<b>Focused: </b>" + State.IsFocusedThis);
+                stringBuilder.AppendLine("<b>Disabled: </b>" + State.IsDisabled);
+                stringBuilder.AppendLine("<b>Interactable: </b>" + State.IsInteractable);
+                stringBuilder.AppendLine("<b>Focused Child: </b>" + State.IsFocusedChild);
+                stringBuilder.AppendLine("<b>Visible Child: </b>" + State.IsRenderingChild);
                 return stringBuilder.ToString();
             }
         }
 
+        // TODO get rid of that
         public UIRoot UIRoot {
             get {
                 if(_uiRoot == null) {

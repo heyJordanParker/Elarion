@@ -15,7 +15,7 @@ namespace Elarion {
 			EventManager.Unregister(this);
 		}
 
-		private static EventManager EventManager { get { return Singleton.Get<EventManager>(); } }
+		private static EventManager EventManager { get { return Singleton.Singleton.Get<EventManager>(); } }
 
 		public void Subscribe(string toEvent, string message) {
 			if(!Events.ContainsKey(toEvent))

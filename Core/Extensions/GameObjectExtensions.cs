@@ -7,7 +7,7 @@ using UnityEngine.UI;
 namespace Elarion.Extensions {
 	public static class GameObjectExtensions {
 
-		public static bool HasComponent<T>(this GameObject gameObject) where T : MonoBehaviour {
+		public static bool HasComponent<T>(this GameObject gameObject) where T : Component {
 			T component;
 			if(!gameObject) {
 				return false;
@@ -16,7 +16,7 @@ namespace Elarion.Extensions {
 			return gameObject.HasComponent<T>(out component);
 		}
 		
-		public static bool HasComponent<T>(this GameObject gameObject, out T component) where T : MonoBehaviour {
+		public static bool HasComponent<T>(this GameObject gameObject, out T component) where T : Component {
 			if(!gameObject) {
 				component = null;
 				return false;
@@ -24,7 +24,15 @@ namespace Elarion.Extensions {
 			
 			component = gameObject.GetComponent<T>();
 
-			return component && component.enabled;
+			if(!component) {
+				return false;
+			}
+
+			if(component is MonoBehaviour && !(component as MonoBehaviour).enabled) {
+				return false;
+			}
+			
+			return true;
 		}
 
 		public static T Component<T>(this GameObject go) where T : Component {
@@ -78,7 +86,7 @@ namespace Elarion.Extensions {
 		}
 
 		public static Pool Pool(this GameObject go, uint amount) {
-			var poolingManager = Singleton.Get<PoolingManager>();
+			var poolingManager = Singleton.Singleton.Get<PoolingManager>();
 			return poolingManager.Pool(go, amount);
 		}
 

@@ -4,7 +4,7 @@ using UnityEngine;
 
 namespace Elarion.Managers {
 
-	internal class EventManager : Singleton {
+	internal class EventManager : Singleton.Singleton {
 		private static List<EventHandler> _eventHandlersIndex;
 
 		private static List<EventHandler> EventHandlersIndex {

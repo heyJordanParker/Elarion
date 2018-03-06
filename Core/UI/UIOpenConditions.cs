@@ -1,6 +1,8 @@
 using System;
+using System.Linq;
 using Elarion.Attributes;
 using Elarion.Extensions;
+using Elarion.Utility;
 using UnityEngine;
 
 namespace Elarion.UI {
@@ -86,6 +88,7 @@ namespace Elarion.UI {
         [HideInInspector]
         public OrientationCondition orientation = OrientationCondition.Portrait;
 
+        private RectTransform _rootCanvasTransform;
         private UIComponent _component;
 
         protected override void Awake() {
@@ -96,13 +99,13 @@ namespace Elarion.UI {
 
         protected void Update() {
             // should be a method in UIComponent
-            var componentCanOpen = _component && _component.gameObject.activeSelf && !_component.Opened;
+            var componentCanOpen = _component && _component.gameObject.activeSelf && !_component.State.IsOpened;
             
             if(componentCanOpen && CanOpen && _component.OpenType != UIOpenType.OpenManually) {
                 _component.Open();
             }
 
-            if(_component && _component.Opened && !CanOpen) {
+            if(_component && _component.State.IsOpened && !CanOpen) {
                 _component.Close();
             }
         }
@@ -174,7 +177,7 @@ namespace Elarion.UI {
                     return true;
                 }
 
-                var currentState = parent.State;
+                var currentState = parent.State.CurrentState;
 
                 foreach(var state in Enum.GetValues(typeof(StateCondition))) {
                     if(!parentState.HasFlag(state)) continue;
@@ -182,39 +185,39 @@ namespace Elarion.UI {
 
                     switch((StateCondition) state) {
                         case StateCondition.Focused:
-                            if(currentState.HasFlag(UIState.FocusedThis) ||
-                               currentState.HasFlag(UIState.FocusedChild)) {
+                            if(currentState.HasFlag(UIState.States.FocusedThis) ||
+                               currentState.HasFlag(UIState.States.FocusedChild)) {
                                 return true;
                             }
 
                             break;
                         case StateCondition.NotFocused:
-                            if(!currentState.HasFlag(UIState.FocusedThis) &&
-                               !currentState.HasFlag(UIState.FocusedChild)) {
+                            if(!currentState.HasFlag(UIState.States.FocusedThis) &&
+                               !currentState.HasFlag(UIState.States.FocusedChild)) {
                                 return true;
                             }
 
                             break;
                         case StateCondition.InTransition:
-                            if(currentState.HasFlag(UIState.InTransition)) {
+                            if(currentState.HasFlag(UIState.States.InTransition)) {
                                 return true;
                             }
 
                             break;
                         case StateCondition.NotInTransition:
-                            if(!currentState.HasFlag(UIState.InTransition)) {
+                            if(!currentState.HasFlag(UIState.States.InTransition)) {
                                 return true;
                             }
 
                             break;
                         case StateCondition.Opened:
-                            if(currentState.HasFlag(UIState.Opened)) {
+                            if(currentState.HasFlag(UIState.States.Opened)) {
                                 return true;
                             }
 
                             break;
                         case StateCondition.NotOpened:
-                            if(!currentState.HasFlag(UIState.Opened)) {
+                            if(!currentState.HasFlag(UIState.States.Opened)) {
                                 return true;
                             }
 
@@ -238,10 +241,24 @@ namespace Elarion.UI {
             }
         }
 
+        protected RectTransform RootCanvasTransform {
+            get {
+                if(_rootCanvasTransform == null) {
+                    var rootCanvas = GetComponentsInParent<Canvas>().SingleOrDefault(c => c.isRootCanvas);
+
+                    if(rootCanvas && rootCanvas.transform is RectTransform) {
+                        _rootCanvasTransform = (RectTransform) rootCanvas.transform;
+                    }
+                }
+                
+                return _rootCanvasTransform;
+            }
+        }
+
         protected float CurrentScreenWidth {
             get {
-                if(_component && _component.UIRoot) {
-                    return _component.UIRoot.Width;
+                if(RootCanvasTransform) {
+                    return _rootCanvasTransform.sizeDelta.x; // Scaled width
                 }
 
                 return Screen.width;
@@ -250,8 +267,8 @@ namespace Elarion.UI {
 
         protected float CurrentScreenHeight {
             get {
-                if(_component && _component.UIRoot) {
-                    return _component.UIRoot.Height;
+                if(RootCanvasTransform) {
+                    return _rootCanvasTransform.sizeDelta.y; // Scaled height
                 }
 
                 return Screen.height;

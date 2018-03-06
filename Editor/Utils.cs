@@ -2,31 +2,43 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using Elarion.Extensions;
+using Elarion.UI;
 using UnityEditor;
 using UnityEngine;
+using UnityEngine.UI;
 
 namespace Elarion.Editor {
-    public static class Utils {
-        private static InspectorDrawer _inspectorDrawer;
+    internal static class Utils {
 
-        public static void DrawInInspector(EditorWindow caller, Action onGUI, string title) {
-            DrawInInspector(caller, onGUI, null, title);
-        }
+        public static void ShowHelpers(UIComponent component) {
+            component.Renderer.hideFlags = HideFlags.None;
+            component.GetComponent<GraphicRaycaster>().hideFlags = HideFlags.None;
+            if(component.HasComponent<CanvasRenderer>()) {
+                component.GetComponent<CanvasRenderer>().hideFlags = HideFlags.None;
+            }
+            
+            var scene = component as UIScene;
 
-        public static void DrawInInspector(EditorWindow caller, Action onGUI, Action<Rect, GUIStyle> onPreviewGUI,
-            string title) {
-            InspectorDrawer.name = title;
-            InspectorDrawer.Initialize(caller, onGUI, onPreviewGUI);
-            EditorUtility.SetDirty(InspectorDrawer);
-        }
-
-        public static InspectorDrawer InspectorDrawer {
-            get {
-                if(_inspectorDrawer == null) _inspectorDrawer = ScriptableObject.CreateInstance<InspectorDrawer>();
-                return _inspectorDrawer;
+            if(scene) {
+                scene.CanvasGroup.hideFlags = HideFlags.None;
             }
         }
+        
+        public static void HideHelpers(UIComponent component) {
+            component.Renderer.hideFlags = HideFlags.HideInInspector;
+            component.GetComponent<GraphicRaycaster>().hideFlags = HideFlags.HideInInspector;
+            if(component.HasComponent<CanvasRenderer>()) {
+                component.GetComponent<CanvasRenderer>().hideFlags = HideFlags.HideInInspector;
+            }
 
+            var scene = component as UIScene;
+
+            if(scene) {
+                scene.CanvasGroup.hideFlags = HideFlags.HideInInspector;
+            }
+        }
+        
         public static void DisplayAsyncProgressBar(string loadingText, float progress) {
             AsyncProgressBar.Display(loadingText, progress);
         }

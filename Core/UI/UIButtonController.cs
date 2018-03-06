@@ -66,7 +66,7 @@ namespace Elarion.UI {
                     closeComponent = _targetComponent;
                     break;
                 case Type.ToggleComponent:
-                    if(_targetComponent != null && _targetComponent.Opened) {
+                    if(_targetComponent != null && _targetComponent.State.IsOpened) {
                         goto case Type.CloseComponent;
                     }
                     goto case Type.OpenComponent;
@@ -89,7 +89,7 @@ namespace Elarion.UI {
             }
 
             if(openComponent != null) {
-                if(openComponent.Opened) {
+                if(openComponent.State.IsOpened) {
                     openComponent.Focus(true); // move this to the open method?
                 } else {
                     openComponent.Open(overrideAnimation: _openAnimationOverride);

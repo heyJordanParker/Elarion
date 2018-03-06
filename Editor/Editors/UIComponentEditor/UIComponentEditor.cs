@@ -1,17 +1,19 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using Elarion.Extensions;
 using Elarion.UI;
 using Elarion.UI.Animation;
 using UnityEditor;
+using UnityEditorInternal;
 using UnityEngine;
 using UnityEngine.EventSystems;
+using UnityEngine.UI;
 
 namespace Elarion.Editor.Editors {
     [CustomEditor(typeof(UIComponent), true)]
     [CanEditMultipleObjects]
     public partial class UIComponentEditor : UnityEditor.Editor {
-        // TODO Scene-specific options (e.g. current scene; hide some of the unnecessary stuff for scenes
 
         // TODO dynamically load those based on an interface/inheritance 
         private static readonly Type[] HelperComponents = {
@@ -69,6 +71,14 @@ namespace Elarion.Editor.Editors {
             }
         }
 
+        private void OnEnable() {
+            if(EditorPrefs.GetBool(Consts.HideUIComponentHelpersKey)) {
+                Utils.HideHelpers(Target);
+            } else {
+                Utils.ShowHelpers(Target);
+            }
+        }
+
         public override void OnInspectorGUI() {
 //            if(Target is UIScene) {
 //                DrawSceneInspectorGUI();
@@ -99,9 +109,9 @@ namespace Elarion.Editor.Editors {
 
             if(Application.isPlaying) {
                 GUI.enabled = !Target.OpenConditions || Target.OpenConditions.CanOpen;
-                var label = Target.Opened ? "Close" : "Open";
+                var label = Target.State.IsOpened ? "Close" : "Open";
                 if(GUILayout.Button(label, GUILayout.MaxWidth(180))) {
-                    if(Target.Opened) {
+                    if(Target.State.IsOpened) {
                         Target.Close();
                     } else {
                         Target.Open();
@@ -110,9 +120,11 @@ namespace Elarion.Editor.Editors {
 
                 GUI.enabled = Target.Focusable;
 
-                label = Target.Focused ? "Unfocus" : "Focus";
+                UIComponent tempQualifier = Target;
+                label = tempQualifier.State.IsFocusedThis || tempQualifier.State.IsFocusedChild ? "Unfocus" : "Focus";
                 if(GUILayout.Button(label, GUILayout.MaxWidth(180))) {
-                    if(Target.Focused) {
+                    UIComponent tempQualifier1 = Target;
+                    if(tempQualifier1.State.IsFocusedThis || tempQualifier1.State.IsFocusedChild) {
                         Target.Unfocus();
                     } else {
                         Target.Focus(true);

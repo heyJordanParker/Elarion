@@ -27,7 +27,7 @@ namespace Elarion.Extensions {
 
 		private static GameObject InstantiateOrSpawnFromPool(GameObject gameObject, Vector3 position, Quaternion rotation, int layer = -1) {
 			//instantiate or spawn from pool
-			return Singleton.Get<PoolingManager>().Instantiate(gameObject, position, rotation, layer);
+			return Singleton.Singleton.Get<PoolingManager>().Instantiate(gameObject, position, rotation, layer);
 		}
 
 		public static T Instantiate<T>(this T component, Vector3 position = new Vector3(), Quaternion rotation = new Quaternion(), int layer = - 1) where T : Component {

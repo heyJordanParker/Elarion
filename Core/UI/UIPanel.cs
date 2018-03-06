@@ -1,3 +1,4 @@
+using NUnit.Framework.Constraints;
 using UnityEngine;
 using UnityEngine.UI;
 
@@ -7,9 +8,6 @@ namespace Elarion.UI {
     [RequireComponent(typeof(Canvas))]
     [RequireComponent(typeof(GraphicRaycaster))] // to propagate input events
     public class UIPanel : UIComponent {
-        // TODO UIForm inheritor - add error checking submitting and so on builtin (submit with enter/submit input (in unity))
-        // TODO UIDialog inheritor - dynamic amount of (getcomponent; onchildren changed), extensible; dialog skins?
-
         [SerializeField]
         private bool _interactable = true;
 
@@ -26,7 +24,7 @@ namespace Elarion.UI {
             set { _interactable = value; }
         }
 
-        protected override Behaviour Render {
+        public override Behaviour Renderer {
             get {
                 if(_canvas == null) {
                     _canvas = GetComponent<Canvas>();
@@ -36,7 +34,7 @@ namespace Elarion.UI {
             }
         }
 
-        protected CanvasGroup CanvasGroup {
+        public CanvasGroup CanvasGroup {
             get {
                 if(_canvasGroup == null) {
                     _canvasGroup = GetComponent<CanvasGroup>();
@@ -46,15 +44,12 @@ namespace Elarion.UI {
             }
         }
 
-        protected override bool UpdateState() {
-            if(!base.UpdateState()) {
-                return false;
-            }
+        protected override void OnStateChanged() {
+            base.OnStateChanged();
 
-            CanvasGroup.interactable = !Disabled;
+            CanvasGroup.interactable = !State.IsDisabled;
 
-            CanvasGroup.blocksRaycasts = Interactable;
-            return true;
+            CanvasGroup.blocksRaycasts = State.IsInteractable;
         }
     }
 }
