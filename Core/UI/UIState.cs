@@ -3,13 +3,10 @@ using Elarion.Extensions;
 using UnityEngine;
 
 namespace Elarion.UI {
-    // TODO move the state here - use this for visualization (readonly) and to clean up the UIComponent class
-    
     [DisallowMultipleComponent]
     public sealed class UIState : MonoBehaviour {
         [Serializable, Flags]
-        public enum States {
-            NotInitialized = -1,
+        private enum States {
             None = 0 << 0, // the element is off (in the hierarchy)
             Opened = 1 << 0, // is this element considered open
             Rendering = 1 << 1,
@@ -33,7 +30,7 @@ namespace Elarion.UI {
         public event Action Focused = () => { };
         public event Action Blurred = () => { };
 
-        private States _oldState = States.NotInitialized;
+        private States _oldState = States.None;
         private States _currentState = States.None;
 
         private void LateUpdate() {
@@ -84,8 +81,8 @@ namespace Elarion.UI {
             _oldState = _currentState;
 
         }
-        
-        public States CurrentState {
+
+        private States CurrentState {
             get { return _currentState; }
             set { _currentState = value; }
         }
@@ -131,7 +128,7 @@ namespace Elarion.UI {
         }
         
         /// <summary>
-        /// Helper function that returns true if any 
+        /// Helper function that returns true if either this or a child is focused 
         /// </summary>
         public bool IsFocused {
             get { return IsFocusedThis || IsFocusedChild; }

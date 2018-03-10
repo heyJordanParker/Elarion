@@ -2,7 +2,7 @@ using System.Collections.Generic;
 using System.Linq;
 using Elarion.Attributes;
 using Elarion.Extensions;
-using Elarion.UI.Animation;
+using Elarion.UI.Helpers.Animation;
 using Elarion.Utility;
 using UnityEngine;
 using UnityEngine.EventSystems;
@@ -11,39 +11,17 @@ using UnityEngine.UI;
 
 namespace Elarion.UI {
     // TODO make this a static invisible manager (initializeOnLoad + a hidden MonoBehaviour that updates it); add the initial scene as a checkbox to scenes and a readonly gameobject field (to easily find the actual one)
-    
+
     [RequireComponent(typeof(Canvas))]
     [RequireComponent(typeof(GraphicRaycaster))]
     [RequireComponent(typeof(CanvasScaler))]
     public class UIRoot : BaseUIBehaviour {
-        [SerializeField]
-        [FormerlySerializedAs("_initialScene")]
-        public UIScene initialScene;
-
         public bool enableTabNavigation = true;
 
         [SerializeField, ReadOnly]
-        private UIScene[] _scenes;
-
-        [SerializeField, ReadOnly]
         private GameObject _selectedObject;
-        
+
         private BaseEventData _baseEventData;
-
-        private UIScene _currentScene;
-
-        protected BaseEventData BaseEventData {
-            get {
-                if(_baseEventData == null)
-                    _baseEventData = new BaseEventData(EventSystem.current);
-                _baseEventData.Reset();
-                return _baseEventData;
-            }
-        }
-        
-        public UIScene CurrentScene {
-            get { return _currentScene; }
-        }
 
         public GameObject SelectedObject {
             get { return _selectedObject; }
@@ -53,63 +31,11 @@ namespace Elarion.UI {
                 EventSystem.SetSelectedGameObject(_selectedObject);
             }
         }
-        
+
         public UIComponent FocusedComponent {
             get { return UIComponent.FocusedComponent; }
         }
 
-        protected string SubmitButton {
-            get {
-                var button = "Submit";
-
-                if(EventSystem == null) return button;
-                
-                var inputModule = EventSystem.currentInputModule == null
-                    ? null
-                    : EventSystem.currentInputModule as StandaloneInputModule;
-
-                if(inputModule != null) {
-                    button = inputModule.submitButton;
-                }
-
-                return button;
-            }
-        }
-        
-        protected string CancelButton {
-            get {
-                var button = "Cancel";
-
-                if(EventSystem == null) return button;
-                
-                var inputModule = EventSystem.currentInputModule == null
-                    ? null
-                    : EventSystem.currentInputModule as StandaloneInputModule;
-
-                if(inputModule != null) {
-                    button = inputModule.cancelButton;
-                }
-
-                return button;
-            }
-        }
-
-        public void OpenScene(UIScene scene, bool skipAnimation = false, UIAnimation overrideOpenAnimation = null, UIAnimation overrideCloseAnimation = null) {
-            if(scene == null || scene == _currentScene) {
-                return;
-            }
-
-            if(_currentScene != null) {
-                _currentScene.Close(skipAnimation, overrideCloseAnimation);
-            }
-
-            _currentScene = scene;
-            if(!_currentScene.State.IsOpened) {
-                _currentScene.Open(skipAnimation, overrideOpenAnimation);
-            }
-        }
-
-        // override all the unneeded fields (and make them useless); make fields that shouldn't be used here virtual and override them with empty values as well
         protected override void Awake() {
             base.Awake();
             // This is necessary for blur effects - the shader can't work with the main render texture
@@ -133,33 +59,21 @@ namespace Elarion.UI {
             }
         }
 
-        protected override void Start() {
-            base.Start();
-
-            if(_scenes == null) {
-                _scenes = GetComponentsInChildren<UIScene>();
-                if(_scenes == null) {
-                    return;
-                }
-            }
-            
-            if(!initialScene) {
-                initialScene = _scenes.Length > 0 ? _scenes[0] : null;
-            }
-
-            OpenScene(initialScene);
-        }
-
         protected virtual void Update() {
             // process the events just once and only if focused
-            if(_current != this || !EventSystem.isFocused) {
+            if(_current != this || !EventSystem || !EventSystem.isFocused) {
                 return;
             }
-            
+
             HandleTabNavigation();
 
-            // the user can change the selected game object - if he does, update the selected component accodringly
+            // the user can change the selected game object - if he does, update the selected component accordingly
             if(EventSystem.currentSelectedGameObject == SelectedObject) {
+                if(SelectedObject == null) {
+                    // Send navigation events to the focused component as a fallback
+                    SelectedObject = FocusedComponent ? FocusedComponent.gameObject : null;
+                }
+
                 return;
             }
 
@@ -176,19 +90,23 @@ namespace Elarion.UI {
             }
         }
 
-        // off-clicks aren't consistent in unfocusing
         private void HandleTabNavigation() {
             if(!enableTabNavigation ||
-               !EventSystem.isFocused ||
+               !EventSystem ||
                !EventSystem.sendNavigationEvents ||
                !Input.GetKeyDown(KeyCode.Tab)) {
                 return;
             }
 
-            var selectable = EventSystem.currentSelectedGameObject ? GetValidSelectableChild(EventSystem.currentSelectedGameObject) : null;
+            var startingTransform = EventSystem.currentSelectedGameObject
+                ? EventSystem.currentSelectedGameObject.transform as RectTransform
+                : null;
+            var selectable = EventSystem.currentSelectedGameObject
+                ? EventSystem.currentSelectedGameObject.GetComponent<Selectable>()
+                : null;
             Selectable nextSelectable = null;
-            
-            if(selectable) {
+
+            if(selectable && selectable.IsInteractable() && selectable.navigation.mode != Navigation.Mode.None) {
                 var reverseNavigationDirection = Input.GetKey(KeyCode.LeftShift) || Input.GetKey(KeyCode.RightShift);
 
                 bool horizontalNavigation = selectable.navigation.mode.HasFlag(Navigation.Mode.Horizontal);
@@ -201,11 +119,11 @@ namespace Elarion.UI {
 
                     if(nextSelectable == null) {
                         nextSelectable = reverseNavigationDirection
-                            ? selectable.FindSelectableOnUp()
-                            : selectable.FindSelectableOnDown();
+                            ? startingTransform.FindCloseSelectableOnUp()
+                            : startingTransform.FindCloseSelectableOnDown();
                     }
                 }
-                
+
                 if(horizontalNavigation && nextSelectable == null) {
                     nextSelectable = reverseNavigationDirection
                         ? selectable.navigation.selectOnLeft
@@ -213,38 +131,33 @@ namespace Elarion.UI {
 
                     if(nextSelectable == null) {
                         nextSelectable = reverseNavigationDirection
-                            ? selectable.FindSelectableOnLeft()
-                            : selectable.FindSelectableOnRight();
+                            ? startingTransform.FindCloseSelectableOnLeft()
+                            : startingTransform.FindCloseSelectableOnRight();
                     }
                 }
             }
 
-            if(!selectable) {
-                if(!FocusedComponent) return;
-
-                nextSelectable = GetValidSelectableChild(FocusedComponent.gameObject);
+            if(!selectable && startingTransform) {
+                nextSelectable = startingTransform.gameObject.GetSelectableChildren().FirstOrDefault(child =>
+                    child.IsInteractable() && child.navigation.mode != Navigation.Mode.None);
             }
-            
-            if(nextSelectable == null || !nextSelectable.IsInteractable() || nextSelectable.navigation.mode == Navigation.Mode.None) return;
-            
+
+            if(nextSelectable == null || !nextSelectable.IsInteractable() ||
+               nextSelectable.navigation.mode == Navigation.Mode.None) return;
+
             var parentComponent = nextSelectable.GetComponentInParent<UIComponent>();
-                
+
             if(parentComponent != null && !parentComponent.State.IsInteractable) {
                 return;
             }
-            
+
             if(parentComponent) {
                 parentComponent.Focus();
             }
-            
+
             Select(nextSelectable);
         }
 
-        private Selectable GetValidSelectableChild(GameObject go) {
-            return go.GetSelectableChildren().FirstOrDefault(child => child.IsInteractable() && child.navigation.mode != Navigation.Mode.None);
-
-        }
-        
         public void Select(Selectable selectable) {
             if(!EventSystem) {
                 return;
@@ -264,15 +177,10 @@ namespace Elarion.UI {
                 // doesn't work if the object is disabled
                 input.ActivateInputField();
             }
-            
+
             // TODO test with TMP
 
             SelectedObject = selectable.gameObject;
-        }
-
-        protected override void OnValidate() {
-            base.OnValidate();
-            _scenes = GetComponentsInChildren<UIScene>();
         }
 
         // this is to prevent multiple update calls

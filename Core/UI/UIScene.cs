@@ -1,6 +1,7 @@
 using System.Collections.Generic;
+using System.Linq;
 using Elarion.Attributes;
-using Elarion.UI.Animation;
+using Elarion.UI.Helpers.Animation;
 using Elarion.Utility;
 using UnityEngine;
 
@@ -16,7 +17,7 @@ namespace Elarion.UI {
         
         // TODO move the currentScene logic here
 
-        [SerializeField, ReadOnly]
+        [SerializeField]
         private bool _initialScene = false;
         
         public bool InitialScene {
@@ -25,59 +26,84 @@ namespace Elarion.UI {
         }
         
         // override this to ignore the ActiveChild flag
-        public override bool ShouldRender {
+        public override bool IsRendering {
             get { return State.IsOpened || State.IsInTransition; }
         }
 
-        public override void Open(bool skipAnimation = false, UIAnimation overrideAnimation = null, bool focus = true, bool enable = true) {
-            if(UIRoot.CurrentScene != this) {
-                UIRoot.OpenScene(this, skipAnimation, overrideAnimation);
-                return;
+        protected override void Awake() {
+            base.Awake();
+
+            if(!AllScenes.Contains(this)) {
+                AllScenes.Add(this);
             }
-            base.Open(skipAnimation, overrideAnimation, focus);
+        }
+        
+        protected override void Start() {
+            base.Start();
+
+            if(InitialScene) {
+                Open();
+            }
         }
 
-        protected override void PreOpen() {
-            base.PreOpen();
+        protected override void OnDestroy() {
+            base.OnDestroy();
+            
+            AllScenes.Remove(this);
+        }
+
+        protected override void BeforeOpen(bool skipAnimation) {
+            base.BeforeOpen(skipAnimation);
+            
+            if(_currentScene != null) {
+                _currentScene.Close(skipAnimation);
+            }
+
+            _currentScene = this;
             transform.SetAsLastSibling();
         }
 
+#if UNITY_EDITOR
         protected override void OnValidate() {
             base.OnValidate();
 
-            InitialScene = UIRoot.initialScene == this;
+            var initialScene = InitialScene ? this : AllScenes.FirstOrDefault(s => s.InitialScene);
+            
+            if(initialScene == null) {
+                initialScene = AllScenes.FirstOrDefault(s => s != this);
+                    
+                if(initialScene != null) {
+                    initialScene.InitialScene = true;
+                }
+            }
+                
+            foreach(var scene in AllScenes) {
+                if(scene == initialScene) {
+                    continue;
+                }
+                
+                if(initialScene != null && scene.InitialScene) {
+                    scene.InitialScene = false;
+                }
+            }
+        }
+#endif
 
-            // set the initial scene (restore when I move the initial scene here)
-//            var initialScene = InitialScene ? this : Scenes.FirstOrDefault(s => s.InitialScene);
-//            
-//            if(initialScene == null) {
-//                initialScene = Scenes.FirstOrDefault();
-//                    
-//                if(initialScene != null) {
-//                    initialScene.InitialScene = true;
-//                }
-//            }
-//                
-//            foreach(var scene in Scenes) {
-//                if(scene == initialScene) {
-//                    continue;
-//                }
-//                
-//                if(initialScene != null && scene.InitialScene) {
-//                    scene.InitialScene = false;
-//                }
-//            }
+        private static UIScene _currentScene;
+        
+        public static UIScene CurrentScene {
+            get { return _currentScene; }
         }
 
-        private static List<UIScene> _scenes;
+        private static readonly List<UIScene> Scenes = new List<UIScene>();
 
-        public static List<UIScene> Scenes {
+        public static List<UIScene> AllScenes {
             get {
-                if(_scenes == null) {
-                    _scenes = SceneTools.FindSceneObjectsOfType<UIScene>();
+                if(Scenes.Count == 0) {
+                    Scenes.AddRange(SceneTools.FindSceneObjectsOfType<UIScene>());
                 }
 
-                return _scenes;
+                return Scenes;
             }
         }
     }

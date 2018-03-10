@@ -10,12 +10,16 @@ using UnityEngine.UI;
 
 namespace Elarion.Editor {
     internal static class Utils {
-
-        public static void ShowHelpers(UIComponent component) {
+        
+        public static void ShowBuiltinHelpers(UIComponent component) {
             component.Renderer.hideFlags = HideFlags.None;
             component.GetComponent<GraphicRaycaster>().hideFlags = HideFlags.None;
             if(component.HasComponent<CanvasRenderer>()) {
                 component.GetComponent<CanvasRenderer>().hideFlags = HideFlags.None;
+            }
+            
+            if(component.HasComponent<CanvasGroup>()) {
+                component.GetComponent<CanvasGroup>().hideFlags = HideFlags.None;
             }
             
             var scene = component as UIScene;
@@ -25,11 +29,15 @@ namespace Elarion.Editor {
             }
         }
         
-        public static void HideHelpers(UIComponent component) {
+        public static void HideBuiltinHelpers(UIComponent component) {
             component.Renderer.hideFlags = HideFlags.HideInInspector;
             component.GetComponent<GraphicRaycaster>().hideFlags = HideFlags.HideInInspector;
             if(component.HasComponent<CanvasRenderer>()) {
                 component.GetComponent<CanvasRenderer>().hideFlags = HideFlags.HideInInspector;
+            }
+            
+            if(component.HasComponent<CanvasGroup>()) {
+                component.GetComponent<CanvasGroup>().hideFlags = HideFlags.HideInInspector;
             }
 
             var scene = component as UIScene;
@@ -38,6 +46,25 @@ namespace Elarion.Editor {
                 scene.CanvasGroup.hideFlags = HideFlags.HideInInspector;
             }
         }
+
+        public static Dictionary<Type, Component> GetComponentsDictionary(GameObject gameObject, IEnumerable<Type> componentTypes) {
+            var helpers = new Dictionary<Type, Component>();
+            foreach(var helperComponent in componentTypes) {
+                helpers.Add(helperComponent, gameObject.GetComponent(helperComponent));
+            }
+
+            return helpers;
+        }
+        
+        public static List<Type> GetTypesWithAttribute<TAttribute>() where TAttribute : Attribute {
+            var typesWithHelpAttribute = 
+                from assembly in AppDomain.CurrentDomain.GetAssemblies()
+                from type in assembly.GetTypes()
+                where type.IsDefined(typeof(TAttribute), false)
+                select type;
+
+            return typesWithHelpAttribute.ToList();
+        }
         
         public static void DisplayAsyncProgressBar(string loadingText, float progress) {
             AsyncProgressBar.Display(loadingText, progress);
@@ -45,21 +72,6 @@ namespace Elarion.Editor {
 
         public static void ClearProgressBar() {
             AsyncProgressBar.Clear();
-        }
-
-        public static AddToBuildSettingsResult AddSceneToBuildSettings(string newScenePath) {
-            if(Path.GetExtension(newScenePath) != ".unity") {
-                return AddToBuildSettingsResult.InvalidScene;
-            }
-
-            var currentScenes = new List<EditorBuildSettingsScene>(EditorBuildSettings.scenes);
-            if(currentScenes.Any(scene => scene.path.Equals(newScenePath))) {
-                return AddToBuildSettingsResult.DuplicateScene;
-            }
-
-            currentScenes.Add(new EditorBuildSettingsScene(newScenePath, true));
-            EditorBuildSettings.scenes = currentScenes.ToArray();
-            return AddToBuildSettingsResult.Successful;
         }
 
         public static T CreateScriptableObject<T>() where T : ScriptableObject {

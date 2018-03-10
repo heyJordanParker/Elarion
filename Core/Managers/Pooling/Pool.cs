@@ -66,7 +66,7 @@ namespace Elarion.Managers {
 		}
 
 		private Pooled Copy(GameObject gameObject) {
-			var copy = Object.Instantiate(gameObject) as GameObject;
+			var copy = Object.Instantiate(gameObject);
 			return copy.AddComponent<Pooled>();
 		}
 

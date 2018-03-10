@@ -41,7 +41,7 @@ namespace Elarion.UI {
             do {
                 Breadcrumb = parentComponent.name + elementSeparator + Breadcrumb;
 
-                parentComponent = parentComponent.Parent as UIComponent;
+                parentComponent = parentComponent.ParentComponent;
             } while(parentComponent != null);
 
             Breadcrumb = Breadcrumb.TrimEnd(elementSeparator.ToCharArray());

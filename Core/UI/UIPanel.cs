@@ -47,7 +47,8 @@ namespace Elarion.UI {
         protected override void OnStateChanged() {
             base.OnStateChanged();
 
-            CanvasGroup.interactable = !State.IsDisabled;
+            // disable disabled child's interaction to simplify navigation events
+            CanvasGroup.interactable = IsRendering && !State.IsDisabled;
 
             CanvasGroup.blocksRaycasts = State.IsInteractable;
         }

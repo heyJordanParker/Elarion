@@ -1,4 +1,8 @@
+using System;
+using System.Linq;
 using UnityEngine;
+using UnityEngine.Events;
+using UnityEngine.EventSystems;
 using UnityEngine.UI;
 
 namespace Elarion.UI {
@@ -7,50 +11,82 @@ namespace Elarion.UI {
 
     // TODO input validator component - a few builtin options and a custom regex option (as enum) and a length validator (with minmax slider)
     
-    // TODO use the OnSubmit/OnCancel handlers to add cancelation/submitting to regular unity input fields and such - just add them on runtime and hook the appropriate events
+    public class UIDialog : UIPanel, ISubmitHandler, ICancelHandler {
 
-    public class UIPopup : UIDialog {
-        // basic info dialog - both submit and cancel close it; minimal inputs
-    }
-    
-    public class UIForm : UIDialog {
-        // Add those below on the first update
-        // input field class - key and value (both strings for easy www calls), optional validation, etc
-        // auto-focus invalid input fields
-        // show errors
-        
-        // TODO UIForm inheritor - add error checking submitting and so on builtin (submit with enter/submit input (in unity))
-        
-        // TODO get all inputfields and button children on awake
-        // TODO add onsubmit event to all inputfields and add a submit event to the button
-    }
-    
-    [RequireComponent(typeof(UISubmitHandler))]
-    [RequireComponent(typeof(UICancelHandler))]
-    public class UIDialog : UIPanel {
+        [Serializable]
+        protected enum DeselectAction {
+            None,
+            Submit,
+            Cancel
+        }
         
         // TODO cache the object that was last focused before opening this and focus it back when closing
         
-        // dialog skins?
+        // dialog submit button?
 
-        // dropdown DeselectAction
-        public bool submitOnDeselect;
-        public bool cancelOnDeselect;
+        [SerializeField]
+        protected Button submitButton;
+
+        [SerializeField]
+        protected DeselectAction deselectAction;
+        
+        // close/submit dialogs when the scene changes/gets deselected/timeout
 
         private InputField[] _inputs;
 
         protected override void Awake() {
             base.Awake();
-
+            
             _inputs = GetComponentsInChildren<InputField>();
+//
+            foreach(var input in _inputs) {
+                // get all unique game objects and add submit handlers to them - hook them with the submit method
+//                input.onValueChanged.AddListener(inputSubmitAction);
+            }
+
+            switch(deselectAction) {
+                case DeselectAction.None:
+                    break;
+                case DeselectAction.Submit:
+                    State.Blurred += Submit;
+                    break;
+                case DeselectAction.Cancel:
+                    State.Blurred += Cancel;
+                    break;
+                default:
+                    goto case DeselectAction.None;
+            }
         }
 
-        public override void Focus(bool setSelection = false) {
-            // always focus the first dialog child if clicked
-            base.Focus(true);
+//        public override void Focus(bool setSelection = false, bool autoFocus = true) {
+//            base.Focus(false, autoFocus);
+//        }
+
+        public void Test() {
+            Debug.Log("Test");
         }
 
-        // TODO add submit, cancel hanlders here
+        protected virtual void Submit() {
+            if(!State.IsOpened) {
+                return;
+            }
+            
+            // TODO cache the submitted/canceled state and reset it when opened (to preven submitting multiple times) 
+            Debug.Log(name + "Submitting", gameObject);
+            Close();
+        }
 
+        protected virtual void Cancel() {
+            Debug.Log(name + "Canceling", gameObject);
+            Close();
+        }
+
+        public void OnSubmit(BaseEventData eventData) {
+            Submit();
+        }
+
+        public void OnCancel(BaseEventData eventData) {
+            Cancel();
+        }
     }
 }

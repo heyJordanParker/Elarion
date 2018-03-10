@@ -2,7 +2,7 @@
 using System.Collections;
 using Elarion.Extensions;
 using Elarion.UI;
-using Elarion.UI.Animation;
+using Elarion.UI.Helpers.Animation;
 using UnityEngine;
 
 namespace Elarion.Utility.PropertyTweeners {

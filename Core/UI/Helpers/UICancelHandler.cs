@@ -1,0 +1,17 @@
+using Elarion.Attributes;
+using UnityEngine;
+using UnityEngine.Events;
+using UnityEngine.EventSystems;
+
+namespace Elarion.UI.Helpers {
+    [UIComponentHelper]
+    public class UICancelHandler : BaseUIBehaviour, ICancelHandler {
+        
+        [SerializeField]
+        private UnityEvent _onCancel;
+
+        public void OnCancel(BaseEventData eventData) {
+            _onCancel.Invoke();
+        }
+    }
+}

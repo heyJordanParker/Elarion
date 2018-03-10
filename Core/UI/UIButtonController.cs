@@ -1,28 +1,30 @@
 using System;
 using Elarion.Attributes;
-using Elarion.UI.Animation;
+using Elarion.UI.Helpers.Animation;
 using UnityEngine;
 using UnityEngine.EventSystems;
 
 namespace Elarion.UI {
-    // TODO open popup option
-    // TODO focus option (default true)
-    public class UIButtonController : BaseUIBehaviour, IPointerClickHandler, ISubmitHandler, ICancelHandler {
+    public class UIButtonController : BaseUIBehaviour, IPointerClickHandler, ISubmitHandler {
         [Serializable]
         private enum Type {
             OpenComponent,
             CloseComponent,
             ToggleComponent,
             OpenUIScene,
-            Submit,
-            Cancel,
+            SendSubmitEvent,
+            SendCancelEvent,
         }
         
         [SerializeField]
         private Type _type = Type.OpenUIScene;
 
-        [SerializeField, ConditionalVisibility("_type == Type.OpenComponent || Type.CloseComponent || Type.Submit || Type.Cancel || _type == Type.ToggleComponent")]
+        [SerializeField, ConditionalVisibility("_type == Type.OpenComponent || Type.CloseComponent || _type == Type.ToggleComponent")]
         private UIComponent _targetComponent;
+        [SerializeField, ConditionalVisibility("_type == Type.SendSubmitEvent")]
+        private GameObject _objectToSubmit;
+        [SerializeField, ConditionalVisibility("_type == Type.SendCancelEvent")]
+        private GameObject _objectToCancel;
         [SerializeField, ConditionalVisibility("_type == Type.OpenUIScene")]
         private UIScene _targetScene;
         
@@ -31,30 +33,19 @@ namespace Elarion.UI {
         [SerializeField, ConditionalVisibility("_type == Type.CloseComponent || Type.OpenUIScene")]
         private UIAnimation _closeAnimationOverride;
 
-        private UIComponent _parentComponent;
-        
-        public UIComponent ParentComponent {
-            get {
-                if(_parentComponent == null) {
-                    _parentComponent = GetComponentInParent<UIComponent>();
-                }
-                return _parentComponent;
+        public void OnPointerClick(PointerEventData eventData) {
+            if(EventHandler(true) && eventData != null) {
+                eventData.Use();
             }
         }
 
-        public void OnPointerClick(PointerEventData eventData) {
-            ClickHandler(true);
-        }
-
         public void OnSubmit(BaseEventData eventData) {
-            ClickHandler(false);
+            if(EventHandler(false) && eventData != null) {
+                eventData.Use();
+            }
         }
         
-        public void OnCancel(BaseEventData eventData) {
-            ClickHandler(false);
-        }
-        
-        private void ClickHandler(bool clickEvent) {
+        private bool EventHandler(bool clickEvent) {
             UIComponent openComponent = null;
             UIComponent closeComponent = null;
 
@@ -72,33 +63,31 @@ namespace Elarion.UI {
                     goto case Type.OpenComponent;
                 case Type.OpenUIScene:
                     openComponent = _targetScene;
-                    closeComponent = _targetScene.UIRoot ? _targetScene.UIRoot.CurrentScene : null;
+                    closeComponent = UIScene.CurrentScene;
                     break;
-                case Type.Cancel:
-                    // TODO use targetdialog
-                    if(_targetComponent != null && !clickEvent) {
-//                        _targetComponent.Cancel();
-                    }
-
-                    break;
-                case Type.Submit:
-                    if(_targetComponent != null && !clickEvent) {
-//                        _targetComponent.Submit();
+                case Type.SendCancelEvent:
+                    if(_objectToCancel != null) {
+                        ExecuteEvents.Execute(_objectToCancel, null, ExecuteEvents.cancelHandler);
                     }
                     break;
+                case Type.SendSubmitEvent:
+                    if(_objectToSubmit != null) {
+                        ExecuteEvents.Execute(_objectToSubmit, null, ExecuteEvents.submitHandler);
+                    }
+                    break;
+                default:
+                    return false;
             }
 
             if(openComponent != null) {
-                if(openComponent.State.IsOpened) {
-                    openComponent.Focus(true); // move this to the open method?
-                } else {
-                    openComponent.Open(overrideAnimation: _openAnimationOverride);
-                }
+                openComponent.Open(overrideAnimation: _openAnimationOverride);
             }
 
             if(closeComponent) {
                 closeComponent.Close(overrideAnimation: _closeAnimationOverride);
             }
+
+            return true;
         }
     }
 }
