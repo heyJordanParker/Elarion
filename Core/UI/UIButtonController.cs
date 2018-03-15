@@ -34,7 +34,11 @@ namespace Elarion.UI {
         private UIAnimation _closeAnimationOverride;
 
         public void OnPointerClick(PointerEventData eventData) {
-            if(EventHandler(true) && eventData != null) {
+            if(eventData == null || eventData.button != PointerEventData.InputButton.Left) {
+                return;
+            }
+            
+            if(EventHandler(true)) {
                 eventData.Use();
             }
         }

@@ -12,11 +12,16 @@ using UnityEngine.UI;
 using Debug = UnityEngine.Debug;
 
 namespace Elarion.UI {
+    
+    // TODO simple loading helper - sets loading to true/false based on delegate/unity event
+    // TODO simple hoverable/pressable helpers - set hovered/pressed based on unity events
+    
+    // TODO move the focus logic to the UIPanel; make an unfocusable UIElement (use it to animate inputs and similar shit)
+    
     [DisallowMultipleComponent]
     [RequireComponent(typeof(UIState))]
     [RequireComponent(typeof(RectTransform))]
     public abstract class UIComponent : BaseUIBehaviour, IPointerClickHandler {
-        // TODO use a null Parent for the topmost component
         [SerializeField]
         private UIOpenType _openType = UIOpenType.OpenWithParent;
 
@@ -184,7 +189,11 @@ namespace Elarion.UI {
         }
 
         public virtual void OnPointerClick(PointerEventData eventData) {
-            UIRoot.Select(null);
+            if(eventData == null || eventData.button != PointerEventData.InputButton.Left) {
+                return;
+            }
+            
+            UIRoot.Select(gameObject);
             Focus(setSelection: false, autoFocus: false);
         }
 
@@ -198,12 +207,8 @@ namespace Elarion.UI {
                 return;
             }
 
-            if(FocusedComponent) {
-                FocusedComponent.Unfocus();
-            }
-
             var focusedComponent = autoFocus ? FindNextFocusedComponent() : this;
-
+            
             FocusedComponent = focusedComponent;
 
             if(!setSelection) {
@@ -240,11 +245,7 @@ namespace Elarion.UI {
 
         }
 
-        public virtual void Unfocus() {
-            if(!State.IsFocusedThis) {
-                return;
-            }
-
+        public static void Unfocus() {
             FocusedComponent = null;
         }
         
@@ -284,13 +285,13 @@ namespace Elarion.UI {
 
             Animator.ResetToSavedProperties();
 
-            var animation1 = overrideAnimation;
+            var animation = overrideAnimation;
 
-            if(animation1 == null) {
-                animation1 = Animator.GetAnimation(UIAnimationType.OnOpen);
+            if(animation == null) {
+                animation = Animator.GetAnimation(UIAnimationType.OnOpen);
             }
 
-            Animator.Play(animation1, callback: () => AfterOpen(focus));
+            Animator.Play(animation, callback: () => AfterOpen(focus));
 
             // components flash before disappearing
             // maybe tab navigation shouldn't jump between components; that means the animator should work decoupled with the UIComponent; maybe make a simple UIComponent that doesn't care about the focus (move the focus to the UIPanel)  
@@ -306,6 +307,11 @@ namespace Elarion.UI {
             }
             
             OpenChildren(UIOpenType.OpenAfterParent, false);
+
+            // send another select event to the selected component; otherwise Unity is likely not to focus it 
+            if(UIRoot.SelectedObject.transform.IsChildOf(transform)) {
+                UIRoot.Select(UIRoot.SelectedObject);
+            }
         }
 
         protected void OpenChildren(UIOpenType openTypeFilter, bool skipAnimation) {

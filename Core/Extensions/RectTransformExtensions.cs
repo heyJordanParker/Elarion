@@ -38,13 +38,13 @@ namespace Elarion.Extensions {
             var scale = rectTransform.localScale;
             var deltaPivot = rectTransform.pivot - pivot;
             var deltaPosition = new Vector3(deltaPivot.x * size.x * scale.x, deltaPivot.y * size.y * scale.y);
-            
+
             rectTransform.pivot = pivot;
             rectTransform.localPosition -= deltaPosition;
         }
-        
+
         /// <summary>
-        /// Finda the closest selectable left to the current one. Prioritizes selectables that share a common parent with the starting one.
+        /// Finds the closest selectable left to the current one. Prioritizes selectables that share a common parent with the starting one.
         /// </summary>
         /// <param name="toTransform">Starting transform. The search is relative to it.</param>
         /// <returns>The closest selectable or null if none is found.</returns>
@@ -53,7 +53,7 @@ namespace Elarion.Extensions {
         }
 
         /// <summary>
-        /// Finda the closest selectable right to the current one. Prioritizes selectables that share a common parent with the starting one.
+        /// Finds the closest selectable right to the current one. Prioritizes selectables that share a common parent with the starting one.
         /// </summary>
         /// <param name="toTransform">Starting transform. The search is relative to it.</param>
         /// <returns>The closest selectable or null if none is found.</returns>
@@ -62,7 +62,7 @@ namespace Elarion.Extensions {
         }
 
         /// <summary>
-        /// Finda the closest selectable up to the current one. Prioritizes selectables that share a common parent with the starting one.
+        /// Finds the closest selectable up to the current one. Prioritizes selectables that share a common parent with the starting one.
         /// </summary>
         /// <param name="toTransform">Starting transform. The search is relative to it.</param>
         /// <returns>The closest selectable or null if none is found.</returns>
@@ -71,7 +71,7 @@ namespace Elarion.Extensions {
         }
 
         /// <summary>
-        /// Finda the closest selectable down to the current one. Prioritizes selectables that share a common parent with the starting one.
+        /// Finds the closest selectable down to the current one. Prioritizes selectables that share a common parent with the starting one.
         /// </summary>
         /// <param name="toTransform">Starting transform. The search is relative to it.</param>
         /// <returns>The closest selectable or null if none is found.</returns>
@@ -80,7 +80,7 @@ namespace Elarion.Extensions {
         }
 
         /// <summary>
-        /// Finda the closest selectable in a direction. Prioritizes selectables that share a common parent with the starting one.
+        /// Finds the closest selectable in a direction. Prioritizes selectables that share a common parent with the starting one.
         /// </summary>
         /// <param name="toTransform">Starting transform. The search is relative to it.</param>
         /// <param name="dir">The Direction of the search.</param>
@@ -97,7 +97,9 @@ namespace Elarion.Extensions {
 
             Selectable result = null;
 
-            foreach(var selectable in Selectable.allSelectables) {
+            var selectables = Selectable.allSelectables.ToArray();
+
+            foreach(var selectable in selectables) {
                 if(selectable == null ||
                    selectable.gameObject == toTransform.gameObject ||
                    !selectable.IsInteractable() ||
@@ -122,35 +124,52 @@ namespace Elarion.Extensions {
                     continue;
                 }
 
+                var normalizedCorrelation = correlation / distance.sqrMagnitude;
+
                 var parentDistance = CommonParentDistance(transform, toTransform);
 
                 if(parentDistance < minParentDistance) {
+                    // this selectable is in the direction we're looking into and the closest to the original one in the hierarchy
                     minParentDistance = parentDistance;
-                }
-
-                if(parentDistance != minParentDistance) {
+                    result = selectable;
+                    maxCorrelation = normalizedCorrelation;
                     continue;
                 }
 
-                var normalizedCorrelation = correlation / distance.sqrMagnitude;
-
-                if(normalizedCorrelation > (double) maxCorrelation) {
-                    maxCorrelation = normalizedCorrelation;
-                    result = selectable;
+                if(parentDistance == minParentDistance) {
+                    // from all the selectables with minimal hierarchical difference find the one that correlates best with our direction
+                    if(normalizedCorrelation > (double) maxCorrelation) {
+                        // this selecgtable is 
+                        maxCorrelation = normalizedCorrelation;
+                        result = selectable;
+                    }
                 }
+
             }
 
             return result;
         }
 
-        private static int CommonParentDistance(Transform fromTransform, Transform toTransform) {
-            var parent = fromTransform.parent;
-
-            if(fromTransform.parent == null) {
-                return -1;
+        /// <summary>
+        /// Returns the distance to a common parent between two transforms.
+        /// One parent distance = one hop up in the hierarchy.
+        /// The hops continue until we the object found is a common parent to both transforms.
+        /// </summary>
+        /// <param name="fromTransform">The transform from which we're calculating the distancek</param>
+        /// <param name="toTransform">The second transform</param>
+        /// <returns>
+        /// The common parent distance.
+        /// Returns 0 if one transform is child of the other.
+        /// Returns -1 if no common parent is found.
+        /// </returns>
+        public static int CommonParentDistance(this Transform fromTransform, Transform toTransform) {
+            if(fromTransform.IsChildOf(toTransform)) {
+                return 0;
             }
 
-            int currentDistance = 1;
+            var parent = fromTransform;
+
+            int currentDistance = 0;
 
             while(parent != null) {
                 if(parent.IsParentOf(toTransform)) {
@@ -169,7 +188,7 @@ namespace Elarion.Extensions {
                 return Vector3.zero;
             if(dir != Vector2.zero)
                 dir /= Mathf.Max(Mathf.Abs(dir.x), Mathf.Abs(dir.y));
-            
+
             dir = rect.rect.center + Vector2.Scale(rect.rect.size, dir * 0.5f);
             return dir;
         }

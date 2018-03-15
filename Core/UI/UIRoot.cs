@@ -26,14 +26,13 @@ namespace Elarion.UI {
         public GameObject SelectedObject {
             get { return _selectedObject; }
             private set {
-                _selectedObject = value;
-                EventSystem.SetSelectedGameObject(null);
-                EventSystem.SetSelectedGameObject(_selectedObject);
-            }
-        }
+                if(_selectedObject == value) {
+                    return;
+                }
 
-        public UIComponent FocusedComponent {
-            get { return UIComponent.FocusedComponent; }
+                _selectedObject = value;
+                EventSystem.SetSelectedGameObject(SelectedObject);
+            }
         }
 
         protected override void Awake() {
@@ -60,23 +59,18 @@ namespace Elarion.UI {
         }
 
         protected virtual void Update() {
-            // process the events just once and only if focused
             if(_current != this || !EventSystem || !EventSystem.isFocused) {
+                // process the events just once and only if focused
                 return;
             }
 
             HandleTabNavigation();
 
-            // the user can change the selected game object - if he does, update the selected component accordingly
             if(EventSystem.currentSelectedGameObject == SelectedObject) {
-                if(SelectedObject == null) {
-                    // Send navigation events to the focused component as a fallback
-                    SelectedObject = FocusedComponent ? FocusedComponent.gameObject : null;
-                }
-
                 return;
             }
 
+            // Follow the user input
             SelectedObject = EventSystem.currentSelectedGameObject;
 
             if(SelectedObject == null) {
@@ -158,29 +152,39 @@ namespace Elarion.UI {
             Select(nextSelectable);
         }
 
-        public void Select(Selectable selectable) {
-            if(!EventSystem) {
-                return;
+        // TODO test with TMP
+        public bool Select(Selectable selectable) {
+            if(!EventSystem ||
+               !selectable ||
+               !Select(selectable.gameObject)) {
+                return false;
             }
 
-            // Deselect
-            if(!selectable) {
-                SelectedObject = null;
-                return;
+            // TODO the ExecuteEvents method might handle this properly; leaving this out for now to make eventual reverting easier
+
+            // this ensures the selection will be made; Unity isn't totally consistent in this
+//            selectable.Select();
+//            
+//            var input = selectable as InputField;
+//
+//            if(input != null) {
+//                // doesn't work if the object is disabled
+//                input.ActivateInputField();
+//            }
+
+            return true;
+        }
+
+        public bool Select(GameObject gameObject) {
+            if(!EventSystem ||
+               !gameObject) {
+                return false;
             }
 
-            selectable.Select();
+            SelectedObject = gameObject;
+            ExecuteEvents.Execute(SelectedObject, null, ExecuteEvents.selectHandler);
 
-            var input = selectable as InputField;
-
-            if(input != null) {
-                // doesn't work if the object is disabled
-                input.ActivateInputField();
-            }
-
-            // TODO test with TMP
-
-            SelectedObject = selectable.gameObject;
+            return true; // selected
         }
 
         // this is to prevent multiple update calls

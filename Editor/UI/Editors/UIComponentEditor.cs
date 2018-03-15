@@ -91,9 +91,9 @@ namespace Elarion.Editor.UI.Editors {
 
                 label = Target.State.IsFocusedThis || Target.State.IsFocusedChild ? "Unfocus" : "Focus";
                 if(GUILayout.Button(label, GUILayout.MaxWidth(180))) {
-                    UIComponent tempQualifier1 = Target;
-                    if(tempQualifier1.State.IsFocusedThis || tempQualifier1.State.IsFocusedChild) {
-                        Target.Unfocus();
+                    var component = Target;
+                    if(component.State.IsFocusedThis || component.State.IsFocusedChild) {
+                        UIComponent.Unfocus();
                     } else {
                         Target.Focus(true);
                     }

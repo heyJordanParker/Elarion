@@ -7,9 +7,11 @@ using UnityEngine;
 
 namespace Elarion.UI {
     
-    // TODO loading condition helper - a helper that switches the scene after a condition returns true (use unity events to hook up)
+    // TODO loading scene helper - a helper that switches the scene after a condition returns true (use unity events or delegates to hook up); auto-close scene and open another one when loading finishes
+    // TODO scene loading property that returns the helper or null
+    // TODO loading indicator ui element - fetches the helper and sets a slider to 0-1 value based on the helper (1 if the helper is null); not exclusive to scenes
     
-    public class UIScene : UIPanel {
+    public sealed class UIScene : UIPanel {
         
         // TODO snapping scroll for android-homescreen animations
         
@@ -29,14 +31,6 @@ namespace Elarion.UI {
         public override bool IsRendering {
             get { return State.IsOpened || State.IsInTransition; }
         }
-
-        protected override void Awake() {
-            base.Awake();
-
-            if(!AllScenes.Contains(this)) {
-                AllScenes.Add(this);
-            }
-        }
         
         protected override void Start() {
             base.Start();
@@ -44,12 +38,6 @@ namespace Elarion.UI {
             if(InitialScene) {
                 Open();
             }
-        }
-
-        protected override void OnDestroy() {
-            base.OnDestroy();
-            
-            AllScenes.Remove(this);
         }
 
         protected override void BeforeOpen(bool skipAnimation) {
@@ -60,6 +48,7 @@ namespace Elarion.UI {
             }
 
             _currentScene = this;
+            
             transform.SetAsLastSibling();
         }
 
@@ -67,17 +56,19 @@ namespace Elarion.UI {
         protected override void OnValidate() {
             base.OnValidate();
 
-            var initialScene = InitialScene ? this : AllScenes.FirstOrDefault(s => s.InitialScene);
+            var allScenes = SceneTools.FindSceneObjectsOfType<UIScene>(); 
+
+            var initialScene = InitialScene ? this : allScenes.FirstOrDefault(s => s.InitialScene);
             
             if(initialScene == null) {
-                initialScene = AllScenes.FirstOrDefault(s => s != this);
+                initialScene = allScenes.FirstOrDefault(s => s != this);
                     
                 if(initialScene != null) {
                     initialScene.InitialScene = true;
                 }
             }
                 
-            foreach(var scene in AllScenes) {
+            foreach(var scene in allScenes) {
                 if(scene == initialScene) {
                     continue;
                 }
@@ -93,18 +84,6 @@ namespace Elarion.UI {
         
         public static UIScene CurrentScene {
             get { return _currentScene; }
-        }
-
-        private static readonly List<UIScene> Scenes = new List<UIScene>();
-
-        public static List<UIScene> AllScenes {
-            get {
-                if(Scenes.Count == 0) {
-                    Scenes.AddRange(SceneTools.FindSceneObjectsOfType<UIScene>());
-                }
-
-                return Scenes;
-            }
         }
     }
 }

@@ -23,6 +23,14 @@ namespace Elarion.Editor.UI {
 			GUILayout.EndVertical();
 		}
 		
+		public static void Readonly(Action readonlyGUI) {
+			var guiEnabled = GUI.enabled;
+			
+			GUI.enabled = false;
+			readonlyGUI();
+			GUI.enabled = guiEnabled;
+		}
+		
 		public static bool AddComponentsButton(string title, GameObject target, Dictionary<Type, Component> components) {
 			var dropdownItems = new Dictionary<Type, string> {{typeof(int), title}};
 

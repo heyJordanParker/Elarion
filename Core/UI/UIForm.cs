@@ -1,20 +1,30 @@
+using System;
+
 namespace Elarion.UI {
     
-    public class UIPopup : UIDialog {
-        // basic info dialog - both submit and cancel close it; minimal inputs
-    }
-    
     public class UIForm : UIDialog {
-        // Add those below on the first update
-        // input field class - key and value (both strings for easy www calls), optional validation, etc
-        // auto-focus invalid input fields
-        // show errors
+
+        [Serializable]
+        public class UIFormInput {
+            
+            // type - toggle, slider, dropdown, input field (or a custom interface inheritor); TMP option
+            // target - object reference
+            // name - unique (for the input) string name (auto generate one)
+            // value - property - returns the correct value based on the input type
+            // required - bool
+            // validation (if required and type is input field) - preset types & custom regex option
+            // validation error (if required and validation is set) 
+            // missing error (if required) - string
+            
+        }
         
-        // TODO show errors on incorrect required fields on submit; just focus empty required fields on submit otherwise (without showing the errors)
+        // TODO get all Selectable children and add them to the UIFormInput array
         
-        // TODO UIForm inheritor - add error checking submitting and so on builtin (submit with enter/submit input (in unity))
         
-        // TODO get all inputfields and button children on awake
-        // TODO add onsubmit event to all inputfields and add a submit event to the button
+        // TODO loading state (for submitting/receiving requests and such)
+        // TODO submit -> send a request to server & enter loading -> wait for response & exit loading -> either finish submission and close the form on OK or show error/errors  
+        
+        // TODO show errors on incorrect required fields on submit;
+        // TODO focus empty required fields on submit (without showing errors)
     }
 }

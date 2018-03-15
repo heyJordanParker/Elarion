@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using Elarion.Attributes;
 using Elarion.UI;
+using Elarion.Utility;
 using UnityEditor;
 using UnityEngine;
 
@@ -14,6 +15,8 @@ namespace Elarion.Editor.UI.Editors {
 
         private SerializedProperty _initialSceneProperty;
         private SerializedProperty _firstFocusedProperty;
+
+        private List<UIScene> _allScenes;
 
         private Dictionary<Type, Component> Helpers { get; set; }
         
@@ -32,6 +35,8 @@ namespace Elarion.Editor.UI.Editors {
             
             _initialSceneProperty = serializedObject.FindProperty("_initialScene");
             _firstFocusedProperty = serializedObject.FindProperty("_firstFocused");
+
+            _allScenes = SceneTools.FindSceneObjectsOfType<UIScene>();
         }
         
         private void UpdateHelpers() {
@@ -42,44 +47,51 @@ namespace Elarion.Editor.UI.Editors {
             if(targets.Length > 1) {
                 return;
             }
-            
-            EditorGUILayout.PropertyField(_initialSceneProperty);
 
-            if(!Target.InitialScene) {
-                GUI.enabled = false;
-                EditorGUILayout.ObjectField("Initial Scene", UIScene.AllScenes.FirstOrDefault(s => s.InitialScene), typeof(GameObject), true);
-                GUI.enabled = true;
+            if(EditorApplication.isPlaying) {
+                EGUI.Readonly(() => {
+                    EditorGUILayout.ObjectField("Current Scene", UIScene.CurrentScene, typeof(GameObject), true);       
+                });
             } else {
-                EditorGUILayout.HelpBox("This scene will be loaded when the application starts.", MessageType.Info);
+                EditorGUILayout.PropertyField(_initialSceneProperty);
             }
+            
+            var initialScene = _allScenes.FirstOrDefault(s => s.InitialScene);
+
+            EGUI.Readonly(() => {
+                EditorGUILayout.ObjectField("Initial Scene", initialScene, typeof(GameObject), true);
+            });
             
             EditorGUILayout.PropertyField(_firstFocusedProperty);
-
-            GUILayout.Space(10);
-
-            GUILayout.BeginHorizontal();
-
-            GUILayout.FlexibleSpace();
-
-            if(Application.isPlaying) {
-                GUI.enabled = !Target.OpenConditions || Target.OpenConditions.CanOpen;
-                var label = Target.State.IsOpened ? "Close" : "Open";
-                if(GUILayout.Button(label, GUILayout.MaxWidth(180))) {
-                    if(Target.State.IsOpened) {
-                        Target.Close();
-                    } else {
-                        Target.Open();
-                    }
-                }
-            } else {
-                if(EGUI.AddComponentsButton("Add Helper Component", Target.gameObject, Helpers)) {
-                    UpdateHelpers();
-                }
+            
+            
+            if(Target.InitialScene && !EditorApplication.isPlaying) {
+                EditorGUILayout.HelpBox("This scene will be opened when the application starts.", MessageType.Info);
             }
 
-            GUILayout.FlexibleSpace();
+            GUILayout.Space(10);
+            
+            EGUI.Horizontal(() => {
+                GUILayout.FlexibleSpace();
 
-            GUILayout.EndHorizontal();
+                if(EditorApplication.isPlaying) {
+                    GUI.enabled = !Target.OpenConditions || Target.OpenConditions.CanOpen;
+                    var label = Target.State.IsOpened ? "Close" : "Open";
+                    if(GUILayout.Button(label, GUILayout.MaxWidth(180))) {
+                        if(Target.State.IsOpened) {
+                            Target.Close();
+                        } else {
+                            Target.Open();
+                        }
+                    }
+                } else {
+                    if(EGUI.AddComponentsButton("Add Helper Component", Target.gameObject, Helpers)) {
+                        UpdateHelpers();
+                    }
+                }
+
+                GUILayout.FlexibleSpace();
+            });
 
             GUILayout.Space(10);
             

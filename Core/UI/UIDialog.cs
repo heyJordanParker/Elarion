@@ -1,5 +1,7 @@
 using System;
 using System.Linq;
+using Elarion.Extensions;
+using Elarion.UI.Helpers;
 using UnityEngine;
 using UnityEngine.Events;
 using UnityEngine.EventSystems;
@@ -7,8 +9,6 @@ using UnityEngine.UI;
 
 namespace Elarion.UI {
     
-    // TODO Popup prefabs - create a default one (and auto load it when instantiating via EditorMenus) and leave it as a public field so users can change it with their own
-
     // TODO input validator component - a few builtin options and a custom regex option (as enum) and a length validator (with minmax slider)
     
     public class UIDialog : UIPanel, ISubmitHandler, ICancelHandler {
@@ -38,10 +38,12 @@ namespace Elarion.UI {
             base.Awake();
             
             _inputs = GetComponentsInChildren<InputField>();
-//
+            
+            // auto-submit when child input fields get submitted 
             foreach(var input in _inputs) {
-                // get all unique game objects and add submit handlers to them - hook them with the submit method
-//                input.onValueChanged.AddListener(inputSubmitAction);
+                var submitHandler = input.gameObject.Component<UISubmitHandler>();
+                
+                submitHandler.Submit += Submit;
             }
 
             switch(deselectAction) {
