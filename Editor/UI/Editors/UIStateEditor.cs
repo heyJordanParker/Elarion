@@ -22,12 +22,7 @@ namespace Elarion.Editor.UI.Editors {
                     EditorGUILayout.Toggle("Interactable", Target.IsInteractable);    
                 });
                 EGUI.Horizontal(() => {
-                    EditorGUILayout.Toggle("Rendering", Target.IsRendering);
                     EditorGUILayout.Toggle("Focused", Target.IsFocusedThis);
-                });
-                EGUI.Horizontal(() => {
-                    EditorGUILayout.Toggle("Rendering Child", Target.IsRenderingChild);
-                    EditorGUILayout.Toggle("Focused Child", Target.IsFocusedChild);
                 });
             });
         }

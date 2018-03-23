@@ -6,10 +6,9 @@ using UnityEngine;
 using UnityEngine.Events;
 using UnityEngine.EventSystems;
 using UnityEngine.UI;
+using Debug = UnityEngine.Debug;
 
 namespace Elarion.UI {
-    
-    // TODO input validator component - a few builtin options and a custom regex option (as enum) and a length validator (with minmax slider)
     
     public class UIDialog : UIPanel, ISubmitHandler, ICancelHandler {
 
@@ -22,7 +21,7 @@ namespace Elarion.UI {
         
         // TODO cache the object that was last focused before opening this and focus it back when closing
         
-        // dialog submit button?
+        // dialog submit button; is it necessary?
 
         [SerializeField]
         protected Button submitButton;
@@ -30,46 +29,35 @@ namespace Elarion.UI {
         [SerializeField]
         protected DeselectAction deselectAction;
         
-        // close/submit dialogs when the scene changes/gets deselected/timeout
-
-        private InputField[] _inputs;
+        // close/submit dialogs when the scene changes/gets deselected
+        
+        // TODO Timeout component (as in graphic settings) - executes an action when the timer expires (also updates a UI element)
+        
+        // TODO scene changed event
 
         protected override void Awake() {
             base.Awake();
             
-            _inputs = GetComponentsInChildren<InputField>();
-            
-            // auto-submit when child input fields get submitted 
-            foreach(var input in _inputs) {
-                var submitHandler = input.gameObject.Component<UISubmitHandler>();
-                
-                submitHandler.Submit += Submit;
-            }
-
             switch(deselectAction) {
                 case DeselectAction.None:
                     break;
                 case DeselectAction.Submit:
-                    State.Blurred += Submit;
+                    Blurred += Submit;
                     break;
                 case DeselectAction.Cancel:
-                    State.Blurred += Cancel;
+                    Blurred += Cancel;
                     break;
                 default:
                     goto case DeselectAction.None;
             }
         }
 
-//        public override void Focus(bool setSelection = false, bool autoFocus = true) {
-//            base.Focus(false, autoFocus);
-//        }
-
         public void Test() {
             Debug.Log("Test");
         }
 
         protected virtual void Submit() {
-            if(!State.IsOpened) {
+            if(!IsOpened) {
                 return;
             }
             

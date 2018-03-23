@@ -35,7 +35,7 @@ namespace Elarion.Extensions {
 			return true;
 		}
 
-		public static T Component<T>(this GameObject go) where T : Component {
+		public static T GetOrAddComponent<T>(this GameObject go) where T : Component {
 			var component = go.GetComponent<T>();
 			if(component == null)
 				component = go.AddComponent<T>();
@@ -44,7 +44,7 @@ namespace Elarion.Extensions {
 
 
 		public static void Subscribe(this GameObject go, string toEvent, string message) {
-			var eventHandler = go.Component<EventHandler>();
+			var eventHandler = go.GetOrAddComponent<EventHandler>();
 			eventHandler.Subscribe(toEvent, message);
 		}
 

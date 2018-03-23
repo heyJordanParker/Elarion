@@ -58,7 +58,7 @@ namespace Elarion.UI {
             }
         }
 
-        protected virtual void Update() {
+        protected virtual void LateUpdate() {
             if(_current != this || !EventSystem || !EventSystem.isFocused) {
                 // process the events just once and only if focused
                 return;
@@ -77,7 +77,7 @@ namespace Elarion.UI {
                 return;
             }
 
-            var selectedComponent = SelectedObject.GetComponentInParent<UIComponent>();
+            var selectedComponent = SelectedObject.GetComponentInParent<UIFocusableComponent>();
 
             if(selectedComponent != null) {
                 selectedComponent.Focus();
@@ -139,9 +139,9 @@ namespace Elarion.UI {
             if(nextSelectable == null || !nextSelectable.IsInteractable() ||
                nextSelectable.navigation.mode == Navigation.Mode.None) return;
 
-            var parentComponent = nextSelectable.GetComponentInParent<UIComponent>();
+            var parentComponent = nextSelectable.GetComponentInParent<UIFocusableComponent>();
 
-            if(parentComponent != null && !parentComponent.State.IsInteractable) {
+            if(parentComponent != null && !parentComponent.IsInteractable) {
                 return;
             }
 
@@ -152,31 +152,17 @@ namespace Elarion.UI {
             Select(nextSelectable);
         }
 
-        // TODO test with TMP
         public bool Select(Selectable selectable) {
-            if(!EventSystem ||
-               !selectable ||
-               !Select(selectable.gameObject)) {
+            if(!selectable) {
                 return false;
             }
 
-            // TODO the ExecuteEvents method might handle this properly; leaving this out for now to make eventual reverting easier
-
-            // this ensures the selection will be made; Unity isn't totally consistent in this
-//            selectable.Select();
-//            
-//            var input = selectable as InputField;
-//
-//            if(input != null) {
-//                // doesn't work if the object is disabled
-//                input.ActivateInputField();
-//            }
-
-            return true;
+            return Select(selectable.gameObject);
         }
 
         public bool Select(GameObject gameObject) {
             if(!EventSystem ||
+               EventSystem.alreadySelecting ||
                !gameObject) {
                 return false;
             }

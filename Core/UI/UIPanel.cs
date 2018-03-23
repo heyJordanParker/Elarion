@@ -1,4 +1,3 @@
-using NUnit.Framework.Constraints;
 using UnityEngine;
 using UnityEngine.UI;
 
@@ -7,7 +6,7 @@ namespace Elarion.UI {
     [RequireComponent(typeof(CanvasGroup))]
     [RequireComponent(typeof(Canvas))]
     [RequireComponent(typeof(GraphicRaycaster))] // to propagate input events
-    public class UIPanel : UIComponent {
+    public class UIPanel : UIFocusableComponent {
         [SerializeField]
         private bool _interactable = true;
 
@@ -44,13 +43,13 @@ namespace Elarion.UI {
             }
         }
 
-        protected override void OnStateChanged() {
-            base.OnStateChanged();
+        protected override void OnStateChanged(States currentState, States previousState) {
+            base.OnStateChanged(currentState, previousState);
 
             // disable disabled child's interaction to simplify navigation events
-            CanvasGroup.interactable = IsRendering && !State.IsDisabled;
+            CanvasGroup.interactable = IsRendering && !IsDisabled;
 
-            CanvasGroup.blocksRaycasts = State.IsInteractable;
+            CanvasGroup.blocksRaycasts = IsInteractable;
         }
     }
 }

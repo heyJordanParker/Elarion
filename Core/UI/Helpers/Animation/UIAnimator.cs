@@ -1,6 +1,7 @@
 using System;
 using System.Linq;
 using Elarion.Attributes;
+using Elarion.Extensions;
 using Elarion.Utility;
 using Elarion.Utility.PropertyTweeners.RectTransform;
 using Elarion.Utility.PropertyTweeners.UIComponent;
@@ -13,7 +14,6 @@ namespace Elarion.UI.Helpers.Animation {
     
     [UISceneHelper]
     [UIComponentHelper]
-    [RequireComponent(typeof(UIComponent))]
     public class UIAnimator : MonoBehaviour, IAnimationController {
 
         [Serializable]
@@ -47,7 +47,7 @@ namespace Elarion.UI.Helpers.Animation {
         public UIComponent Target {
             get {
                 if(_target == null) {
-                    _target = GetComponent<UIComponent>();
+                    _target = gameObject.GetOrAddComponent<UIComponent>();
                 }
                 return _target;
             }

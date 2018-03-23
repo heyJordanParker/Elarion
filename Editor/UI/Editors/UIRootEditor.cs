@@ -8,7 +8,7 @@ namespace Elarion.Editor.UI.Editors {
         public override void OnInspectorGUI() {
             base.OnInspectorGUI();
             GUI.enabled = false;
-            EditorGUILayout.ObjectField("Focused Component", UIComponent.FocusedComponent, typeof(UIComponent), true);
+            EditorGUILayout.ObjectField("Focused Component", UIFocusableComponent.FocusedComponent, typeof(UIComponent), true);
             GUI.enabled = true;
         }
         

@@ -78,24 +78,30 @@ namespace Elarion.Editor.UI.Editors {
 
             if(Application.isPlaying) {
                 GUI.enabled = !Target.OpenConditions || Target.OpenConditions.CanOpen;
-                var label = Target.State.IsOpened ? "Close" : "Open";
+                var label = Target.IsOpened ? "Close" : "Open";
                 if(GUILayout.Button(label, GUILayout.MaxWidth(180))) {
-                    if(Target.State.IsOpened) {
+                    if(Target.IsOpened) {
                         Target.Close();
                     } else {
                         Target.Open();
                     }
                 }
 
-                GUI.enabled = Target.Focusable;
+                var focusableTarget = Target as UIFocusableComponent;
 
-                label = Target.State.IsFocusedThis || Target.State.IsFocusedChild ? "Unfocus" : "Focus";
+                GUI.enabled = focusableTarget != null && focusableTarget.Focusable;
+
+                var isFocused = focusableTarget != null && focusableTarget.IsFocused;
+                
+                // if current selected game object
+                label = isFocused ? "Unfocus" : "Focus";
                 if(GUILayout.Button(label, GUILayout.MaxWidth(180))) {
-                    var component = Target;
-                    if(component.State.IsFocusedThis || component.State.IsFocusedChild) {
-                        UIComponent.Unfocus();
-                    } else {
-                        Target.Focus(true);
+                    if(focusableTarget != null) {
+                        if(focusableTarget.IsFocused) {
+                            focusableTarget.Unfocus();
+                        } else {
+                            focusableTarget.Focus(true);
+                        }
                     }
                 }
 

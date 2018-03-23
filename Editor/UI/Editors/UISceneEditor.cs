@@ -76,9 +76,9 @@ namespace Elarion.Editor.UI.Editors {
 
                 if(EditorApplication.isPlaying) {
                     GUI.enabled = !Target.OpenConditions || Target.OpenConditions.CanOpen;
-                    var label = Target.State.IsOpened ? "Close" : "Open";
+                    var label = Target.IsOpened ? "Close" : "Open";
                     if(GUILayout.Button(label, GUILayout.MaxWidth(180))) {
-                        if(Target.State.IsOpened) {
+                        if(Target.IsOpened) {
                             Target.Close();
                         } else {
                             Target.Open();

@@ -61,7 +61,7 @@ namespace Elarion.UI {
                     closeComponent = _targetComponent;
                     break;
                 case Type.ToggleComponent:
-                    if(_targetComponent != null && _targetComponent.State.IsOpened) {
+                    if(_targetComponent != null && _targetComponent.IsOpened) {
                         goto case Type.CloseComponent;
                     }
                     goto case Type.OpenComponent;

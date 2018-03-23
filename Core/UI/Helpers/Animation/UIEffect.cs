@@ -8,7 +8,6 @@ using UnityEngine.UI;
 namespace Elarion.UI.Helpers.Animation {
     [UISceneHelper]
     [UIComponentHelper]
-    [RequireComponent(typeof(UIComponent))]
     public class UIEffect : BaseUIBehaviour, IAnimationController {
         private class UIEffectTweener : PropertyTweener<float, UIEffect> {
             public UIEffectTweener(MonoBehaviour owner) : base(owner) { }
@@ -151,22 +150,22 @@ namespace Elarion.UI.Helpers.Animation {
         protected override void Awake() {
             base.Awake();
             
-            _component = GetComponent<UIComponent>();
+            _component = gameObject.GetOrAddComponent<UIComponent>();
         }
 
         protected override void OnEnable() {
             base.OnEnable();
             
-            _component.State.Opened += OnOpened;
-            _component.State.Closed += OnClosed;
+            _component.Opened += OnOpened;
+            _component.Closed += OnClosed;
 
         }
 
         protected override void OnDisable() {
             base.OnDisable();
             
-            _component.State.Opened -= OnOpened;
-            _component.State.Closed -= OnClosed;
+            _component.Opened -= OnOpened;
+            _component.Closed -= OnClosed;
         }
 
         public void OnOpened() {

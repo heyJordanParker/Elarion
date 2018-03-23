@@ -7,7 +7,6 @@ using UnityEngine;
 namespace Elarion.UI.Helpers {
     // TODO parent states -> target states; allow the user to target any state object
     [UIComponentHelper]
-    [RequireComponent(typeof(UIComponent))]
     public class UIOpenConditions : BaseUIBehaviour {
         protected const int MaxScreenSize = 2000;
 
@@ -91,18 +90,18 @@ namespace Elarion.UI.Helpers {
         protected override void Awake() {
             base.Awake();
 
-            _component = GetComponent<UIComponent>();
+            _component = gameObject.GetOrAddComponent<UIComponent>();
         }
 
         protected void Update() {
             // should be a method in UIComponent
-            var componentCanOpen = _component && _component.gameObject.activeSelf && !_component.State.IsOpened;
+            var componentCanOpen = _component && _component.gameObject.activeSelf && !_component.IsOpened;
             
             if(componentCanOpen && CanOpen && _component.OpenType != UIOpenType.OpenManually) {
                 _component.Open();
             }
 
-            if(_component && _component.State.IsOpened && !CanOpen) {
+            if(_component && _component.IsOpened && !CanOpen) {
                 _component.Close();
             }
         }
@@ -146,6 +145,7 @@ namespace Elarion.UI.Helpers {
         private bool ParentStateValid {
             get {
                 var parent = _component.ParentComponent;
+                var focusableParent = UIFocusableComponent.GetFocusableParentComponent(_component);
 
                 if(parent == null) {
                     return false;
@@ -155,45 +155,43 @@ namespace Elarion.UI.Helpers {
                     return true;
                 }
 
-                var currentState = parent.State;
-
                 foreach(var state in Enum.GetValues(typeof(StateCondition))) {
                     if(!parentState.HasFlag(state)) continue;
 
 
                     switch((StateCondition) state) {
                         case StateCondition.Focused:
-                            if(currentState.IsFocused) {
+                            if(focusableParent != null && focusableParent.IsFocused) {
                                 return true;
                             }
 
                             break;
                         case StateCondition.NotFocused:
-                            if(!currentState.IsFocused) {
+                            if(focusableParent != null && !focusableParent.IsFocused) {
                                 return true;
                             }
 
                             break;
                         case StateCondition.InTransition:
-                            if(currentState.IsInTransition) {
+                            if(parent.IsInTransition) {
                                 return true;
                             }
 
                             break;
                         case StateCondition.NotInTransition:
-                            if(!currentState.IsInTransition) {
+                            if(!parent.IsInTransition) {
                                 return true;
                             }
 
                             break;
                         case StateCondition.Opened:
-                            if(currentState.IsOpened) {
+                            if(parent.IsOpened) {
                                 return true;
                             }
 
                             break;
                         case StateCondition.NotOpened:
-                            if(!currentState.IsOpened) {
+                            if(!parent.IsOpened) {
                                 return true;
                             }
 

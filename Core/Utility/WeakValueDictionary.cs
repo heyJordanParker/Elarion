@@ -189,7 +189,7 @@ namespace Elarion {
 		#endregion
 	}
 
-	public class WeakReference<T> : System.WeakReference {
+	public class WeakReference<T> : WeakReference {
 		public WeakReference(T target) : base(target) { }
 		public WeakReference(T target, bool trackResurrection) : base(target, trackResurrection) { }
 #if !CompactFramework

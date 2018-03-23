@@ -13,7 +13,10 @@ namespace Elarion.UI.Helpers {
         public event Action Submit = () => { };
 
         public void OnSubmit(BaseEventData eventData) {
-            _onSubmit.Invoke();
+            if(_onSubmit != null) {
+                _onSubmit.Invoke();
+            }
+            
             Submit();
         }
     }

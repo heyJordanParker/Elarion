@@ -10,7 +10,7 @@ namespace Elarion.Attributes {
         public ConditionalVisibilityAttribute(string visibilityConditions = null,
             string enableConditions = null) {
 
-            this.visibleConditions = visibilityConditions;
+            visibleConditions = visibilityConditions;
             this.enableConditions = enableConditions;
         }
         

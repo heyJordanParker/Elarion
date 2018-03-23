@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using Elarion.Attributes;
@@ -14,10 +15,8 @@ namespace Elarion.UI {
     public sealed class UIScene : UIPanel {
         
         // TODO snapping scroll for android-homescreen animations
-        
-        // TODO selected scene boolean; add custom editor showing the selected scene below the boolean (if it isn't the current scene)
-        
-        // TODO move the currentScene logic here
+
+        public event Action<UIScene> SceneChanging = newScene => { };  
 
         [SerializeField]
         private bool _initialScene = false;
@@ -29,7 +28,7 @@ namespace Elarion.UI {
         
         // override this to ignore the ActiveChild flag
         public override bool IsRendering {
-            get { return State.IsOpened || State.IsInTransition; }
+            get { return IsOpened || IsInTransition; }
         }
         
         protected override void Start() {
@@ -42,6 +41,8 @@ namespace Elarion.UI {
 
         protected override void BeforeOpen(bool skipAnimation) {
             base.BeforeOpen(skipAnimation);
+
+            SceneChanging(this);
             
             if(_currentScene != null) {
                 _currentScene.Close(skipAnimation);
