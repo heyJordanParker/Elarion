@@ -159,33 +159,30 @@ namespace Elarion.UI.Helpers.Animation {
         }
         
         public void Animate(UIAnimator animator, Action callback = null) {
-            Action syncedCallback = null;
-
-            if(callback != null) {
-                var callbackFired = false;
-                
-                syncedCallback = () => {
-                    if(!callbackFired) {
-                        callback();
-                        callbackFired = true;
-                    }
-                };    
+            if(animatePosition) {
+                animator.Move(positionDelta, positionAnimationDirection, callback, AnimationOptions);
+                callback = null; // to avoid multiple calls of the callback
             }
             
-            if(animatePosition)
-                animator.Move(positionDelta, positionAnimationDirection, syncedCallback, AnimationOptions);
+            if(animateAnchors) {
+                animator.MoveAnchors(minAnchorDelta, maxAnchorDelta, anchorsAnimationDirection, callback, AnimationOptions);
+                callback = null; // to avoid multiple calls of the callback
+            }
             
-            if(animateAnchors)
-                animator.MoveAnchors(minAnchorDelta, maxAnchorDelta, anchorsAnimationDirection, syncedCallback, AnimationOptions);
+            if(animateRotation) {
+                animator.Rotate(rotationDelta, rotationAnimationDirection, callback, AnimationOptions);
+                callback = null; // to avoid multiple calls of the callback
+            }
             
-            if(animateRotation)
-                animator.Rotate(rotationDelta, rotationAnimationDirection, syncedCallback, AnimationOptions);
+            if(animateSize) {
+                animator.Resize(sizeDelta, sizeAnimationDirection, callback, AnimationOptions);
+                callback = null; // to avoid multiple calls of the callback
+            }
             
-            if(animateSize)
-                animator.Resize(sizeDelta, sizeAnimationDirection, syncedCallback, AnimationOptions);
-            
-            if(animateAlpha)
-                animator.Fade(alphaDelta, alphaAnimationDirection, syncedCallback, AnimationOptions);
+            if(animateAlpha) {
+                animator.Fade(alphaDelta, alphaAnimationDirection, callback, AnimationOptions);
+                callback = null; // to avoid multiple calls of the callback
+            }
         }
 
         public void Stop(UIAnimator animator, bool reset = false) {

@@ -19,7 +19,7 @@ namespace Elarion.UI {
         [SerializeField]
         private Type _type = Type.OpenUIScene;
 
-        [SerializeField, ConditionalVisibility("_type == Type.OpenComponent || Type.CloseComponent || _type == Type.ToggleComponent")]
+        [SerializeField, ConditionalVisibility("_type == Type.OpenComponent || Type.CloseComponent || Type.ToggleComponent")]
         private UIComponent _targetComponent;
         [SerializeField, ConditionalVisibility("_type == Type.SendSubmitEvent")]
         private GameObject _objectToSubmit;
@@ -28,9 +28,9 @@ namespace Elarion.UI {
         [SerializeField, ConditionalVisibility("_type == Type.OpenUIScene")]
         private UIScene _targetScene;
         
-        [SerializeField, ConditionalVisibility("_type == Type.OpenComponent || Type.OpenUIScene")]
+        [SerializeField, ConditionalVisibility("_type == Type.OpenComponent || Type.OpenUIScene || Type.ToggleComponent")]
         private UIAnimation _openAnimationOverride;
-        [SerializeField, ConditionalVisibility("_type == Type.CloseComponent || Type.OpenUIScene")]
+        [SerializeField, ConditionalVisibility("_type == Type.CloseComponent || Type.OpenUIScene || Type.ToggleComponent")]
         private UIAnimation _closeAnimationOverride;
 
         public void OnPointerClick(PointerEventData eventData) {

@@ -106,6 +106,10 @@ namespace Elarion.UI {
         protected override void CloseInternal(UIAnimation animation, bool isEventOrigin) {
             base.CloseInternal(animation, isEventOrigin);
             
+            SwitchFocusOnClose();
+        }
+
+        protected virtual void SwitchFocusOnClose() {
             if(IsFocusedThis) {
                 var nextFocused = FindNextFocusedComponent();
                 if(nextFocused) {
@@ -118,8 +122,7 @@ namespace Elarion.UI {
             if(eventData == null || eventData.button != PointerEventData.InputButton.Left) {
                 return;
             }
-
-            UIRoot.Select(gameObject);
+            
             Focus(setSelection: false, autoFocus: false);
         }
         

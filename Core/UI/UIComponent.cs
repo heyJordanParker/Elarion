@@ -15,12 +15,14 @@ namespace Elarion.UI {
     // TODO simple loading helper - sets loading to true/false based on delegate/unity event
     // TODO simple hoverable/pressable helpers - set hovered/pressed based on unity events
 
-    // TODO Make an unfocusable UIElement (use it to animate inputs and similar shit)
+    // TODO move the child closing logic to the child UIComponents; Send ParentClosing; ParentOpening/ParentFinishedOpening events and let child objects open/close accordingly based on what the parent is doing
 
     [DisallowMultipleComponent]
     [RequireComponent(typeof(RectTransform))]
     public abstract class UIComponent : UIState {
-        [SerializeField]
+        [SerializeField, HideInInspector]
+        [Tooltip(
+            "When to open the component. Auto opens it based on element type. OpenWithParent opens it at the same time as the parent opens (animations overlap). Open after parent waits for the parent animation to finish and then opens the element. Manual doesn't auto-open the component.")]
         private UIOpenType _openType = UIOpenType.OpenWithParent;
 
         private UIRoot _uiRoot;
@@ -139,6 +141,14 @@ namespace Elarion.UI {
             OpenConditions = GetComponent<UIOpenConditions>();
         }
 
+        protected override void Start() {
+            base.Start();
+
+            if(ParentComponent == null && OpenType == UIOpenType.Auto) {
+                Open();
+            }
+        }
+
         protected override void OnEnable() {
             base.OnEnable();
 
@@ -213,7 +223,7 @@ namespace Elarion.UI {
         protected virtual void AfterOpen(bool isEventOrigin) {
             OpenChildren(UIOpenType.OpenAfterParent, false);
 
-            // send another select event to the selected component; otherwise Unity is likely not to focus it 
+            // send another select event to the selected component; otherwise Unity is likely not to focus it; hack 
             if(UIRoot && UIRoot.SelectedObject && UIRoot.SelectedObject.transform.IsChildOf(transform)) {
                 UIRoot.Select(UIRoot.SelectedObject);
             }
@@ -221,8 +231,16 @@ namespace Elarion.UI {
 
         protected void OpenChildren(UIOpenType openTypeFilter, bool skipAnimation) {
             foreach(var child in ChildComponents) {
-                if(!child.CanOpen ||
-                   child.OpenType != openTypeFilter) {
+                
+                if(!child.CanOpen) {
+                    continue;
+                }
+                
+                if(openTypeFilter == UIOpenType.OpenWithParent) {
+                    if(child.OpenType != UIOpenType.OpenWithParent && child.OpenType != UIOpenType.Auto) {
+                        continue;
+                    }
+                } else if(child.OpenType != openTypeFilter) {
                     continue;
                 }
                 
@@ -268,7 +286,7 @@ namespace Elarion.UI {
         /// <summary>
         /// Called after the object has been closed and all close animations have finished playing (if any)
         /// </summary>
-        protected void AfterClose() {
+        protected virtual void AfterClose() {
             if(HasAnimator) {
                 Animator.ResetToSavedProperties();
                 Renderer.enabled = false; // instantly hide this, the state will update on the next frame
@@ -336,7 +354,9 @@ namespace Elarion.UI {
 
             // top level elements
             if(ParentComponent == null) {
-                _openType = UIOpenType.OpenManually;
+                if(_openType != UIOpenType.OpenManually && _openType != UIOpenType.Auto) {
+                    _openType = UIOpenType.OpenManually;
+                }
             }
         }
 

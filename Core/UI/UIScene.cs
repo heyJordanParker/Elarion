@@ -32,8 +32,6 @@ namespace Elarion.UI {
         }
         
         protected override void Start() {
-            base.Start();
-
             if(InitialScene) {
                 Open();
             }

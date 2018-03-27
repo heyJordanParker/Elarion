@@ -58,6 +58,7 @@ namespace Elarion.UI {
             }
         }
 
+        // Update after the event system; Ensure that 
         protected virtual void LateUpdate() {
             if(_current != this || !EventSystem || !EventSystem.isFocused) {
                 // process the events just once and only if focused
@@ -67,6 +68,14 @@ namespace Elarion.UI {
             HandleTabNavigation();
 
             if(EventSystem.currentSelectedGameObject == SelectedObject) {
+                return;
+            }
+
+            if(EventSystem.currentSelectedGameObject == null) {
+                // generally if the user clicks on a text or another raycastable component without a handler; select the focused component
+                
+                SelectedObject = UIFocusableComponent.FocusedComponent != null ? UIFocusableComponent.FocusedComponent.gameObject : null;
+                
                 return;
             }
 
@@ -80,7 +89,9 @@ namespace Elarion.UI {
             var selectedComponent = SelectedObject.GetComponentInParent<UIFocusableComponent>();
 
             if(selectedComponent != null) {
-                selectedComponent.Focus();
+                // Generally when a user clicks something inside another component
+                
+                selectedComponent.Focus(false, false);
             }
         }
 
@@ -164,7 +175,7 @@ namespace Elarion.UI {
             if(!EventSystem ||
                EventSystem.alreadySelecting ||
                !gameObject) {
-                return false;
+                return false; // wasn't selected
             }
 
             SelectedObject = gameObject;

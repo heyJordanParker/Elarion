@@ -22,6 +22,7 @@ namespace Elarion.Editor.UI.Editors {
         private GUIStyle _previewStyle;
 
         private UIAnimator _animator;
+        private SerializedProperty _openType;
 
         protected UIComponent Target {
             get { return target as UIComponent; }
@@ -60,11 +61,25 @@ namespace Elarion.Editor.UI.Editors {
                 Utils.ShowBuiltinHelpers(Target);
             }
             
+            _openType = serializedObject.FindProperty("_openType");
+            
             UpdateHelpers();
         }
 
         public override void OnInspectorGUI() {
             base.OnInspectorGUI();
+
+            if(Target.ParentComponent != null) {
+                EditorGUILayout.PropertyField(_openType, new GUIContent("Open Type"));
+            } else {
+                var toggle = EditorGUILayout.Toggle(new GUIContent("Auto Open"), Target.OpenType == UIOpenType.Auto);
+
+                if(toggle) {
+                    _openType.intValue = (int) UIOpenType.Auto;
+                } else {
+                    _openType.intValue = (int) UIOpenType.OpenManually;
+                }
+            }
 
             if(targets.Length > 1) {
                 return;
@@ -125,6 +140,8 @@ namespace Elarion.Editor.UI.Editors {
             GUILayout.EndHorizontal();
 
             GUILayout.Space(10);
+            
+            serializedObject.ApplyModifiedProperties();
         }
 
         private void UpdateHelpers() {

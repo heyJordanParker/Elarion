@@ -5,10 +5,11 @@ namespace Elarion.UI {
     [RequireComponent(typeof(Text))]
     public class UIBreadcrumb : BaseUIBehaviour {
 
-        public UIComponent startingElement;
         public string elementSeparator = " - ";
 
         protected Text text;
+
+        private UIComponent _focusedComponent;
 
         protected string Breadcrumb {
             get { return text.text; }
@@ -18,23 +19,25 @@ namespace Elarion.UI {
         protected override void Awake() {
             base.Awake();
             text = GetComponent<Text>();
+        }
+
+        private void Update() {
+            if(_focusedComponent == UIFocusableComponent.FocusedComponent) {
+                return;
+            }
+
+            var newFocusedComponent = UIFocusableComponent.FocusedComponent != null ? UIFocusableComponent.FocusedComponent : UIScene.CurrentScene;
+
+            if(_focusedComponent == newFocusedComponent) {
+                return;
+            }
             
+            _focusedComponent = newFocusedComponent;
             UpdateBreadcrumb();
         }
 
-        protected virtual void UpdateBreadcrumb() {
-            if(startingElement == null) {
-                startingElement = GetComponent<UIComponent>();
-                if(startingElement == null) {
-                    return;
-                }
-            }
-
-            if(!text) {
-                text = GetComponent<Text>();
-            }
-
-            var parentComponent = startingElement;
+        private void UpdateBreadcrumb() {
+            var parentComponent = _focusedComponent;
 
             Breadcrumb = string.Empty;
 
@@ -42,21 +45,11 @@ namespace Elarion.UI {
                 Breadcrumb = parentComponent.name + elementSeparator + Breadcrumb;
 
                 parentComponent = parentComponent.ParentComponent;
-            } while(parentComponent != null);
+            } while(parentComponent != null && !(parentComponent is UIScene));
+
+            Breadcrumb = UIScene.CurrentScene.name + elementSeparator + Breadcrumb;
 
             Breadcrumb = Breadcrumb.TrimEnd(elementSeparator.ToCharArray());
-        }
-
-        protected override void OnTransformParentChanged() {
-            base.OnTransformParentChanged();
-
-            UpdateBreadcrumb();
-        }
-
-        protected override void OnValidate() {
-            base.OnValidate();
-            
-            UpdateBreadcrumb();
         }
     }
 }

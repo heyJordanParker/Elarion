@@ -4,6 +4,7 @@ namespace Elarion.UI {
 
     [Serializable]
     public enum UIOpenType {
+        Auto,
         OpenWithParent,
         OpenAfterParent,
         OpenManually
