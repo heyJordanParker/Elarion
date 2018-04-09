@@ -11,10 +11,31 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 4ab013877c59463d99bed13bed482803, type: 3}
   m_Name: Default UI Animation
   m_EditorClassIdentifier: 
-  type: 4
-  slideDirection: 0
-  colorFadeColor: {r: 1, g: 1, b: 1, a: 1}
-  duration: 51
+  _movementDirection: 0
+  _delay: 0
+  _durationPreset: 34
   _customDuration: 0.5
-  defaultEaseFunction: 0
-  easeFunction: 0
+  _easingFunctionPreset: 7
+  _customEasingFunction: 0
+  animatePosition: 0
+  positionAnimationDirection: 2
+  positionDelta: {x: 0, y: 0}
+  animateAnchors: 0
+  anchorsAnimationDirection: 0
+  minAnchorDelta: {x: 0, y: 0}
+  maxAnchorDelta: {x: 0, y: 0}
+  animateSize: 0
+  sizeAnimationDirection: 2
+  sizeDelta: {x: 0, y: 0}
+  animateRotation: 0
+  rotationAnimationDirection: 2
+  rotationDelta: {x: 0, y: 0, z: 0}
+  animateAlpha: 1
+  alphaAnimationDirection: 0
+  alphaDelta: 0
+  overrideParentAnchors: 0
+  overrideParentAnchorMin: {x: 0.5, y: 0.5}
+  overrideParentAnchorMax: {x: 0.5, y: 0.5}
+  savePosition: 0
+  _movementPreset: 0
+  _fadePreset: 1

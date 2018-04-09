@@ -131,12 +131,12 @@ namespace Elarion.Utility {
 
         #endregion
 
-        public static ExecutorBehavior Create(string name = "Executor", bool dontDestroyOnLoad = false, HideFlags hideFlags = HideFlags.None) {
+        public static TExecutor Create<TExecutor>(string name = "Executor", bool dontDestroyOnLoad = false, HideFlags hideFlags = HideFlags.None) where TExecutor : ExecutorBehavior {
             var go = new GameObject(name) {
                 hideFlags = hideFlags
             };
 
-            var executor = go.AddComponent<ExecutorBehavior>();
+            var executor = go.AddComponent<TExecutor>();
 
             executor.DontDestroyOnLoad = dontDestroyOnLoad;
 

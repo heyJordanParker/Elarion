@@ -1,15 +1,10 @@
 using System;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.Serialization;
 
 namespace Elarion.UI.Helpers.Animation {
     public partial class UIAnimation {
-        
-        [Serializable]
-        private enum AnimationPresetDirection {
-            From = UIAnimationDirection.From,
-            To = UIAnimationDirection.To
-        }
         
         [Serializable]
         private enum AnimationMovementPreset {
@@ -58,20 +53,22 @@ namespace Elarion.UI.Helpers.Animation {
             public float alphaDelta = 0;
         }
         
+        // Convenience fields for the editor, can't remove them via conditional compilation because the ScriptableObject serialization busts
+#pragma warning disable CS0414
         
-        private UIAnimationDirection GetAnimationDirection(bool isRelative) {
-            if(!isRelative) {
-                return (UIAnimationDirection) _movementDirection;
-            }
-
-            if(_movementDirection == AnimationPresetDirection.To) {
-                return UIAnimationDirection.RelativeTo;
-            }
-
-            return UIAnimationDirection.RelativeFrom;
-        }
+        [Header("Animation Configuration")]
+        [SerializeField]
+        [FormerlySerializedAs("_movement")]
+        private AnimationMovementPreset _movementPreset = AnimationMovementPreset.NoMovement;
+                
+        [SerializeField]
+        [FormerlySerializedAs("_fade")]
+        private AnimationFadePreset _fadePreset = AnimationFadePreset.FadeIn;
         
-        #if UNITY_EDITOR
+#pragma warning restore CS0414
+
+        
+#if UNITY_EDITOR
         private void OnValidate() {
             if(MovementPresets.ContainsKey(_movementPreset)) {
                 var preset = MovementPresets[_movementPreset];
@@ -201,7 +198,6 @@ namespace Elarion.UI.Helpers.Animation {
                 return _fadePresets;
             }
         }
-        
-        #endif
+#endif
     }
 }

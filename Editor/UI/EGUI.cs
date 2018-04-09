@@ -1,11 +1,8 @@
 ﻿using System;
-using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
-using Elarion.UI;
 using UnityEditor;
 using UnityEngine;
-using UnityEngine.EventSystems;
 
 namespace Elarion.Editor.UI {
 	public static class EGUI {

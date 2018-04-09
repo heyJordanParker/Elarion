@@ -41,11 +41,11 @@ namespace Elarion.UI {
 
             Breadcrumb = string.Empty;
 
-            do {
+            while(parentComponent != null && !(parentComponent is UIScene)) {
                 Breadcrumb = parentComponent.name + elementSeparator + Breadcrumb;
 
                 parentComponent = parentComponent.ParentComponent;
-            } while(parentComponent != null && !(parentComponent is UIScene));
+            }
 
             Breadcrumb = UIScene.CurrentScene.name + elementSeparator + Breadcrumb;
 

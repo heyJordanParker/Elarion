@@ -1,5 +1,4 @@
 using System;
-using System.Collections.Generic;
 using Elarion.Extensions;
 using UnityEngine;
 
@@ -24,12 +23,20 @@ namespace Elarion.UI {
         public event Action EnteredTransition = () => { };
         public event Action ExitedTransition = () => { };
 
+        private bool _initialized;
+        
         protected bool IsStateDirty {
-            get { return currentState != previousState; }
+            get { return !_initialized  || _currentState != _previousState; }
         }
 
-        protected States previousState = States.None;
-        protected States currentState = States.None;
+        private States _previousState = States.None;
+        private States _currentState = States.None;
+
+        protected override void Start() {
+            base.Start();
+
+            _initialized = true;
+        }
 
         /// <summary>
         /// Simply updates the state every frame. Override to change behavior.
@@ -47,11 +54,10 @@ namespace Elarion.UI {
             }
             
             // TODO integrate the focusing and unfocusing of panels with the builtin event system (ExecuteEvents and such)
-            // TODO add UIElements (simpler; can't be focused)
 
-            OnStateChanged(currentState, previousState);
+            OnStateChanged(_currentState, _previousState);
             
-            previousState = currentState;
+            _previousState = _currentState;
         }
 
         protected virtual void OnStateChanged(States currentState, States previousState) {
@@ -79,8 +85,8 @@ namespace Elarion.UI {
         }
 
         private States CurrentState {
-            get { return currentState; }
-            set { currentState = value; }
+            get { return _currentState; }
+            set { _currentState = value; }
         }
 
         public bool IsOpened {

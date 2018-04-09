@@ -3,22 +3,20 @@ using System.Collections.Generic;
 using UnityEngine;
 
 namespace Elarion.Singleton {
-    public abstract class Singleton : MonoBehaviour {
+    public abstract class SingletonBehaviour : MonoBehaviour {
         
-        // TODO finish the SingletonNew class & replace this with that
-        
-        private static Dictionary<Type, Singleton> _instances;
+        private static Dictionary<Type, SingletonBehaviour> _instances;
 
-        private static Dictionary<Type, Singleton> Instances {
+        private static Dictionary<Type, SingletonBehaviour> Instances {
             get {
                 if(_instances == null)
-                    _instances = new Dictionary<Type, Singleton>();
+                    _instances = new Dictionary<Type, SingletonBehaviour>();
                 return _instances;
             }
         }
 
-        public static T Get<T>() where T : Singleton {
-            Singleton singleton;
+        public static T Get<T>() where T : SingletonBehaviour {
+            SingletonBehaviour singleton;
             if(!Instances.TryGetValue(typeof(T), out singleton)) {
                 return null;
             }
@@ -27,7 +25,7 @@ namespace Elarion.Singleton {
 
         protected virtual void Awake() {
             var type = GetType();
-            Singleton instance;
+            SingletonBehaviour instance;
             if(!Instances.TryGetValue(type, out instance)) {
                 Instances.Add(type, this);
             } else if(instance != this) {
@@ -46,8 +44,8 @@ namespace Elarion.Singleton {
         }
 
         
-        #if UNITY_EDITOR
         protected virtual void OnValidate() {
+#if UNITY_EDITOR
             if(UnityEditor.EditorApplication.isPlayingOrWillChangePlaymode || UnityEditor.SceneManagement.EditorSceneManager.loadedSceneCount == 0) {
                 // loaded scene count is to prevent GetActiveScene from throwing an exception when exiting play mode
                 return;
@@ -57,7 +55,7 @@ namespace Elarion.Singleton {
 
             var rootGameObjects = scene.GetRootGameObjects();
 
-            var singletons = new List<Singleton> {this};
+            var singletons = new List<SingletonBehaviour> {this};
 
 
             foreach(var gameObject in rootGameObjects) {
@@ -72,14 +70,14 @@ namespace Elarion.Singleton {
                 }
                 
                 if(component != null) {
-                    singletons.Add(component as Singleton);
+                    singletons.Add(component as SingletonBehaviour);
                 }
             }
 
             if(singletons.Count > 1) {
                 Debug.Log("The scene contains multiple instances of the " + GetType().Name + " Singleton.", this);
             }
+#endif
         }
-        #endif
     }
 }

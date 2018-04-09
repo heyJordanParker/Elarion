@@ -1,5 +1,4 @@
 ﻿using System;
-using UnityEditor;
 
 namespace Elarion.Attributes {
     [AttributeUsage(AttributeTargets.Class)]

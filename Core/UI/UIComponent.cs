@@ -1,19 +1,15 @@
-using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
-using Elarion.Attributes;
-using Elarion.Extensions;
 using Elarion.UI.Helpers;
 using Elarion.UI.Helpers.Animation;
 using UnityEngine;
-using UnityEngine.EventSystems;
-using UnityEngine.UI;
 using Debug = UnityEngine.Debug;
 
 namespace Elarion.UI {
     // TODO simple loading helper - sets loading to true/false based on delegate/unity event
     // TODO simple hoverable/pressable helpers - set hovered/pressed based on unity events
+    // TODO simple tooltip
 
     // TODO move the child closing logic to the child UIComponents; Send ParentClosing; ParentOpening/ParentFinishedOpening events and let child objects open/close accordingly based on what the parent is doing
 
@@ -25,7 +21,7 @@ namespace Elarion.UI {
             "When to open the component. Auto opens it based on element type. OpenWithParent opens it at the same time as the parent opens (animations overlap). Open after parent waits for the parent animation to finish and then opens the element. Manual doesn't auto-open the component.")]
         private UIOpenType _openType = UIOpenType.OpenWithParent;
 
-        private UIRoot _uiRoot;
+        private UIManager _uiManager;
 
         private UIAnimator _animator;
         private IAnimationController[] _animationControllers = { };
@@ -154,10 +150,7 @@ namespace Elarion.UI {
 
             UpdateParent();
 
-            ChildComponents = GetComponentsInChildren<UIComponent>(includeInactive: true)
-                .Where(child => child.ParentComponent == this).ToList();
-
-            OnStateChanged(currentState, previousState);
+            UpdateState();
         }
 
         protected override void OnDisable() {
@@ -167,7 +160,7 @@ namespace Elarion.UI {
 
             Close(true);
 
-            OnStateChanged(currentState, previousState);
+            UpdateState();
         }
 
         /// <summary>
@@ -178,7 +171,7 @@ namespace Elarion.UI {
                 return;
             }
 
-            // TODO register all top-level components in the UIRoot (UIManager); Update them from there
+            // TODO register all top-level components in the UIManager; Update them from there
 
             UpdateComponent();
         }
@@ -193,7 +186,11 @@ namespace Elarion.UI {
             if(!CanOpen) {
                 return;
             }
-
+            
+            // Update children
+            ChildComponents = GetComponentsInChildren<UIComponent>(includeInactive: true)
+                .Where(child => child.ParentComponent == this).ToList();
+            
             var noAnimation = animation == null;
 
             BeforeOpen(noAnimation);
@@ -224,8 +221,8 @@ namespace Elarion.UI {
             OpenChildren(UIOpenType.OpenAfterParent, false);
 
             // send another select event to the selected component; otherwise Unity is likely not to focus it; hack 
-            if(UIRoot && UIRoot.SelectedObject && UIRoot.SelectedObject.transform.IsChildOf(transform)) {
-                UIRoot.Select(UIRoot.SelectedObject);
+            if(UIManager && UIManager.SelectedObject && UIManager.SelectedObject.transform.IsChildOf(transform)) {
+                UIManager.Select(UIManager.SelectedObject);
             }
         }
 
@@ -235,6 +232,8 @@ namespace Elarion.UI {
                 if(!child.CanOpen) {
                     continue;
                 }
+                
+                Debug.Log(name + "Opening child " + child.name);
                 
                 if(openTypeFilter == UIOpenType.OpenWithParent) {
                     if(child.OpenType != UIOpenType.OpenWithParent && child.OpenType != UIOpenType.Auto) {
@@ -313,10 +312,6 @@ namespace Elarion.UI {
             IsInTransition = IsAnimating ||
                              !HasAnimator && ParentComponent != null && ParentComponent.IsInTransition;
 
-            if(IsStateDirty) {
-                // TODO fire any events here; Fire the blur event in the UIPanel
-            }
-
             // Finish updating the state
             base.UpdateState();
         }
@@ -375,19 +370,8 @@ namespace Elarion.UI {
             }
         }
 
-        // TODO get rid of this
-        protected UIRoot UIRoot {
-            get {
-                if(_uiRoot == null) {
-                    _uiRoot = UIRoot.UIRootCache.SingleOrDefault(root => root.transform.IsParentOf(transform));
-
-                    if(_uiRoot == null) {
-                        _uiRoot = GetComponentInParent<UIRoot>();
-                    }
-                }
-
-                return _uiRoot;
-            }
+        protected UIManager UIManager {
+            get { return UIManager.Instance; }
         }
     }
 }

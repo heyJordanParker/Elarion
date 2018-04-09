@@ -109,12 +109,17 @@ namespace Elarion.UI {
             SwitchFocusOnClose();
         }
 
+        /// <summary>
+        /// Used to control the focus after the object is closed. Usually, you'll want to do that only if IsFocusedThis is true.
+        /// </summary>
         protected virtual void SwitchFocusOnClose() {
-            if(IsFocusedThis) {
-                var nextFocused = FindNextFocusedComponent();
-                if(nextFocused) {
-                    nextFocused.Focus(true);
-                }
+            if(!IsFocusedThis) {
+                return;
+            }
+            
+            var nextFocused = FindNextFocusedComponent();
+            if(nextFocused) {
+                nextFocused.Focus(true);
             }
         }
 
@@ -138,7 +143,7 @@ namespace Elarion.UI {
         /// <param name="setSelection">If set to true, tries to select a Selectable object via the builtin system.</param>
         /// <param name="autoFocus">If set to true, tries to find the most appropriate component to focus next.</param>
         public virtual void Focus(bool setSelection = false, bool autoFocus = true) {
-            if(IsFocusedThis || !UIRoot || !Focusable) {
+            if(IsFocusedThis || !UIManager || !Focusable) {
                 return;
             }
 
@@ -156,8 +161,8 @@ namespace Elarion.UI {
                 selectable = FocusedComponent.gameObject.GetFirstSelectableChild();
             }
 
-            if(selectable && UIRoot) {
-                UIRoot.Select(selectable);
+            if(selectable && UIManager) {
+                UIManager.Select(selectable);
             }
         }
 

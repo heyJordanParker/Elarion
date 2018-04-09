@@ -1,32 +1,108 @@
-﻿using UnityEngine;
+﻿using System;
+using System.Collections.Generic;
+using System.Diagnostics;
+using System.Linq;
+using System.Reflection;
+using Elarion.Utility;
+using UnityEngine;
 
 namespace Elarion.Singleton {
-    public class SingletonUpdater : SingletonNew<SingletonUpdater> {
-        
-        // TODO create a singleton updater (that calls the builtin methods for all singletons during runtime); use a proxy object (that just has events for everything without actual functionality)
-        
-        // TODO add method stubs to the base class & call them in the updater
-        
-        // TODO create a SingletonInspector - a window showing all singletons and their current state; show warnings if one of the singletons doesn't have the [Serializable] attribute
-        
-        // TODO create a protected event OnSingletonCreated/Destroyed and use it to fascilitate hooking the singletons with their update functions
-        
-        // TODO create a base inspector for singletons that inlines the inspector for the scriptableobject inside a property drawer. Example here: https://answers.unity.com/questions/1034777/draw-scrptableobject-inspector-in-other-inspector.html
-        
-        // TODO get the singletons to create/assign inside the editor
-        
-        // TODO add unit tests
-        
-        // TODO open source
-        
-        // TODO release as a free asset on the asset store
+    public class SingletonUpdater : ExecutorBehavior {
+        [SerializeField]
+        private List<ScriptableObject> _singletons = new List<ScriptableObject>();
 
-        public float test = 2;
+        private static SingletonUpdater _updater;
 
-//        [RuntimeInitializeOnLoadMethod]
-        public static void Initialize() {
-            // Create a hidden proxy object to call the builtin functions of all singletons
+        private static SingletonUpdater Updater {
+            get {
+                if(_updater == null) {
+                    _updater = Create<SingletonUpdater>("Singleton Updater", true); // , HideFlags.HideAndDontSave
+                }
+
+                return _updater;
+            }
         }
-        
+
+        public static void RegisterSingleton<TSingleton>(TSingleton singleton)
+            where TSingleton : ScriptableObject, ISingleton {
+            Updater.DestroyEvent += singleton.Deinitialize;
+
+            Updater.FixedUpdateEvent += singleton.OnFixedUpdate;
+            Updater.UpdateEvent += singleton.OnUpdate;
+            Updater.LateUpdateEvent += singleton.OnLateUpdate;
+
+
+            Updater.ApplicationFocusEvent += singleton.OnApplicationFocus;
+            Updater.ApplicationPauseEvent += singleton.OnApplicationPause;
+            Updater.ApplicationQuitEvent += singleton.OnApplicationQuit;
+
+            Updater.DrawGizmosEvent += singleton.OnDrawGizmos;
+            Updater.PostRenderEvent += singleton.OnPostRender;
+            Updater.PreCullEvent += singleton.OnPreCull;
+            Updater.PreRenderEvent += singleton.OnPreRender;
+            Updater.ResetEvent += singleton.OnReset;
+
+            Updater._singletons.Add(singleton);
+        }
+
+        public static void UnregisterSingleton<TSingleton>(TSingleton singleton)
+            where TSingleton : ScriptableObject, ISingleton {
+            Updater.DestroyEvent -= singleton.Deinitialize;
+
+            Updater.FixedUpdateEvent -= singleton.OnFixedUpdate;
+            Updater.UpdateEvent -= singleton.OnUpdate;
+            Updater.LateUpdateEvent -= singleton.OnLateUpdate;
+
+
+            Updater.ApplicationFocusEvent -= singleton.OnApplicationFocus;
+            Updater.ApplicationPauseEvent -= singleton.OnApplicationPause;
+            Updater.ApplicationQuitEvent -= singleton.OnApplicationQuit;
+
+            Updater.DrawGizmosEvent -= singleton.OnDrawGizmos;
+            Updater.PostRenderEvent -= singleton.OnPostRender;
+            Updater.PreCullEvent -= singleton.OnPreCull;
+            Updater.PreRenderEvent -= singleton.OnPreRender;
+            Updater.ResetEvent -= singleton.OnReset;
+
+            Updater._singletons.Remove(singleton);
+        }
+
+        [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.BeforeSceneLoad)]
+        private static void InitializeSingletons() {
+            
+            // TODO test this in a bigger project. I'm getting ~170ms on a simple project
+            // TODO test this on my phone - maybe without the editor the performance will be much higher (set a static int in TestClass and render it on screen)
+
+            var sw2 = new Stopwatch();
+            
+            sw2.Start();
+            
+            var singletons =
+                from assembly in AppDomain.CurrentDomain.GetAssemblies()
+                from type in assembly.GetTypes()
+                where !type.IsAbstract && !type.IsGenericType &&
+                      type.GetCustomAttributes(typeof(SingletonAttribute), true).Length > 0
+                select type;
+            
+            foreach(var singleton in singletons) {
+                var method = singleton.GetMethods(BindingFlags.NonPublic | BindingFlags.Static | BindingFlags.FlattenHierarchy)
+                    .FirstOrDefault(m =>
+                        m.GetCustomAttributes(typeof(SingletonCreateInstanceAttribute), true).Length > 0);
+                
+                method.Invoke(null, null);
+            }
+//            
+            sw2.Stop();
+
+            TestClass.time = sw2.Elapsed.TotalMilliseconds;
+//
+//            Debug.Log("Total Time " + sw2.Elapsed.TotalMilliseconds);
+        }
+
+        // TODO add documentation
+
+        // TODO open source
+
+        // TODO release as a free asset on the asset store
     }
 }

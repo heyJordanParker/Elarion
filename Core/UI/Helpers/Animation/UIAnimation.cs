@@ -16,27 +16,16 @@ namespace Elarion.UI.Helpers.Animation {
         // TODO animate scale (pop-in animations generally look better when the component is scaled instead of resized)
         
         // TODO Animate interface (containing the animate method); maybe add a target field (useful for other scripts)
+        
+        [Serializable]
+        private enum AnimationDirection {
+            From = UIAnimationDirection.From,
+            To = UIAnimationDirection.To
+        }
 
-        #region PresetConfiguration
-        
-        #if UNITY_EDITOR
-        [Header("Animation Configuration")]
-        [SerializeField]
-        [FormerlySerializedAs("_movement")]
-        private AnimationMovementPreset _movementPreset = AnimationMovementPreset.NoMovement;
-        #endif
-        
         [SerializeField]
         [ConditionalVisibility("_movementPreset != AnimationMovementPreset.NoMovement || AnimationMovementPreset.Custom")]
-        private AnimationPresetDirection _movementDirection = AnimationPresetDirection.From;
-        
-        #if UNITY_EDITOR
-        [SerializeField]
-        [FormerlySerializedAs("_fade")]
-        private AnimationFadePreset _fadePreset = AnimationFadePreset.FadeIn;
-        #endif
-        
-        #endregion
+        private AnimationDirection _movementDirection = AnimationDirection.From;
 
         [Space(10)]
         [SerializeField]
@@ -156,6 +145,18 @@ namespace Elarion.UI.Helpers.Animation {
             get {
                 return new UIAnimationOptions(savePosition, Duration == 0, _customEasingFunction, Duration, Delay);
             }
+        }
+        
+        private UIAnimationDirection GetAnimationDirection(bool isRelative) {
+            if(!isRelative) {
+                return (UIAnimationDirection) _movementDirection;
+            }
+
+            if(_movementDirection == AnimationDirection.To) {
+                return UIAnimationDirection.RelativeTo;
+            }
+
+            return UIAnimationDirection.RelativeFrom;
         }
         
         public void Animate(UIAnimator animator, Action callback = null) {

@@ -3,7 +3,7 @@ using UnityEditor;
 using UnityEngine;
 
 namespace Elarion.Editor.UI.Editors {
-    [CustomEditor(typeof(UIRoot), true)]
+    [CustomEditor(typeof(UIManager), true)]
     public class UIRootEditor : UnityEditor.Editor {
         public override void OnInspectorGUI() {
             base.OnInspectorGUI();

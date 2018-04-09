@@ -1,6 +1,5 @@
 ﻿using Elarion.UI;
 using Elarion.UI.Helpers.Animation;
-using Elarion.Utility;
 using UnityEditor;
 using UnityEngine;
 using UnityEngine.EventSystems;
@@ -57,7 +56,7 @@ namespace Elarion.Editor.UI.Menus {
         }
 
         private static GameObject CreateNewUI() {
-            var rootComponents = new[] {typeof(UIRoot), typeof(Image), typeof(CanvasScaler)};
+            var rootComponents = new[] {typeof(UIManager), typeof(Image), typeof(CanvasScaler)};
 
             var rootGO = new GameObject("UI Root", rootComponents) {
                 layer = LayerMask.NameToLayer(UILayer)
@@ -88,38 +87,12 @@ namespace Elarion.Editor.UI.Menus {
             Undo.RegisterCreatedObjectUndo(eventSystem, "Creating " + eventSystem.name);
         }
 
-        private static GameObject GetOrCreateUIRoot() {
-            // try finding UIRoot
-
-            // if it doesn't exist - try finding a canvas scaler and add UIRoot to its' game object
-            // if no canvas scaler is present - try finding a canvas - add UIRoot to the top level one (if more than one are present)
-
-            // if none of those are possible - create a UIRoot at the selection (set other components as children)
-
-            // set layer to UILayer (all other objects will become children and share the same layer)
-
-            var uiRoots = SceneTools.FindSceneObjectsOfType<UIRoot>();
-
-            if(uiRoots.Count > 0) {
-                return uiRoots[0].gameObject;
-            }
-
-            var uiRoot = CreateNewUI();
-
-            return uiRoot;
-        }
-
         // TODO move CreateUIElement to this and rename this to CreateUIElement
         public static T Create<T>(string name = null, GameObject parent = null) where T : MonoBehaviour {
 
             if(parent == null) {
                 parent = Selection.activeGameObject;
             }
-
-            if(parent == null || parent.GetComponentInParent<UIRoot>() == null) {
-                parent = GetOrCreateUIRoot();
-            }
-
 
             var defaultName = ObjectNames.NicifyVariableName(typeof(T).Name);
 

@@ -1,21 +1,17 @@
-using System.Collections.Generic;
 using System.Linq;
 using Elarion.Attributes;
 using Elarion.Extensions;
-using Elarion.UI.Helpers.Animation;
+using Elarion.Singleton;
 using Elarion.Utility;
 using UnityEngine;
 using UnityEngine.EventSystems;
-using UnityEngine.Serialization;
 using UnityEngine.UI;
 
 namespace Elarion.UI {
-    // TODO make this a static invisible manager (initializeOnLoad + a hidden MonoBehaviour that updates it); add the initial scene as a checkbox to scenes and a readonly gameobject field (to easily find the actual one)
-
-    [RequireComponent(typeof(Canvas))]
-    [RequireComponent(typeof(GraphicRaycaster))]
-    [RequireComponent(typeof(CanvasScaler))]
-    public class UIRoot : BaseUIBehaviour {
+    
+    [CreateAssetMenu(fileName = "UI Manager.asset", menuName = "Manager/UI Manager", order = 81)]
+    public class UIManager : Singleton<UIManager> {
+        
         public bool enableTabNavigation = true;
 
         [SerializeField, ReadOnly]
@@ -35,32 +31,18 @@ namespace Elarion.UI {
             }
         }
 
-        protected override void Awake() {
-            base.Awake();
+        public override void Initialize() {
+            base.Initialize();
             // This is necessary for blur effects - the shader can't work with the main render texture
-            var uiCamera = UIHelper.CreateUICamera("UI Root Camera", transform);
+            var uiCamera = UIHelper.CreateUICamera("UI Root Camera");
             uiCamera.hideFlags = HideFlags.HideAndDontSave;
         }
 
-        protected override void OnEnable() {
-            base.OnEnable();
-
-            if(_current == null) {
-                _current = this;
-            }
-        }
-
-        protected override void OnDisable() {
-            base.OnDisable();
-
-            if(_current == this) {
-                _current = null;
-            }
-        }
-
         // Update after the event system; Ensure that 
-        protected virtual void LateUpdate() {
-            if(_current != this || !EventSystem || !EventSystem.isFocused) {
+        public override void OnLateUpdate() {
+            base.OnLateUpdate();
+            
+            if(!EventSystem || !EventSystem.isFocused) {
                 // process the events just once and only if focused
                 return;
             }
@@ -184,23 +166,8 @@ namespace Elarion.UI {
             return true; // selected
         }
 
-        // this is to prevent multiple update calls
-        private static UIRoot _current;
-
         private static EventSystem EventSystem {
             get { return EventSystem.current; }
-        }
-
-        private static List<UIRoot> _uiRootCache;
-
-        public static List<UIRoot> UIRootCache {
-            get {
-                if(_uiRootCache == null) {
-                    _uiRootCache = new List<UIRoot>();
-                }
-
-                return _uiRootCache;
-            }
         }
     }
 }

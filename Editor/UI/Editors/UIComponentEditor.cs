@@ -1,9 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
 using Elarion.Attributes;
 using Elarion.UI;
-using Elarion.UI.Helpers;
 using Elarion.UI.Helpers.Animation;
 using UnityEditor;
 using UnityEngine;

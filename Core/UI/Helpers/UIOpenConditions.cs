@@ -269,12 +269,12 @@ namespace Elarion.UI.Helpers {
 #endif
 
 #if UNITY_STANDALONE
-                    _currentPlatform = _currentPlatform.SetFlag(Platform.Standalone, true);
+                    _currentPlatform = _currentPlatform.SetFlag(PlatformCondition.Standalone, true);
 #endif
 
 #if UNITY_ANDROID
-                    _currentPlatform = _currentPlatform.SetFlag(Platform.Mobile, true);
-                    _currentPlatform = _currentPlatform.SetFlag(Platform.MobileAndroid, true);
+                    _currentPlatform = _currentPlatform.SetFlag(PlatformCondition.Mobile, true);
+                    _currentPlatform = _currentPlatform.SetFlag(PlatformCondition.MobileAndroid, true);
 #endif
 
 #if UNITY_IOS

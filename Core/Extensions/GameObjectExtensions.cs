@@ -1,6 +1,5 @@
 using System.Collections.Generic;
 using System.Linq;
-using Elarion.Managers;
 using UnityEngine;
 using UnityEngine.UI;
 
@@ -83,11 +82,6 @@ namespace Elarion.Extensions {
 			foreach(Transform child in go.transform) {
 				SetLayer(child.gameObject, layer);
 			}
-		}
-
-		public static Pool Pool(this GameObject go, uint amount) {
-			var poolingManager = Singleton.Singleton.Get<PoolingManager>();
-			return poolingManager.Pool(go, amount);
 		}
 
 		public static IEnumerable<Selectable> GetSelectableChildren(this GameObject go) {

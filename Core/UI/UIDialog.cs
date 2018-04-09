@@ -1,6 +1,5 @@
 using System;
 using System.Collections.Generic;
-using Elarion.UI.Helpers.Animation;
 using UnityEngine;
 using UnityEngine.EventSystems;
 using UnityEngine.UI;
@@ -74,7 +73,7 @@ namespace Elarion.UI {
                 InitiallyFocusedComponent = FocusedComponent;
             }
             
-            InitiallySelectedObject = UIRoot.SelectedObject;                
+            InitiallySelectedObject = UIManager.SelectedObject;                
             
             ActiveDialogs.Push(this);
 
@@ -103,7 +102,7 @@ namespace Elarion.UI {
             }
             
             if(InitiallySelectedObject != null) {
-                UIRoot.Select(InitiallySelectedObject);
+                UIManager.Select(InitiallySelectedObject);
                 InitiallySelectedObject = null;
             }
         }

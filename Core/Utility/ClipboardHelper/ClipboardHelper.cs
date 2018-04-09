@@ -1,5 +1,4 @@
-﻿using System.Runtime.InteropServices;
-using UnityEngine;
+﻿using UnityEngine;
 
 namespace Elarion.Utility {
     public class ClipboardHelper {
