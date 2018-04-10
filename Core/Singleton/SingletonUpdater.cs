@@ -1,12 +1,15 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Diagnostics;
-using System.Linq;
-using System.Reflection;
+﻿using System.Collections.Generic;
 using Elarion.Utility;
 using UnityEngine;
 
 namespace Elarion.Singleton {
+    
+    // TODO add documentation
+
+    // TODO open source
+
+    // TODO release as a free asset on the asset store
+    
     public class SingletonUpdater : ExecutorBehavior {
         [SerializeField]
         private List<ScriptableObject> _singletons = new List<ScriptableObject>();
@@ -66,43 +69,5 @@ namespace Elarion.Singleton {
 
             Updater._singletons.Remove(singleton);
         }
-
-        [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.BeforeSceneLoad)]
-        private static void InitializeSingletons() {
-            
-            // TODO test this in a bigger project. I'm getting ~170ms on a simple project
-            // TODO test this on my phone - maybe without the editor the performance will be much higher (set a static int in TestClass and render it on screen)
-
-            var sw2 = new Stopwatch();
-            
-            sw2.Start();
-            
-            var singletons =
-                from assembly in AppDomain.CurrentDomain.GetAssemblies()
-                from type in assembly.GetTypes()
-                where !type.IsAbstract && !type.IsGenericType &&
-                      type.GetCustomAttributes(typeof(SingletonAttribute), true).Length > 0
-                select type;
-            
-            foreach(var singleton in singletons) {
-                var method = singleton.GetMethods(BindingFlags.NonPublic | BindingFlags.Static | BindingFlags.FlattenHierarchy)
-                    .FirstOrDefault(m =>
-                        m.GetCustomAttributes(typeof(SingletonCreateInstanceAttribute), true).Length > 0);
-                
-                method.Invoke(null, null);
-            }
-//            
-            sw2.Stop();
-
-            TestClass.time = sw2.Elapsed.TotalMilliseconds;
-//
-//            Debug.Log("Total Time " + sw2.Elapsed.TotalMilliseconds);
-        }
-
-        // TODO add documentation
-
-        // TODO open source
-
-        // TODO release as a free asset on the asset store
     }
 }

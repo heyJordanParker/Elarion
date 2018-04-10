@@ -233,8 +233,6 @@ namespace Elarion.UI {
                     continue;
                 }
                 
-                Debug.Log(name + "Opening child " + child.name);
-                
                 if(openTypeFilter == UIOpenType.OpenWithParent) {
                     if(child.OpenType != UIOpenType.OpenWithParent && child.OpenType != UIOpenType.Auto) {
                         continue;
