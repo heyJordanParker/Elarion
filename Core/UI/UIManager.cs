@@ -1,11 +1,10 @@
 using System.Linq;
-using Elarion.Attributes;
 using Elarion.Extensions;
-using Elarion.Singleton;
 using Elarion.Utility;
 using UnityEngine;
 using UnityEngine.EventSystems;
 using UnityEngine.UI;
+using yaSingleton;
 
 namespace Elarion.UI {
     
@@ -14,7 +13,7 @@ namespace Elarion.UI {
         
         public bool enableTabNavigation = true;
 
-        [SerializeField, ReadOnly]
+        [SerializeField, HideInInspector]
         private GameObject _selectedObject;
 
         private BaseEventData _baseEventData;
@@ -31,11 +30,17 @@ namespace Elarion.UI {
             }
         }
 
-        public override void Initialize() {
+        protected override void Initialize() {
             base.Initialize();
             // This is necessary for blur effects - the shader can't work with the main render texture
             var uiCamera = UIHelper.CreateUICamera("UI Root Camera");
             uiCamera.hideFlags = HideFlags.HideAndDontSave;
+        }
+
+        protected override void Deinitialize() {
+            base.Deinitialize();
+
+            _selectedObject = null;
         }
 
         // Update after the event system; Ensure that 
