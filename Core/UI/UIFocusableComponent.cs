@@ -177,7 +177,7 @@ namespace Elarion.UI {
                 return focusableParentComponent.FindNextFocusedComponent();
             }
 
-            if(UIScene.CurrentScene == this) {
+            if(UIScene.CurrentScene == this || UIScene.CurrentScene == null) {
                 return null;
             }
 

@@ -1,0 +1,19 @@
+﻿using Elarion.Saved.Variables.References;
+using UnityEngine;
+using UnityEngine.UI;
+
+namespace Elarion.Saved.Variables.Setters {
+    [ExecuteInEditMode]
+    public class SliderSetterPercentage : MonoBehaviour {
+        public Slider slider;
+
+        public FloatReference currentValue = 0.5f;
+        public FloatReference maxValue = 1;
+        
+        private void Update() {
+            if(slider != null) {
+                slider.value = Mathf.Clamp01(currentValue / maxValue);
+            }
+        }
+    }
+}
