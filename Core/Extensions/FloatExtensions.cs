@@ -12,5 +12,9 @@ namespace Elarion.Extensions {
 		public static float Sign(this float value) {
 			return Mathf.Sign(value);
 		}
+
+		public static bool Approximately(this float value, float otherValue) {
+			return Mathf.Approximately(value, otherValue);
+		}
 	}
 }

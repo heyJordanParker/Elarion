@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using Elarion.Saved.Events.Listeners;
 using UnityEngine;
 
 namespace Elarion.Saved.Events {
@@ -13,7 +14,7 @@ namespace Elarion.Saved.Events {
         protected void Raise(TParameter value) {
             Event(value);
             
-            for(int i = _eventListeners.Count - 1; i >= 0; i--) {
+            for(int i = _eventListeners.Count - 1; i >= 0; --i) {
                 _eventListeners[i].OnEventRaised(value);
             }
         }

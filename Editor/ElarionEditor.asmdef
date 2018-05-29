@@ -1,0 +1,12 @@
+{
+    "name": "ElarionEditor",
+    "references": [
+        "Elarion",
+        "yaSingleton",
+        "yaSingletonEditor"
+    ],
+    "includePlatforms": [
+        "Editor"
+    ],
+    "excludePlatforms": []
+}

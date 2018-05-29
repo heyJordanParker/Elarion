@@ -50,7 +50,7 @@ namespace Elarion.Editor.UI.PropertyDrawers {
             inRect.width = rect.width - inRect.width;
 
             if(Attribute.minValueString == null || Mathf.RoundToInt(Attribute.minValue - min) != 0) {
-                min = EditorGUI.IntField(inRect, GUIContent.none, (int) min);
+                min = EditorGUI.FloatField(inRect, GUIContent.none, min);
             } else {
                 EditorGUI.LabelField(inRect, GUIContent.none, new GUIContent(Attribute.minValueString));
             }
@@ -68,7 +68,7 @@ namespace Elarion.Editor.UI.PropertyDrawers {
             inRect.width = rect.width - inRect.width;
 
             if(Attribute.maxValueString == null || Mathf.RoundToInt(Attribute.maxValue - max) != 0) {
-                max = EditorGUI.IntField(inRect, GUIContent.none, (int) max);
+                max = EditorGUI.FloatField(inRect, GUIContent.none, max);
             } else {
                 EditorGUI.LabelField(inRect, GUIContent.none, new GUIContent(Attribute.maxValueString));
             }

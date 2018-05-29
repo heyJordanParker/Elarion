@@ -1,7 +1,7 @@
 ﻿using UnityEngine;
 using UnityEngine.Events;
 
-namespace Elarion.Saved.Events {
+namespace Elarion.Saved.Events.Listeners {
     /// <summary>
     /// A generic template for building event listeners.
     /// </summary>

@@ -1,6 +1,8 @@
 {
     "name": "Elarion",
-    "references": [],
+    "references": [
+        "yaSingleton"
+    ],
     "includePlatforms": [],
     "excludePlatforms": []
 }

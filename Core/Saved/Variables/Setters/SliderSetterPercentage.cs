@@ -7,8 +7,8 @@ namespace Elarion.Saved.Variables.Setters {
     public class SliderSetterPercentage : MonoBehaviour {
         public Slider slider;
 
-        public FloatReference currentValue = 0.5f;
-        public FloatReference maxValue = 1;
+        public FloatReference currentValue = new FloatReference(0.5f);
+        public FloatReference maxValue = new FloatReference(1);
         
         private void Update() {
             if(slider != null) {

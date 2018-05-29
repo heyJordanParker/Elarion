@@ -1,7 +1,7 @@
 ﻿using UnityEngine;
 using UnityEngine.Events;
 
-namespace Elarion.Saved.Events {
+namespace Elarion.Saved.Events.Listeners {
     public class SimpleEventListener : MonoBehaviour {
         [SerializeField]
         private SimpleEvent _event;

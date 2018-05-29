@@ -3,7 +3,6 @@ using UnityEditor;
 using UnityEngine;
 
 namespace Elarion.Editor.Editors {
-    
     [CustomEditor(typeof(SimpleEvent))]
     public class EventEditor : UnityEditor.Editor {
 

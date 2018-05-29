@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using Elarion.Saved.Events;
+using Elarion.Saved.Events.Listeners;
 using UnityEngine;
 
 namespace Elarion.Saved.Variables.References {

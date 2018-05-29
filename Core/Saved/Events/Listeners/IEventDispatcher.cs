@@ -1,4 +1,4 @@
-﻿namespace Elarion.Saved.Events {
+﻿namespace Elarion.Saved.Events.Listeners {
     public interface IEventDispatcher<TParameter> {
         void AddListener(IEventListener<TParameter> listener);
 
