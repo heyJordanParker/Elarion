@@ -7,25 +7,24 @@ using UnityEngine.EventSystems;
 namespace Elarion.UI.Helpers {
     [UIComponentHelper]
     [RequireComponent(typeof(RectTransform))]
-    public class UIResizable : MonoBehaviour {
+    public class UIResizable : BaseUIBehaviour {
         
         // TODO the same clamping as in UI draggable (same inheritor)
 
         [SerializeField]
-        private bool _limitSize = false;
+        protected bool limitSize = false;
 
         [SerializeField]
-        [ConditionalVisibility("_limitSize")]
+        [ConditionalVisibility("limitSize")]
         private Vector2 _minSize = new Vector2(100, 100);
         
         [SerializeField]
-        [ConditionalVisibility("_limitSize")]
+        [ConditionalVisibility("limitSize")]
         private Vector2 _maxSize = new Vector2(1000, 1000);
 
         [Tooltip("Save the position if an animator is present.")]
         public bool savePosition = true;
         
-        private RectTransform _transform;
         private UIAnimator _animator;
 
         private ResizeDirection _resizeDirection;
@@ -33,8 +32,8 @@ namespace Elarion.UI.Helpers {
         public bool Resizing { get; private set; }
 
         public bool LimitSize {
-            get { return _limitSize; }
-            set { _limitSize = value; }
+            get { return limitSize; }
+            set { limitSize = value; }
         }
 
         public Vector2 MinSize {
@@ -47,8 +46,8 @@ namespace Elarion.UI.Helpers {
             set { _maxSize = value; }
         }
 
-        protected void Awake() {
-            _transform = GetComponent<RectTransform>();
+        protected override void Awake() {
+            base.Awake();
             _animator = GetComponent<UIAnimator>();
         }
 
@@ -86,7 +85,6 @@ namespace Elarion.UI.Helpers {
         }
 
         public void Resize(Vector2 amount) {
-
             float pivotX = 0.5f;
             float pivotY = 0.5f;
             
@@ -108,23 +106,23 @@ namespace Elarion.UI.Helpers {
                 resize.y = -amount.y;
             }
 
-            var width = _transform.sizeDelta.x + resize.x;
-            var height = _transform.sizeDelta.y + resize.y;
+            var width = Transform.sizeDelta.x + resize.x;
+            var height = Transform.sizeDelta.y + resize.y;
 
             if(LimitSize) {
                 width = Mathf.Clamp(width, MinSize.x, MaxSize.x);
                 height = Mathf.Clamp(height, MinSize.y, MaxSize.y);
             } 
 
-            var pivot = _transform.pivot;
+            var pivot = Transform.pivot;
             
-            _transform.SetPivot(new Vector2(pivotX, pivotY));
+            Transform.SetPivot(new Vector2(pivotX, pivotY));
             
-            _transform.SetSizeWithCurrentAnchors(RectTransform.Axis.Horizontal, width);
+            Transform.SetSizeWithCurrentAnchors(RectTransform.Axis.Horizontal, width);
             
-            _transform.SetSizeWithCurrentAnchors(RectTransform.Axis.Vertical, height);
+            Transform.SetSizeWithCurrentAnchors(RectTransform.Axis.Vertical, height);
             
-            _transform.SetPivot(pivot);
+            Transform.SetPivot(pivot);
         }
     }
 }

@@ -40,8 +40,6 @@ namespace Elarion.UI.Utils {
             }
         }
 
-        private Navigation _navigation;
-
         protected override void OnEnable() {
             Selectable.navigation = new Navigation() {
                     mode = (Navigation.Mode) _navigationMode,

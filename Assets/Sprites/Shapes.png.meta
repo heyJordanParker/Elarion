@@ -1,0 +1,1403 @@
+fileFormatVersion: 2
+guid: 82057886560ed4045aadfa70d8dac92c
+timeCreated: 1529450254
+licenseType: Free
+TextureImporter:
+  fileIDToRecycleName:
+    21300000: Rounded15
+    21300002: Rounded30
+    21300004: Rounded45
+    21300006: Rounded60
+    21300008: Rounded75
+    21300010: Rounded90
+    21300012: Circle
+    21300014: Rounded15_ShadowS
+    21300016: Rounded30_ShadowS
+    21300018: Rounded45_ShadowS
+    21300020: Rounded60_ShadowS
+    21300022: Rounded75_ShadowS
+    21300024: Shapes_12
+    21300026: Circle_ShadowS
+    21300028: Shapes_14
+    21300030: Shapes_15
+    21300032: Shapes_16
+    21300034: Shapes_17
+    21300036: Shapes_18
+    21300038: Shapes_19
+    21300040: Shapes_20
+    21300042: Shapes_21
+    21300044: Shapes_22
+    21300046: Shapes_23
+    21300048: Shapes_24
+    21300050: Shapes_25
+    21300052: Shapes_26
+    21300054: Shapes_27
+    21300056: Shapes_28
+    21300058: Shapes_29
+    21300060: Shapes_30
+    21300062: Shapes_31
+    21300064: Shapes_32
+    21300066: Shapes_33
+    21300068: Shapes_34
+    21300070: Shapes_35
+    21300072: Shapes_36
+    21300074: Shapes_37
+    21300076: Shapes_38
+    21300078: Shapes_39
+    21300080: Shapes_40
+    21300082: Shapes_41
+    21300084: Shapes_42
+    21300086: Shapes_43
+    21300088: Shapes_44
+    21300090: Shapes_45
+    21300092: Shapes_46
+    21300094: Shapes_47
+    21300096: Shapes_48
+    21300098: Pixel
+  externalObjects: {}
+  serializedVersion: 4
+  mipmaps:
+    mipMapMode: 0
+    enableMipMap: 0
+    sRGBTexture: 1
+    linearTexture: 0
+    fadeOut: 0
+    borderMipMap: 0
+    mipMapsPreserveCoverage: 0
+    alphaTestReferenceValue: 0.5
+    mipMapFadeDistanceStart: 1
+    mipMapFadeDistanceEnd: 3
+  bumpmap:
+    convertToNormalMap: 0
+    externalNormalMap: 0
+    heightScale: 0.25
+    normalMapFilter: 0
+  isReadable: 0
+  grayScaleToAlpha: 0
+  generateCubemap: 6
+  cubemapConvolution: 0
+  seamlessCubemap: 0
+  textureFormat: 1
+  maxTextureSize: 2048
+  textureSettings:
+    serializedVersion: 2
+    filterMode: -1
+    aniso: -1
+    mipBias: -1
+    wrapU: 1
+    wrapV: 1
+    wrapW: 1
+  nPOTScale: 0
+  lightmap: 0
+  compressionQuality: 50
+  spriteMode: 2
+  spriteExtrude: 1
+  spriteMeshType: 1
+  alignment: 0
+  spritePivot: {x: 0.5, y: 0.5}
+  spriteBorder: {x: 0, y: 0, z: 0, w: 0}
+  spritePixelsToUnits: 100
+  alphaUsage: 1
+  alphaIsTransparency: 1
+  spriteTessellationDetail: -1
+  textureType: 8
+  textureShape: 1
+  maxTextureSizeSet: 0
+  compressionQualitySet: 0
+  textureFormatSet: 0
+  platformSettings:
+  - buildTarget: DefaultTexturePlatform
+    maxTextureSize: 2048
+    resizeAlgorithm: 0
+    textureFormat: -1
+    textureCompression: 1
+    compressionQuality: 50
+    crunchedCompression: 0
+    allowsAlphaSplitting: 0
+    overridden: 0
+    androidETC2FallbackOverride: 0
+  - buildTarget: Standalone
+    maxTextureSize: 2048
+    resizeAlgorithm: 0
+    textureFormat: -1
+    textureCompression: 1
+    compressionQuality: 50
+    crunchedCompression: 0
+    allowsAlphaSplitting: 0
+    overridden: 0
+    androidETC2FallbackOverride: 0
+  - buildTarget: Android
+    maxTextureSize: 2048
+    resizeAlgorithm: 0
+    textureFormat: -1
+    textureCompression: 1
+    compressionQuality: 50
+    crunchedCompression: 0
+    allowsAlphaSplitting: 0
+    overridden: 0
+    androidETC2FallbackOverride: 0
+  - buildTarget: Windows Store Apps
+    maxTextureSize: 2048
+    resizeAlgorithm: 0
+    textureFormat: -1
+    textureCompression: 1
+    compressionQuality: 50
+    crunchedCompression: 0
+    allowsAlphaSplitting: 0
+    overridden: 0
+    androidETC2FallbackOverride: 0
+  - buildTarget: WebGL
+    maxTextureSize: 2048
+    resizeAlgorithm: 0
+    textureFormat: -1
+    textureCompression: 1
+    compressionQuality: 50
+    crunchedCompression: 0
+    allowsAlphaSplitting: 0
+    overridden: 0
+    androidETC2FallbackOverride: 0
+  spriteSheet:
+    serializedVersion: 2
+    sprites:
+    - serializedVersion: 2
+      name: Rounded15
+      rect:
+        serializedVersion: 2
+        x: 149
+        y: 3751
+        width: 300
+        height: 300
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 15, y: 15, z: 15, w: 15}
+      outline:
+      - - {x: -148.38869, y: 150}
+        - {x: -150, y: 149.85349}
+        - {x: -150, y: -149.56058}
+        - {x: 150, y: -149.56058}
+        - {x: 150, y: 150}
+      physicsShape: []
+      tessellationDetail: 0
+    - serializedVersion: 2
+      name: Rounded30
+      rect:
+        serializedVersion: 2
+        x: 600
+        y: 3600
+        width: 600
+        height: 600
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 250, y: 250, z: 250, w: 250}
+      outline:
+      - - {x: -152.63675, y: 157.7637}
+        - {x: -154.68753, y: 151.61136}
+        - {x: -154.68753, y: -151.90427}
+        - {x: -152.63675, y: -153.95505}
+        - {x: 157.03122, y: -153.95505}
+        - {x: 157.03122, y: 157.7637}
+      physicsShape: []
+      tessellationDetail: 0
+    - serializedVersion: 2
+      name: Rounded45
+      rect:
+        serializedVersion: 2
+        x: 1200
+        y: 3600
+        width: 600
+        height: 600
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 250, y: 250, z: 250, w: 250}
+      outline:
+      - - {x: 136.66985, y: 157.7637}
+        - {x: -123.77937, y: 157.7637}
+        - {x: -154.54109, y: 153.66214}
+        - {x: -154.54109, y: -139.59958}
+        - {x: -142.2364, y: -153.95505}
+        - {x: 136.66985, y: -153.95505}
+        - {x: 155.12688, y: -129.34567}
+        - {x: 155.12688, y: 139.30667}
+      physicsShape: []
+      tessellationDetail: 0
+    - serializedVersion: 2
+      name: Rounded60
+      rect:
+        serializedVersion: 2
+        x: 1800
+        y: 3600
+        width: 600
+        height: 600
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 250, y: 250, z: 250, w: 250}
+      outline:
+      - - {x: -129.78514, y: 157.7637}
+        - {x: -154.39452, y: 151.61136}
+        - {x: -154.39452, y: -143.70114}
+        - {x: -144.14061, y: -153.95505}
+        - {x: 157.32423, y: -153.95505}
+        - {x: 157.32423, y: 102.39262}
+        - {x: 155.27345, y: 129.05276}
+        - {x: 142.96877, y: 157.7637}
+      physicsShape: []
+      tessellationDetail: 0
+    - serializedVersion: 2
+      name: Rounded75
+      rect:
+        serializedVersion: 2
+        x: 2400
+        y: 3600
+        width: 600
+        height: 600
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 250, y: 250, z: 250, w: 250}
+      outline:
+      - - {x: -129.63881, y: 157.7637}
+        - {x: -154.24818, y: 143.40823}
+        - {x: -154.24818, y: -108.83785}
+        - {x: -143.99428, y: -153.95505}
+        - {x: 124.65806, y: -153.95505}
+        - {x: 155.41978, y: -141.65036}
+        - {x: 155.41978, y: 135.20511}
+        - {x: 151.31822, y: 157.7637}
+      physicsShape: []
+      tessellationDetail: 0
+    - serializedVersion: 2
+      name: Rounded90
+      rect:
+        serializedVersion: 2
+        x: 3000
+        y: 3600
+        width: 600
+        height: 600
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 250, y: 250, z: 250, w: 250}
+      outline:
+      - - {x: -143.84758, y: 157.7637}
+        - {x: -154.10149, y: 149.56058}
+        - {x: -154.10149, y: -139.59958}
+        - {x: -147.94914, y: -153.95505}
+        - {x: 102.24617, y: -153.95505}
+        - {x: 159.66805, y: -129.34567}
+        - {x: 159.66805, y: 94.18949}
+        - {x: 124.80476, y: 157.7637}
+      physicsShape: []
+      tessellationDetail: 0
+    - serializedVersion: 2
+      name: Circle
+      rect:
+        serializedVersion: 2
+        x: 3600
+        y: 3600
+        width: 600
+        height: 600
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline:
+      - - {x: 81.8848, y: 157.7637}
+        - {x: -92.4316, y: 157.7637}
+        - {x: -153.95505, y: 100.341835}
+        - {x: -153.95505, y: -80.126915}
+        - {x: -104.73629, y: -153.95505}
+        - {x: 104.4434, y: -153.95505}
+        - {x: 157.7637, y: -61.669888}
+        - {x: 157.7637, y: 55.224648}
+        - {x: 114.6973, y: 151.61136}
+      physicsShape: []
+      tessellationDetail: 0
+    - serializedVersion: 2
+      name: Rounded15_ShadowS
+      rect:
+        serializedVersion: 2
+        x: 0
+        y: 3000
+        width: 600
+        height: 600
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 250, y: 250, z: 250, w: 250}
+      outline:
+      - - {x: -204.05273, y: 249.90242}
+        - {x: -247.11914, y: 219.1407}
+        - {x: -247.11914, y: -209.47258}
+        - {x: -214.30664, y: -250.4882}
+        - {x: 204.05273, y: -250.4882}
+        - {x: 245.06836, y: -234.08195}
+        - {x: 245.06836, y: 249.90242}
+      - - {x: -142.5293, y: -135.64445}
+        - {x: -142.5293, y: 139.16023}
+        - {x: 142.5293, y: 139.16023}
+        - {x: 136.37695, y: -137.69524}
+      physicsShape: []
+      tessellationDetail: 0
+    - serializedVersion: 2
+      name: Rounded30_ShadowS
+      rect:
+        serializedVersion: 2
+        x: 600
+        y: 3000
+        width: 600
+        height: 600
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 250, y: 250, z: 250, w: 250}
+      outline:
+      - - {x: -220.31253, y: 249.90242}
+        - {x: -242.87114, y: 221.19148}
+        - {x: -246.9727, y: 163.7696}
+        - {x: -246.9727, y: -197.1679}
+        - {x: -216.21097, y: -250.4882}
+        - {x: 253.41794, y: -250.4882}
+        - {x: 253.41794, y: 249.90242}
+      - - {x: -130.07816, y: 139.16023}
+        - {x: 142.67575, y: 128.90633}
+        - {x: 128.32028, y: -139.74602}
+        - {x: -123.92582, y: -137.69524}
+      physicsShape: []
+      tessellationDetail: 0
+    - serializedVersion: 2
+      name: Rounded45_ShadowS
+      rect:
+        serializedVersion: 2
+        x: 1200
+        y: 3000
+        width: 600
+        height: 600
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 250, y: 250, z: 250, w: 250}
+      outline:
+      - - {x: -248.87703, y: 249.90242}
+        - {x: -248.87703, y: -250.4882}
+        - {x: 169.48235, y: -250.4882}
+        - {x: 251.5136, y: -236.13274}
+        - {x: 251.5136, y: 249.90242}
+      - - {x: -140.18562, y: -108.98431}
+        - {x: 124.365166, y: 137.10945}
+        - {x: 140.77141, y: -102.83196}
+        - {x: 112.06048, y: -137.69524}
+      physicsShape: []
+      tessellationDetail: 0
+    - serializedVersion: 2
+      name: Rounded60_ShadowS
+      rect:
+        serializedVersion: 2
+        x: 1800
+        y: 3000
+        width: 600
+        height: 600
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 250, y: 250, z: 250, w: 250}
+      outline:
+      - - {x: 204.4922, y: 249.90242}
+        - {x: -226.17186, y: 249.90242}
+        - {x: -248.73045, y: 241.6993}
+        - {x: -248.73045, y: -250.4882}
+        - {x: 79.39455, y: -250.4882}
+        - {x: 188.08595, y: -244.33586}
+        - {x: 251.66017, y: -197.1679}
+        - {x: 251.66017, y: 184.27742}
+      - - {x: -140.03905, y: -98.7304}
+        - {x: -43.652325, y: 143.2618}
+        - {x: 140.91798, y: 106.34773}
+        - {x: 101.95314, y: -139.74602}
+      physicsShape: []
+      tessellationDetail: 0
+    - serializedVersion: 2
+      name: Rounded75_ShadowS
+      rect:
+        serializedVersion: 2
+        x: 2400
+        y: 3000
+        width: 600
+        height: 600
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 250, y: 250, z: 250, w: 250}
+      outline:
+      - - {x: -232.17789, y: 249.90242}
+        - {x: -250.63492, y: 221.19148}
+        - {x: -250.63492, y: -197.1679}
+        - {x: -178.85757, y: -250.4882}
+        - {x: 177.97838, y: -250.4882}
+        - {x: 249.75572, y: -182.81242}
+        - {x: 249.75572, y: 237.59773}
+        - {x: 196.43541, y: 249.90242}
+      - - {x: -139.89272, y: -78.22259}
+        - {x: -88.62319, y: 141.21101}
+        - {x: 116.45493, y: 130.9571}
+        - {x: 141.06432, y: -84.37493}
+      physicsShape: []
+      tessellationDetail: 0
+    - serializedVersion: 2
+      name: Shapes_12
+      rect:
+        serializedVersion: 2
+        x: 3000
+        y: 3000
+        width: 600
+        height: 600
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 250, y: 250, z: 250, w: 250}
+      outline:
+      - - {x: -250.4882, y: 249.90242}
+        - {x: -250.4882, y: -225.87883}
+        - {x: -156.15227, y: -250.4882}
+        - {x: 231.44539, y: -250.4882}
+        - {x: 245.80086, y: -238.18352}
+        - {x: 249.90242, y: -227.92961}
+        - {x: 249.90242, y: 249.90242}
+      - - {x: -125.39056, y: -98.7304}
+        - {x: -59.765553, y: 141.21101}
+        - {x: 141.21101, y: -59.765553}
+        - {x: 73.535225, y: -135.64445}
+      physicsShape: []
+      tessellationDetail: 0
+    - serializedVersion: 2
+      name: Circle_ShadowS
+      rect:
+        serializedVersion: 2
+        x: 3600
+        y: 3000
+        width: 600
+        height: 600
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline:
+      - - {x: -153.95505, y: 249.90242}
+        - {x: -244.18942, y: 149.41414}
+        - {x: -244.18942, y: -232.03117}
+        - {x: -201.12302, y: -242.28508}
+        - {x: 247.9981, y: -242.28508}
+        - {x: 247.9981, y: 249.90242}
+      - - {x: -100.63473, y: -88.476494}
+        - {x: -110.88863, y: 89.94148}
+        - {x: 114.6973, y: 83.78913}
+        - {x: 75.73246, y: -119.23821}
+      physicsShape: []
+      tessellationDetail: 0
+    - serializedVersion: 2
+      name: Shapes_14
+      rect:
+        serializedVersion: 2
+        x: 0
+        y: 2400
+        width: 600
+        height: 600
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline:
+      - - {x: 236.86523, y: 298.97446}
+        - {x: -296.3379, y: 298.97446}
+        - {x: -296.3379, y: -299.85367}
+        - {x: 294.2871, y: -299.85367}
+        - {x: 294.2871, y: 225.14635}
+        - {x: 249.16992, y: 284.619}
+      - - {x: -142.5293, y: -137.84193}
+        - {x: -138.42773, y: 143.1151}
+        - {x: 136.37695, y: 143.1151}
+        - {x: 136.37695, y: -139.89272}
+      physicsShape: []
+      tessellationDetail: 0
+    - serializedVersion: 2
+      name: Shapes_15
+      rect:
+        serializedVersion: 2
+        x: 600
+        y: 2400
+        width: 600
+        height: 600
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline:
+      - - {x: -279.7852, y: 298.97446}
+        - {x: -296.19144, y: 280.51743}
+        - {x: -296.19144, y: -299.85367}
+        - {x: 282.12888, y: -299.85367}
+        - {x: 294.43356, y: -221.92398}
+        - {x: 294.43356, y: 298.97446}
+      - - {x: -119.82426, y: 139.01353}
+        - {x: 128.32028, y: 141.06432}
+        - {x: 142.67575, y: -125.537254}
+        - {x: -123.92582, y: -139.89272}
+      physicsShape: []
+      tessellationDetail: 0
+    - serializedVersion: 2
+      name: Shapes_16
+      rect:
+        serializedVersion: 2
+        x: 1200
+        y: 2400
+        width: 600
+        height: 600
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline:
+      - - {x: -298.09576, y: 298.97446}
+        - {x: -298.09576, y: -295.7521}
+        - {x: -285.79108, y: -299.85367}
+        - {x: 292.52924, y: -299.85367}
+        - {x: 292.52924, y: 298.97446}
+      - - {x: -119.67781, y: -137.84193}
+        - {x: -136.08406, y: 122.60728}
+        - {x: 112.06048, y: 139.01353}
+        - {x: 107.958916, y: -141.9435}
+      physicsShape: []
+      tessellationDetail: 0
+    - serializedVersion: 2
+      name: Shapes_17
+      rect:
+        serializedVersion: 2
+        x: 1800
+        y: 2400
+        width: 600
+        height: 600
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline:
+      - - {x: -285.64453, y: 298.97446}
+        - {x: -289.7461, y: 272.3143}
+        - {x: -289.7461, y: -279.34586}
+        - {x: -258.98438, y: -299.85367}
+        - {x: 284.4727, y: -299.85367}
+        - {x: 292.6758, y: -281.39664}
+        - {x: 292.6758, y: 231.29869}
+        - {x: 282.4219, y: 298.97446}
+      - - {x: -140.03905, y: -100.92788}
+        - {x: -99.02342, y: 141.06432}
+        - {x: 142.96877, y: 102.099464}
+        - {x: 95.8008, y: -141.9435}
+      physicsShape: []
+      tessellationDetail: 0
+    - serializedVersion: 2
+      name: Shapes_18
+      rect:
+        serializedVersion: 2
+        x: 2400
+        y: 2400
+        width: 600
+        height: 600
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline:
+      - - {x: -291.65054, y: 298.97446}
+        - {x: -291.65054, y: -178.85757}
+        - {x: -271.14273, y: -299.85367}
+        - {x: 249.75572, y: -299.85367}
+        - {x: 298.97446, y: -197.3146}
+        - {x: 298.97446, y: 298.97446}
+      - - {x: -139.89272, y: -80.42007}
+        - {x: -86.57241, y: 141.06432}
+        - {x: 141.06432, y: 87.743996}
+        - {x: 81.59165, y: -139.89272}
+      physicsShape: []
+      tessellationDetail: 0
+    - serializedVersion: 2
+      name: Shapes_19
+      rect:
+        serializedVersion: 2
+        x: 3000
+        y: 2400
+        width: 600
+        height: 600
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline:
+      - - {x: -158.20305, y: 290.77133}
+        - {x: -229.9804, y: 268.21274}
+        - {x: -291.50385, y: 214.89244}
+        - {x: -291.50385, y: -252.6857}
+        - {x: -258.69135, y: -299.85367}
+        - {x: 278.61334, y: -299.85367}
+        - {x: 299.12115, y: -232.17789}
+        - {x: 299.12115, y: 206.68932}
+        - {x: 245.80086, y: 290.77133}
+      - - {x: -137.69524, y: -76.318504}
+        - {x: -104.882744, y: 126.70884}
+        - {x: 75.586006, y: 141.06432}
+        - {x: 67.38288, y: -139.89272}
+      physicsShape: []
+      tessellationDetail: 0
+    - serializedVersion: 2
+      name: Shapes_20
+      rect:
+        serializedVersion: 2
+        x: 3600
+        y: 2400
+        width: 600
+        height: 600
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline:
+      - - {x: -268.7988, y: 290.77133}
+        - {x: -285.20505, y: 268.21274}
+        - {x: -285.20505, y: -211.67007}
+        - {x: -254.44333, y: -299.85367}
+        - {x: 258.25198, y: -299.85367}
+        - {x: 289.0137, y: -156.29897}
+        - {x: 289.0137, y: 288.72055}
+        - {x: 276.709, y: 290.77133}
+      - - {x: -106.78707, y: 87.743996}
+        - {x: 141.35745, y: 18.017435}
+        - {x: 110.59574, y: -90.67397}
+        - {x: -8.349574, y: -139.89272}
+      physicsShape: []
+      tessellationDetail: 0
+    - serializedVersion: 2
+      name: Shapes_21
+      rect:
+        serializedVersion: 2
+        x: 0
+        y: 1800
+        width: 600
+        height: 600
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline:
+      - - {x: -300, y: 300}
+        - {x: -300, y: -300}
+        - {x: 300, y: -300}
+        - {x: 300, y: 300}
+      - - {x: -142.5293, y: 140.91798}
+        - {x: 140.47852, y: 138.8672}
+        - {x: 136.37695, y: -137.98827}
+        - {x: -140.47852, y: -137.98827}
+      physicsShape: []
+      tessellationDetail: 0
+    - serializedVersion: 2
+      name: Shapes_22
+      rect:
+        serializedVersion: 2
+        x: 600
+        y: 1800
+        width: 600
+        height: 600
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline:
+      - - {x: -294.14066, y: 300}
+        - {x: -300, y: 300}
+        - {x: -300, y: -297.94922}
+        - {x: -294.14066, y: -300}
+        - {x: 300, y: -300}
+        - {x: 300, y: 300}
+      - - {x: -138.28128, y: -78.51561}
+        - {x: -125.9766, y: 142.96877}
+        - {x: 140.62497, y: 130.66408}
+        - {x: 126.26949, y: -137.98827}
+      physicsShape: []
+      tessellationDetail: 0
+    - serializedVersion: 2
+      name: Shapes_23
+      rect:
+        serializedVersion: 2
+        x: 1200
+        y: 1800
+        width: 600
+        height: 600
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline:
+      - - {x: -300, y: 300}
+        - {x: -300, y: -300}
+        - {x: 300, y: -300}
+        - {x: 300, y: 300}
+      - - {x: -140.18562, y: -109.27733}
+        - {x: -113.52547, y: 140.91798}
+        - {x: 138.72063, y: 110.156265}
+        - {x: 112.06048, y: -140.03905}
+      physicsShape: []
+      tessellationDetail: 0
+    - serializedVersion: 2
+      name: Shapes_24
+      rect:
+        serializedVersion: 2
+        x: 1800
+        y: 1800
+        width: 600
+        height: 600
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline:
+      - - {x: -300, y: 300}
+        - {x: -300, y: -300}
+        - {x: 300, y: -300}
+        - {x: 300, y: 300}
+      - - {x: -137.98827, y: -96.97264}
+        - {x: -96.97264, y: 142.96877}
+        - {x: 142.96877, y: 99.90236}
+        - {x: 104.00392, y: -137.98827}
+      physicsShape: []
+      tessellationDetail: 0
+    - serializedVersion: 2
+      name: Shapes_25
+      rect:
+        serializedVersion: 2
+        x: 2400
+        y: 1800
+        width: 600
+        height: 600
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline:
+      - - {x: -299.85367, y: 300}
+        - {x: -299.85367, y: -300}
+        - {x: 300, y: -300}
+        - {x: 300, y: 300}
+      - - {x: -139.89272, y: -80.56639}
+        - {x: -86.57241, y: 142.96877}
+        - {x: 143.1151, y: 87.59767}
+        - {x: 89.79478, y: -137.98827}
+      physicsShape: []
+      tessellationDetail: 0
+    - serializedVersion: 2
+      name: Shapes_26
+      rect:
+        serializedVersion: 2
+        x: 3000
+        y: 1800
+        width: 600
+        height: 600
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline:
+      - - {x: -289.45306, y: 300}
+        - {x: -299.70697, y: 278.32034}
+        - {x: -299.70697, y: -265.13672}
+        - {x: -258.69135, y: -300}
+        - {x: 270.41022, y: -300}
+        - {x: 300, y: -261.03516}
+        - {x: 300, y: 300}
+        - {x: 288.86725, y: 300}
+      - - {x: -139.74602, y: -74.41405}
+        - {x: -74.121025, y: 140.91798}
+        - {x: 124.80476, y: 112.207054}
+        - {x: 139.16023, y: -76.46483}
+      physicsShape: []
+      tessellationDetail: 0
+    - serializedVersion: 2
+      name: Shapes_27
+      rect:
+        serializedVersion: 2
+        x: 3600
+        y: 1800
+        width: 600
+        height: 600
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline:
+      - - {x: -274.95114, y: 300}
+        - {x: -299.56052, y: 298.82816}
+        - {x: -299.56052, y: -248.73045}
+        - {x: -244.18942, y: -300}
+        - {x: 293.11526, y: -300}
+        - {x: 300, y: -228.22264}
+        - {x: 300, y: 298.82816}
+        - {x: 299.2676, y: 300}
+      - - {x: -108.83785, y: -88.769516}
+        - {x: -117.04098, y: -74.41405}
+        - {x: -73.97457, y: 122.46096}
+        - {x: 133.15433, y: 50.683613}
+      physicsShape: []
+      tessellationDetail: 0
+    - serializedVersion: 2
+      name: Shapes_28
+      rect:
+        serializedVersion: 2
+        x: 0
+        y: 1200
+        width: 600
+        height: 600
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline:
+      - - {x: -160.98633, y: 173.58391}
+        - {x: -173.29102, y: 159.22844}
+        - {x: -173.29102, y: -172.99812}
+        - {x: 154.83398, y: -172.99812}
+        - {x: 171.24023, y: -156.59187}
+        - {x: 171.24023, y: 161.27922}
+        - {x: 156.88477, y: 173.58391}
+      - - {x: -142.5293, y: 138.72063}
+        - {x: 142.5293, y: 136.66985}
+        - {x: 138.42773, y: -131.9825}
+        - {x: -136.37695, y: -138.13484}
+      - - {x: -279.93164, y: 300}
+        - {x: -279.93164, y: 265.86908}
+        - {x: -224.56055, y: 259.71674}
+        - {x: 261.4746, y: 259.71674}
+        - {x: 286.08398, y: 284.3261}
+        - {x: 286.08398, y: 300}
+      physicsShape: []
+      tessellationDetail: 0
+    - serializedVersion: 2
+      name: Shapes_29
+      rect:
+        serializedVersion: 2
+        x: 600
+        y: 1200
+        width: 600
+        height: 600
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline:
+      - - {x: 179.58981, y: 124.365166}
+        - {x: 177.53903, y: 169.48235}
+        - {x: 171.38669, y: 177.68547}
+        - {x: -173.14456, y: 177.68547}
+        - {x: -173.14456, y: -138.13484}
+        - {x: -171.09378, y: -156.59187}
+        - {x: -146.4844, y: -172.99812}
+        - {x: 136.5234, y: -172.99812}
+        - {x: 142.67575, y: -170.94734}
+        - {x: 150.87888, y: -166.84578}
+        - {x: 179.58981, y: -144.28719}
+      - - {x: -140.33206, y: -117.62703}
+        - {x: -117.773476, y: 140.77141}
+        - {x: 142.67575, y: 124.365166}
+        - {x: -115.722694, y: -140.18562}
+      - - {x: -279.7852, y: 300}
+        - {x: -279.7852, y: 284.3261}
+        - {x: -212.1094, y: 259.71674}
+        - {x: 247.2656, y: 259.71674}
+        - {x: 278.0273, y: 288.42767}
+        - {x: 278.0273, y: 300}
+      physicsShape: []
+      tessellationDetail: 0
+    - serializedVersion: 2
+      name: Shapes_30
+      rect:
+        serializedVersion: 2
+        x: 1200
+        y: 1200
+        width: 600
+        height: 600
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline:
+      - - {x: -156.59187, y: 177.68547}
+        - {x: -172.99812, y: 173.58391}
+        - {x: -172.99812, y: -172.99812}
+        - {x: 177.68547, y: -172.99812}
+        - {x: 177.68547, y: 177.68547}
+      - - {x: -142.2364, y: -101.22078}
+        - {x: -107.37312, y: 142.82219}
+        - {x: 142.82219, y: 105.908134}
+        - {x: 105.908134, y: -140.18562}
+      - - {x: -273.4864, y: 300}
+        - {x: -273.4864, y: 282.27533}
+        - {x: -203.75984, y: 259.71674}
+        - {x: 155.12688, y: 259.71674}
+        - {x: 235.10735, y: 267.91986}
+        - {x: 267.91986, y: 290.47845}
+        - {x: 267.91986, y: 300}
+      physicsShape: []
+      tessellationDetail: 0
+    - serializedVersion: 2
+      name: Shapes_31
+      rect:
+        serializedVersion: 2
+        x: 1800
+        y: 1200
+        width: 600
+        height: 600
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline:
+      - - {x: -174.90233, y: 173.58391}
+        - {x: -174.90233, y: -172.99812}
+        - {x: 145.01955, y: -172.99812}
+        - {x: 177.83205, y: -168.89656}
+        - {x: 177.83205, y: 144.87297}
+        - {x: 145.01955, y: 173.58391}
+      - - {x: -140.03905, y: -101.22078}
+        - {x: -92.87108, y: 140.77141}
+        - {x: 140.91798, y: 103.85735}
+        - {x: 73.2422, y: -138.13484}
+      - - {x: -256.9336, y: 300}
+        - {x: -256.9336, y: 274.0722}
+        - {x: -193.35936, y: 259.71674}
+        - {x: 237.3047, y: 259.71674}
+        - {x: 259.8633, y: 272.02142}
+        - {x: 259.8633, y: 300}
+      physicsShape: []
+      tessellationDetail: 0
+    - serializedVersion: 2
+      name: Shapes_32
+      rect:
+        serializedVersion: 2
+        x: 2400
+        y: 1200
+        width: 600
+        height: 600
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline:
+      - - {x: 130.81041, y: 177.68547}
+        - {x: -84.52163, y: 177.68547}
+        - {x: -176.80678, y: 163.33}
+        - {x: -176.80678, y: -123.77937}
+        - {x: -135.79115, y: -172.99812}
+        - {x: 126.70884, y: -172.99812}
+        - {x: 171.82603, y: -144.28719}
+        - {x: 173.87682, y: -125.830154}
+        - {x: 173.87682, y: 134.61906}
+      - - {x: -139.89272, y: -76.6114}
+        - {x: -127.588036, y: 112.06048}
+        - {x: 79.54087, y: 138.72063}
+        - {x: 83.64243, y: -142.2364}
+      - - {x: -250.63492, y: 300}
+        - {x: -250.63492, y: 276.123}
+        - {x: -248.58414, y: 259.71674}
+        - {x: 237.45103, y: 259.71674}
+        - {x: 249.75572, y: 282.27533}
+        - {x: 249.75572, y: 300}
+      physicsShape: []
+      tessellationDetail: 0
+    - serializedVersion: 2
+      name: Shapes_33
+      rect:
+        serializedVersion: 2
+        x: 3000
+        y: 1200
+        width: 600
+        height: 600
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline:
+      - - {x: -119.23821, y: 177.68547}
+        - {x: -176.66008, y: 130.5175}
+        - {x: -176.66008, y: -175.0489}
+        - {x: 155.56648, y: -175.0489}
+        - {x: 176.0743, y: -109.423904}
+        - {x: 176.0743, y: 161.27922}
+        - {x: 139.16023, y: 177.68547}
+      - - {x: -137.69524, y: -74.560616}
+        - {x: -65.9179, y: 140.77141}
+        - {x: 143.2618, y: 62.841724}
+        - {x: 104.29695, y: -129.93172}
+      - - {x: -242.28508, y: 300}
+        - {x: -242.28508, y: 288.42767}
+        - {x: -232.03117, y: 263.8183}
+        - {x: -184.8632, y: 259.71674}
+        - {x: 167.87117, y: 259.71674}
+        - {x: 241.6993, y: 286.3769}
+        - {x: 241.6993, y: 300}
+      physicsShape: []
+      tessellationDetail: 0
+    - serializedVersion: 2
+      name: Shapes_34
+      rect:
+        serializedVersion: 2
+        x: 3600
+        y: 1200
+        width: 600
+        height: 600
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline:
+      - - {x: -106.78707, y: 177.68547}
+        - {x: -170.3613, y: 163.33}
+        - {x: -170.3613, y: -80.71296}
+        - {x: -110.88863, y: -168.89656}
+        - {x: -92.4316, y: -172.99812}
+        - {x: 122.90043, y: -172.99812}
+        - {x: 174.16995, y: -95.068436}
+        - {x: 174.16995, y: 167.43156}
+        - {x: 168.01761, y: 177.68547}
+      - - {x: -106.78707, y: -93.017654}
+        - {x: -135.49802, y: 25.927664}
+        - {x: -24.755823, y: 138.72063}
+        - {x: 88.03715, y: -109.423904}
+      - - {x: -203.1738, y: 300}
+        - {x: -203.1738, y: 267.91986}
+        - {x: 184.42386, y: 267.91986}
+        - {x: 198.77933, y: 290.47845}
+        - {x: 198.77933, y: 300}
+      physicsShape: []
+      tessellationDetail: 0
+    - serializedVersion: 2
+      name: Shapes_35
+      rect:
+        serializedVersion: 2
+        x: 0
+        y: 600
+        width: 600
+        height: 600
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline:
+      - - {x: -156.88477, y: 157.03122}
+        - {x: -156.88477, y: -150.58597}
+        - {x: -154.83398, y: -154.68753}
+        - {x: 154.83398, y: -154.68753}
+        - {x: 154.83398, y: 157.03122}
+      - - {x: -115.86914, y: 116.01559}
+        - {x: -111.76758, y: 111.914024}
+        - {x: 109.7168, y: 111.914024}
+      physicsShape: []
+      tessellationDetail: 0
+    - serializedVersion: 2
+      name: Shapes_36
+      rect:
+        serializedVersion: 2
+        x: 600
+        y: 600
+        width: 600
+        height: 600
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline:
+      - - {x: -140.33206, y: 157.03122}
+        - {x: -154.68753, y: 136.5234}
+        - {x: -154.68753, y: -140.33206}
+        - {x: -146.4844, y: -154.68753}
+        - {x: 134.47263, y: -154.68753}
+        - {x: 157.03122, y: -152.63675}
+        - {x: 157.03122, y: 138.57419}
+        - {x: 136.5234, y: 157.03122}
+      - - {x: -103.41801, y: -109.57035}
+        - {x: -113.67191, y: 101.66012}
+        - {x: 93.45699, y: 111.914024}
+        - {x: 111.914024, y: -111.62113}
+      physicsShape: []
+      tessellationDetail: 0
+    - serializedVersion: 2
+      name: Shapes_37
+      rect:
+        serializedVersion: 2
+        x: 1200
+        y: 600
+        width: 600
+        height: 600
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline:
+      - - {x: -156.59187, y: 157.03122}
+        - {x: -156.59187, y: -156.73831}
+        - {x: 155.12688, y: -156.73831}
+        - {x: 155.12688, y: 157.03122}
+      - - {x: -113.52547, y: -99.316444}
+        - {x: -115.57625, y: 105.76168}
+        - {x: 105.908134, y: 99.60934}
+        - {x: 105.908134, y: -113.67191}
+      physicsShape: []
+      tessellationDetail: 0
+    - serializedVersion: 2
+      name: Shapes_38
+      rect:
+        serializedVersion: 2
+        x: 1800
+        y: 600
+        width: 600
+        height: 600
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline:
+      - - {x: 138.8672, y: 157.03122}
+        - {x: -154.39452, y: 157.03122}
+        - {x: -154.39452, y: -156.73831}
+        - {x: 116.30862, y: -156.73831}
+        - {x: 157.32423, y: -128.02737}
+        - {x: 157.32423, y: 116.01559}
+        - {x: 153.22267, y: 154.98044}
+      - - {x: -107.22655, y: 85.25387}
+        - {x: 114.257835, y: 74.99996}
+        - {x: 93.750015, y: -109.57035}
+        - {x: -90.8203, y: -107.51957}
+      physicsShape: []
+      tessellationDetail: 0
+    - serializedVersion: 2
+      name: Shapes_39
+      rect:
+        serializedVersion: 2
+        x: 2400
+        y: 600
+        width: 600
+        height: 600
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline:
+      - - {x: -111.181786, y: 157.03122}
+        - {x: -154.24818, y: 148.8281}
+        - {x: -154.24818, y: -123.92582}
+        - {x: -131.68959, y: -156.73831}
+        - {x: 114.40415, y: -156.73831}
+        - {x: 157.47057, y: -146.4844}
+        - {x: 157.47057, y: 122.16793}
+        - {x: 136.96275, y: 157.03122}
+      - - {x: -82.47085, y: -105.46879}
+        - {x: -109.131004, y: 77.05074}
+        - {x: 114.40415, y: 81.152306}
+        - {x: 79.54087, y: -105.46879}
+      physicsShape: []
+      tessellationDetail: 0
+    - serializedVersion: 2
+      name: Shapes_40
+      rect:
+        serializedVersion: 2
+        x: 3000
+        y: 600
+        width: 600
+        height: 600
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline:
+      - - {x: -119.23821, y: 157.03122}
+        - {x: -154.10149, y: 103.7109}
+        - {x: -154.10149, y: -152.63675}
+        - {x: -137.69524, y: -156.73831}
+        - {x: 145.31258, y: -156.73831}
+        - {x: 159.66805, y: -109.57035}
+        - {x: 159.66805, y: 120.11715}
+        - {x: 104.29695, y: 157.03122}
+      - - {x: -82.32415, y: -105.46879}
+        - {x: -86.42571, y: 103.7109}
+        - {x: 116.60164, y: 74.99996}
+        - {x: 65.3321, y: -111.62113}
+      physicsShape: []
+      tessellationDetail: 0
+    - serializedVersion: 2
+      name: Shapes_41
+      rect:
+        serializedVersion: 2
+        x: 3600
+        y: 600
+        width: 600
+        height: 600
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline:
+      - - {x: -114.9902, y: 157.03122}
+        - {x: -153.95505, y: 97.558556}
+        - {x: -153.95505, y: -119.82426}
+        - {x: -94.48238, y: -156.73831}
+        - {x: 102.39262, y: -156.73831}
+        - {x: 157.7637, y: -103.41801}
+        - {x: 157.7637, y: 103.7109}
+        - {x: 133.15433, y: 157.03122}
+      - - {x: -16.552698, y: -103.41801}
+        - {x: -30.908167, y: 109.86324}
+        - {x: 110.59574, y: 23.730433}
+        - {x: 12.158239, y: -109.57035}
+      physicsShape: []
+      tessellationDetail: 0
+    - serializedVersion: 2
+      name: Shapes_42
+      rect:
+        serializedVersion: 2
+        x: 0
+        y: 0
+        width: 600
+        height: 600
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline:
+      - - {x: -165.08789, y: 154.83398}
+        - {x: -165.08789, y: -177.39258}
+        - {x: 171.24023, y: -177.39258}
+        - {x: 171.24023, y: 154.83398}
+      physicsShape: []
+      tessellationDetail: 0
+    - serializedVersion: 2
+      name: Shapes_43
+      rect:
+        serializedVersion: 2
+        x: 600
+        y: 0
+        width: 600
+        height: 600
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline:
+      - - {x: -154.68753, y: 146.63086}
+        - {x: -164.94144, y: 142.5293}
+        - {x: -164.94144, y: -158.93555}
+        - {x: -142.38284, y: -177.39258}
+        - {x: 171.38669, y: -177.39258}
+        - {x: 171.38669, y: 146.63086}
+      physicsShape: []
+      tessellationDetail: 0
+    - serializedVersion: 2
+      name: Shapes_44
+      rect:
+        serializedVersion: 2
+        x: 1200
+        y: 0
+        width: 600
+        height: 600
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline:
+      - - {x: -164.795, y: 146.63086}
+        - {x: -164.795, y: -167.13867}
+        - {x: -162.74422, y: -177.39258}
+        - {x: 153.0761, y: -177.39258}
+        - {x: 165.38078, y: -167.13867}
+        - {x: 165.38078, y: 122.021484}
+        - {x: 163.33, y: 146.63086}
+      physicsShape: []
+      tessellationDetail: 0
+    - serializedVersion: 2
+      name: Shapes_45
+      rect:
+        serializedVersion: 2
+        x: 1800
+        y: 0
+        width: 600
+        height: 600
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline:
+      - - {x: 124.51174, y: 146.63086}
+        - {x: 118.3594, y: 144.58008}
+        - {x: 120.41018, y: 134.32617}
+        - {x: -49.80467, y: 146.63086}
+        - {x: -137.98827, y: 146.63086}
+        - {x: -164.64842, y: 117.91992}
+        - {x: -164.64842, y: -148.68164}
+        - {x: -135.93748, y: -167.13867}
+        - {x: -111.32811, y: -177.39258}
+        - {x: 132.71486, y: -177.39258}
+        - {x: 167.57814, y: -138.42773}
+        - {x: 167.57814, y: 115.86914}
+        - {x: 140.91798, y: 146.63086}
+      physicsShape: []
+      tessellationDetail: 0
+    - serializedVersion: 2
+      name: Shapes_46
+      rect:
+        serializedVersion: 2
+        x: 2400
+        y: 0
+        width: 600
+        height: 600
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline:
+      - - {x: -168.60365, y: 146.63086}
+        - {x: -168.60365, y: -156.88477}
+        - {x: -125.537254, y: -177.39258}
+        - {x: 151.31822, y: -177.39258}
+        - {x: 167.72447, y: -165.08789}
+        - {x: 167.72447, y: 111.76758}
+        - {x: 159.52135, y: 146.63086}
+      physicsShape: []
+      tessellationDetail: 0
+    - serializedVersion: 2
+      name: Shapes_47
+      rect:
+        serializedVersion: 2
+        x: 3000
+        y: 0
+        width: 600
+        height: 600
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline:
+      - - {x: 112.50008, y: 138.42773}
+        - {x: 108.39851, y: 124.072266}
+        - {x: 26.36726, y: 138.42773}
+        - {x: -143.84758, y: 138.42773}
+        - {x: -164.3554, y: 130.22461}
+        - {x: -164.3554, y: -154.83398}
+        - {x: -135.64445, y: -175.3418}
+        - {x: -92.57806, y: -181.49414}
+        - {x: 118.65242, y: -181.49414}
+        - {x: 167.87117, y: -126.12305}
+        - {x: 167.87117, y: 97.41211}
+        - {x: 159.66805, y: 138.42773}
+      physicsShape: []
+      tessellationDetail: 0
+    - serializedVersion: 2
+      name: Shapes_48
+      rect:
+        serializedVersion: 2
+        x: 3600
+        y: 0
+        width: 600
+        height: 600
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline:
+      - - {x: 102.39262, y: 130.22461}
+        - {x: 79.83402, y: 130.22461}
+        - {x: 81.8848, y: 115.86914}
+        - {x: 110.59574, y: 87.1582}
+        - {x: -35.00973, y: 130.22461}
+        - {x: -112.939415, y: 130.22461}
+        - {x: -162.15817, y: 105.615234}
+        - {x: -162.15817, y: -109.7168}
+        - {x: -133.44724, y: -177.39258}
+        - {x: 133.15433, y: -177.39258}
+        - {x: 165.96683, y: -81.00586}
+        - {x: 165.96683, y: 66.65039}
+        - {x: 133.15433, y: 109.7168}
+      physicsShape: []
+      tessellationDetail: 0
+    - serializedVersion: 2
+      name: Pixel
+      rect:
+        serializedVersion: 2
+        x: 250
+        y: 3846
+        width: 5
+        height: 5
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 1, y: 1, z: 1, w: 1}
+      outline:
+      - - {x: -49.414062, y: 50}
+        - {x: -49.414062, y: -49.43354}
+        - {x: 50, y: -49.43354}
+        - {x: 50, y: 50}
+      physicsShape: []
+      tessellationDetail: 0
+    outline: []
+    physicsShape: []
+  spritePackingTag: 
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 

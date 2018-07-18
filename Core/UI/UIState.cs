@@ -4,7 +4,7 @@ using UnityEngine;
 
 namespace Elarion.UI {
     [DisallowMultipleComponent]
-    public class UIState : BaseUIBehaviour {
+    public abstract class UIState : BaseUIBehaviour {
         [Serializable, Flags]
         protected enum States {
             None = 0 << 0, // the element is off (in the hierarchy)
@@ -13,16 +13,8 @@ namespace Elarion.UI {
             FocusedThis = 1 << 2, // is this element focused - usually yes, but might not be if there's an edgemenu for example
             Disabled = 1 << 3, // not interactable while visible; hook UI effects to make it sexy
             Interactable = 1 << 4, // is this element interactable (accepting input events)
-            // hovered; for UIElements that inherit the Selectable class
-            // selected; for UIElements that inherit the Selectable class
         }
         
-        public event Action StateChanged = () => { };
-        public event Action Opened = () => { };
-        public event Action Closed = () => { };
-        public event Action EnteredTransition = () => { };
-        public event Action ExitedTransition = () => { };
-
         private bool _initialized;
         
         protected bool IsStateDirty {
@@ -53,36 +45,12 @@ namespace Elarion.UI {
                 return;
             }
             
-            // TODO integrate the focusing and unfocusing of panels with the builtin event system (ExecuteEvents and such)
-
             OnStateChanged(_currentState, _previousState);
             
             _previousState = _currentState;
         }
 
-        protected virtual void OnStateChanged(States currentState, States previousState) {
-            #region StateChangedEvents
-
-            StateChanged();
-
-            if(!previousState.HasFlag(States.Opened) && currentState.HasFlag(States.Opened)) {
-                Opened();
-            }
-            
-            if(previousState.HasFlag(States.Opened) && !currentState.HasFlag(States.Opened)) {
-                Closed();
-            }
-            
-            if(!previousState.HasFlag(States.InTransition) && currentState.HasFlag(States.InTransition)) {
-                EnteredTransition();
-            }
-            
-            if(previousState.HasFlag(States.InTransition) && !currentState.HasFlag(States.InTransition)) {
-                ExitedTransition();
-            }
-            
-            #endregion
-        }
+        protected virtual void OnStateChanged(States currentState, States previousState) { }
 
         private States CurrentState {
             get { return _currentState; }

@@ -1,8 +1,11 @@
 {
     "name": "Elarion",
     "references": [
-        "yaSingleton"
+        "yaSingleton",
+        "Unity.TextMeshPro"
     ],
+    "optionalUnityReferences": [],
     "includePlatforms": [],
-    "excludePlatforms": []
+    "excludePlatforms": [],
+    "allowUnsafeCode": false
 }

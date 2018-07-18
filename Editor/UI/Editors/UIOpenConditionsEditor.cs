@@ -21,7 +21,7 @@ namespace Elarion.Editor.UI.Editors {
             platformProperty = serializedObject.FindProperty("platform");
             screenWidthProperty = serializedObject.FindProperty("screenWidth");
             screenHeightProperty = serializedObject.FindProperty("screenHeight");
-            parentStateProperty = serializedObject.FindProperty("parentState");
+            parentStateProperty = serializedObject.FindProperty("state");
             screenOrientationProperty = serializedObject.FindProperty("orientation");
         }
 
@@ -47,12 +47,12 @@ namespace Elarion.Editor.UI.Editors {
                 EditorGUILayout.PropertyField(screenHeightProperty, new GUIContent("Min/Max Screen Height"));
             }
             
-            EditorGUILayout.LabelField("Opens only in some parent states", boldLabel);
+            EditorGUILayout.LabelField("Opens only in some states", boldLabel);
             
-            Target.parentStateCondition = EditorGUILayout.Toggle("Parent State Condition", Target.parentStateCondition);
+            Target.stateCondition = EditorGUILayout.Toggle("State Condition", Target.stateCondition);
 
-            if(Target.parentStateCondition) {
-                EditorGUILayout.PropertyField(parentStateProperty, new GUIContent("Show in Parent State"));
+            if(Target.stateCondition) {
+                EditorGUILayout.PropertyField(parentStateProperty, new GUIContent("Show in State"));
             }
             
             EditorGUILayout.LabelField("Opens only on the specified screen orientation", boldLabel);

@@ -1,5 +1,4 @@
 using UnityEngine;
-using UnityEngine.EventSystems;
 
 namespace Elarion.UI {
     [RequireComponent(typeof(RectTransform))]

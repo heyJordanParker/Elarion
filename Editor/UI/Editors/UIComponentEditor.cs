@@ -21,6 +21,14 @@ namespace Elarion.Editor.UI.Editors {
 
         private UIAnimator _animator;
         private SerializedProperty _openType;
+        private SerializedProperty _closeType;
+        
+        private SerializedProperty _beforeOpenEvent;
+        private SerializedProperty _afterOpenEvent;
+        
+        private SerializedProperty _beforeCloseEvent;
+        private SerializedProperty _afterCloseEvent;
+        private SerializedProperty _overrideParent;
 
         protected UIComponent Target {
             get { return target as UIComponent; }
@@ -60,6 +68,14 @@ namespace Elarion.Editor.UI.Editors {
             }
             
             _openType = serializedObject.FindProperty("_openType");
+            _closeType = serializedObject.FindProperty("_closeType");
+            
+            _overrideParent = serializedObject.FindProperty("_overrideParentComponent");
+            
+            _beforeOpenEvent = serializedObject.FindProperty("_beforeOpenEvent");
+            _afterOpenEvent = serializedObject.FindProperty("_afterOpenEvent");
+            _beforeCloseEvent = serializedObject.FindProperty("_beforeCloseEvent");
+            _afterCloseEvent = serializedObject.FindProperty("_afterCloseEvent");
             
             UpdateHelpers();
         }
@@ -67,17 +83,38 @@ namespace Elarion.Editor.UI.Editors {
         public override void OnInspectorGUI() {
             base.OnInspectorGUI();
 
-            if(Target.ParentComponent != null) {
+            if(Target.ParentComponent) {
                 EditorGUILayout.PropertyField(_openType, new GUIContent("Open Type"));
+                EditorGUILayout.PropertyField(_closeType, new GUIContent("Close Type"));
             } else {
                 var toggle = EditorGUILayout.Toggle(new GUIContent("Auto Open"), Target.OpenType == UIOpenType.Auto);
 
                 if(toggle) {
                     _openType.intValue = (int) UIOpenType.Auto;
+                    var group = Target.GetComponent<UIComponentGroup>();
+                    if(group) {
+                        UIComponentGroupEditor.SetGroupToAutoOpen(group);
+                    }
                 } else {
-                    _openType.intValue = (int) UIOpenType.OpenManually;
+                    _openType.intValue = (int) UIOpenType.Manual;
                 }
+                
+                EGUI.Readonly(() => {
+                    EditorGUILayout.Toggle(new GUIContent("Manual Close"), true);
+                    
+                    _closeType.intValue = (int) UIOpenType.Manual;
+                });
             }
+            
+            EditorGUILayout.PropertyField(_overrideParent, new GUIContent("Override Parent"));
+            
+            GUILayout.Space(10);
+            
+            EditorGUILayout.PropertyField(_beforeOpenEvent);
+            EditorGUILayout.PropertyField(_afterOpenEvent);
+            
+            EditorGUILayout.PropertyField(_beforeCloseEvent);
+            EditorGUILayout.PropertyField(_afterCloseEvent);
 
             if(targets.Length > 1) {
                 return;
@@ -97,24 +134,6 @@ namespace Elarion.Editor.UI.Editors {
                         Target.Close();
                     } else {
                         Target.Open();
-                    }
-                }
-
-                var focusableTarget = Target as UIFocusableComponent;
-
-                GUI.enabled = focusableTarget != null && focusableTarget.Focusable;
-
-                var isFocused = focusableTarget != null && focusableTarget.IsFocused;
-                
-                // if current selected game object
-                label = isFocused ? "Unfocus" : "Focus";
-                if(GUILayout.Button(label, GUILayout.MaxWidth(180))) {
-                    if(focusableTarget != null) {
-                        if(focusableTarget.IsFocused) {
-                            focusableTarget.Unfocus();
-                        } else {
-                            focusableTarget.Focus(true);
-                        }
                     }
                 }
 

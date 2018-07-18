@@ -2,7 +2,6 @@
 using System.Collections.Generic;
 using Elarion.Saved.Events.Listeners;
 using UnityEngine;
-using UnityEngine.Events;
 
 namespace Elarion.Saved.Events {
     
@@ -40,12 +39,6 @@ namespace Elarion.Saved.Events {
             if(_eventListeners.Contains(listener)) {
                 _eventListeners.Remove(listener);
             }
-        }
-    }
-    
-    public abstract class RaisableSavedEvent<TEvent, TParameter> : SavedEvent<TParameter> {
-        public new void Raise(TParameter value) {
-            base.Raise(value);
         }
     }
 }

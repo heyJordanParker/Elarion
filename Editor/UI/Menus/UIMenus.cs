@@ -22,9 +22,10 @@ namespace Elarion.Editor.UI.Menus {
 
         [MenuItem("GameObject/UI/Scene", false, -10)]
         private static void CreateUIScene() {
-            var scene = Create<UIScene>("Scene");
+            var scene = Create<UIPanel>("Scene");
             scene.gameObject.AddComponent<Image>();
             scene.gameObject.AddComponent<UIAnimator>();
+            scene.gameObject.AddComponent<UIComponentGroup>();
         }
 
         [MenuItem("GameObject/UI/UI Root", false, -10)]
@@ -42,17 +43,6 @@ namespace Elarion.Editor.UI.Menus {
             }
             
             Selection.activeGameObject = go;
-            
-            
-//            var uiRoot = SceneTools.FindSceneObjectsOfType<UIRoot>().FirstOrDefault();
-//
-//            if(uiRoot != null) {
-//                Selection.activeObject = uiRoot;
-//                EditorGUIUtility.PingObject(uiRoot);
-//                return;
-//            }
-//
-//            GetOrCreateUIRoot();
         }
 
         private static GameObject CreateNewUI() {
@@ -65,9 +55,7 @@ namespace Elarion.Editor.UI.Menus {
             rootGO.GetComponent<Canvas>().renderMode = RenderMode.ScreenSpaceOverlay;
             Undo.RegisterCreatedObjectUndo(rootGO, "Creating " + rootGO.name);
             
-            var scene = Create<UIScene>("First Scene", rootGO);
-
-            scene.InitialScene = true;
+            var scene = Create<UIPanel>("First Scene", rootGO);
 
             CreateEventSystem();
             

@@ -1,38 +1,170 @@
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using Elarion.Saved.Events.UnityEvents;
 using Elarion.UI.Helpers;
 using Elarion.UI.Helpers.Animation;
 using UnityEngine;
+using UnityEngine.Events;
 using Debug = UnityEngine.Debug;
 
 namespace Elarion.UI {
-    // TODO simple loading helper - sets loading to true/false based on delegate/unity event
-    // TODO simple hoverable/pressable helpers - set hovered/pressed based on unity events
-    // TODO simple tooltip
-
-    // TODO move the child closing logic to the child UIComponents; Send ParentClosing; ParentOpening/ParentFinishedOpening events and let child objects open/close accordingly based on what the parent is doing
+    // TODO hook to the parent using events (UpdateChildren, Before/After Open/Close
 
     [DisallowMultipleComponent]
     [RequireComponent(typeof(RectTransform))]
     public abstract class UIComponent : UIState {
         [SerializeField, HideInInspector]
         [Tooltip(
-            "When to open the component. Auto opens it based on element type. OpenWithParent opens it at the same time as the parent opens (animations overlap). Open after parent waits for the parent animation to finish and then opens the element. Manual doesn't auto-open the component.")]
-        private UIOpenType _openType = UIOpenType.OpenWithParent;
+            "When to open the component. Auto opens it based on element type. WithParent opens it at the same time as the parent opens (animations overlap). Open after parent waits for the parent animation to finish and then opens the element. Manual doesn't auto-open the component.")]
+        private UIOpenType _openType = UIOpenType.WithParent;
+        [SerializeField, HideInInspector]
+        [Tooltip(
+            "When to close the component. Auto closes it based on element type. WithParent closes it at the same time as the parent closes (animations overlap). Close after parent waits for the parent animation to finish and then closes the element. Manual doesn't auto-close the component.")]
+        private UIOpenType _closeType = UIOpenType.WithParent;
 
-        private UIManager _uiManager;
+        [SerializeField, HideInInspector]
+        private UIComponent _overrideParentComponent;
 
+        [SerializeField, HideInInspector]
+        private BoolUnityEvent _beforeOpenEvent = new BoolUnityEvent();
+        [SerializeField, HideInInspector]
+        private UnityEvent _afterOpenEvent = new UnityEvent();
+        
+        [SerializeField, HideInInspector]
+        private BoolUnityEvent _beforeCloseEvent = new BoolUnityEvent();
+        [SerializeField, HideInInspector]
+        private UnityEvent _afterCloseEvent = new UnityEvent();
+        
         private UIAnimator _animator;
         private IAnimationController[] _animationControllers = { };
-        private List<UIComponent> _childComponents = new List<UIComponent>();
+        private UIComponent _parentComponent;
 
-        public UIComponent ParentComponent { get; private set; }
+        public event Action BeforeUpdate = () => { };
 
-        protected List<UIComponent> ChildComponents {
-            get { return _childComponents; }
-            set { _childComponents = value; }
+        public UIComponent ParentComponent {
+            get => _parentComponent;
+            private set {
+                if(_parentComponent == value) {
+                    return;
+                }
+
+                if(_parentComponent) {
+                    _parentComponent.BeforeUpdate -= UpdateComponent;
+                    _parentComponent.BeforeOpenEvent.RemoveListener(OnParentBeforeOpen);
+                    _parentComponent.AfterOpenEvent.RemoveListener(OnParentAfterOpen);
+                    _parentComponent.BeforeCloseEvent.RemoveListener(OnParentBeforeClose);
+                    _parentComponent.AfterCloseEvent.RemoveListener(OnParentAfterClose);
+                }
+                // unhook
+                
+                _parentComponent = value;
+
+                if(_parentComponent) {
+                    _parentComponent.BeforeUpdate += UpdateComponent;
+                    _parentComponent.BeforeOpenEvent.AddListener(OnParentBeforeOpen);
+                    _parentComponent.AfterOpenEvent.AddListener(OnParentAfterOpen);
+                    _parentComponent.BeforeCloseEvent.AddListener(OnParentBeforeClose);
+                    _parentComponent.AfterCloseEvent.AddListener(OnParentAfterClose);
+                }
+                // rehook
+            }
         }
+        
+                  
+        protected void CloseChildren(UIOpenType closeTypeFilter, bool skipAnimation) {
+//            foreach(var child in ChildComponents) {
+//                
+//                if(closeTypeFilter == UIOpenType.WithParent) {
+//                    if(child.CloseType != UIOpenType.WithParent && child.CloseType != UIOpenType.Auto) {
+//                        continue;
+//                    }
+//                } else if(child.CloseType != closeTypeFilter) {
+//                    continue;
+//                }
+//                
+//                var childAnimation = skipAnimation ? null : child.GetAnimation(UIAnimationType.OnClose);
+//
+//                child.CloseInternal(childAnimation, false);
+//            }
+        }
+
+        private void OnParentBeforeClose(bool skipAnimation) {
+            if(CloseType != UIOpenType.WithParent && CloseType != UIOpenType.Auto) {
+                return;
+            }
+                
+            var childAnimation = skipAnimation ? null : GetAnimation(UIAnimationType.OnClose);
+
+            CloseInternal(childAnimation, false);
+        }
+        
+        
+        private void OnParentAfterClose() {
+            if(CloseType != UIOpenType.AfterParent) {
+                return;
+            }
+                
+            CloseInternal(null, true);
+        }
+
+
+        protected void OpenChildren(UIOpenType openTypeFilter, bool skipAnimation) {
+//            foreach(var child in ChildComponents) {
+//                
+//                if(!child.CanOpen) {
+//                    continue;
+//                }
+//                
+//                if(openTypeFilter == UIOpenType.WithParent) {
+//                    if(child.OpenType != UIOpenType.WithParent && child.OpenType != UIOpenType.Auto) {
+//                        continue;
+//                    }
+//                } else if(child.OpenType != openTypeFilter) {
+//                    continue;
+//                }
+//                
+//                var childAnimation = skipAnimation ? null : child.GetAnimation(UIAnimationType.OnOpen);
+//
+//                child.OpenInternal(childAnimation, false);
+//            }
+        }
+        
+        protected virtual void OnParentBeforeOpen(bool skipAnimation) {
+            if(!CanOpen) {
+                return;
+            }
+                
+            if(OpenType != UIOpenType.WithParent && OpenType != UIOpenType.Auto) {
+                return;
+            }
+                
+            var animation = skipAnimation ? null : GetAnimation(UIAnimationType.OnOpen);
+
+            OpenInternal(animation, false);
+        }
+
+        protected virtual void OnParentAfterOpen() {
+            if(!CanOpen) {
+                return;
+            }
+                
+            if(OpenType != UIOpenType.AfterParent) {
+                return;
+            }
+                
+            var animation = GetAnimation(UIAnimationType.OnOpen);
+
+            OpenInternal(animation, false);
+        }
+
+        public UIComponent OverrideParentComponent {
+            get => _overrideParentComponent;
+            private set => _overrideParentComponent = value;
+        }
+
+        protected List<UIComponent> ChildComponents { get; set; } = new List<UIComponent>();
 
         public UIAnimator Animator {
             get {
@@ -47,30 +179,23 @@ namespace Elarion.UI {
         public UIOpenConditions OpenConditions { get; protected set; }
 
         public UIOpenType OpenType {
-            get { return _openType; }
+            get => _openType;
+            set => _openType = value;
         }
 
-        public virtual bool IsRendering {
-            get { return IsOpened || IsInTransition || IsRenderingChild; }
-        }
+        public UIOpenType CloseType => _closeType;
 
-        public virtual bool IsRenderingChild {
-            get { return ChildComponents.Any(child => child.IsRendering); }
-        }
+        public bool IsRendering => IsOpened || IsInTransition;
 
         protected virtual bool InteractableSelf {
-            get { return true; }
+            get => true;
             // ReSharper disable once ValueParameterNotUsed
             set { }
         }
 
-        protected bool InteractableParent {
-            get { return ParentComponent == null || ParentComponent.IsInteractable; }
-        }
+        protected bool InteractableParent => ParentComponent == null || ParentComponent.IsInteractable;
 
-        public bool HasAnimator {
-            get { return Animator != null && Animator.enabled; }
-        }
+        public bool HasAnimator => Animator != null && Animator.enabled;
 
         public bool IsAnimating {
             get {
@@ -90,10 +215,6 @@ namespace Elarion.UI {
 
         protected virtual bool CanOpen {
             get {
-                if(ParentComponent && (!ParentComponent.isActiveAndEnabled || !ParentComponent.IsOpened)) {
-                    return false;
-                }
-
                 if(IsOpened || !isActiveAndEnabled) {
                     return false;
                 }
@@ -106,28 +227,13 @@ namespace Elarion.UI {
             }
         }
         
-        public void Open(bool skipAnimation = false) {
-            var animation = skipAnimation ? null : GetAnimation(UIAnimationType.OnOpen);
+        public BoolUnityEvent BeforeOpenEvent => _beforeOpenEvent;
 
-            OpenInternal(animation, true);
-        }
+        public UnityEvent AfterOpenEvent => _afterOpenEvent;
 
-        public void Open(UIAnimation overrideAnimation) {
-            var animation = overrideAnimation != null ? overrideAnimation : GetAnimation(UIAnimationType.OnOpen);
-            
-            OpenInternal(animation, true);
-        }
-        
-        public void Close(bool skipAnimation = false) {
-            var animation = skipAnimation ? null : GetAnimation(UIAnimationType.OnClose);
-            CloseInternal(animation, true);
-        }
+        public BoolUnityEvent BeforeCloseEvent => _beforeCloseEvent;
 
-        public void Close(UIAnimation overrideAnimation) {
-            var animation = overrideAnimation != null ? overrideAnimation : GetAnimation(UIAnimationType.OnClose);
-            
-            CloseInternal(animation, true);
-        }
+        public UnityEvent AfterCloseEvent => _afterCloseEvent;
 
         protected override void Awake() {
             base.Awake();
@@ -171,12 +277,35 @@ namespace Elarion.UI {
                 return;
             }
 
-            // TODO register all top-level components in the UIManager; Update them from there
-
             UpdateComponent();
         }
+        
+        public void Open(bool skipAnimation = false) {
+            var animation = skipAnimation ? null : GetAnimation(UIAnimationType.OnOpen);
 
-        protected virtual void BeforeOpen(bool skipAnimation) { }
+            OpenInternal(animation, true);
+        }
+
+        public void Open(UIAnimation overrideAnimation) {
+            var animation = overrideAnimation != null ? overrideAnimation : GetAnimation(UIAnimationType.OnOpen);
+            
+            OpenInternal(animation, true);
+        }
+        
+        public void Close(bool skipAnimation = false) {
+            var animation = skipAnimation ? null : GetAnimation(UIAnimationType.OnClose);
+            CloseInternal(animation, true);
+        }
+
+        public void Close(UIAnimation overrideAnimation) {
+            var animation = overrideAnimation != null ? overrideAnimation : GetAnimation(UIAnimationType.OnClose);
+            
+            CloseInternal(animation, true);
+        }
+
+        protected virtual void BeforeOpen(bool skipAnimation) {
+            BeforeOpenEvent.Invoke(skipAnimation);
+        }
 
         protected virtual void OpenInternal(UIAnimation animation, bool isEventOrigin) {
             if(isEventOrigin && !gameObject.activeSelf) {
@@ -191,63 +320,36 @@ namespace Elarion.UI {
             ChildComponents = GetComponentsInChildren<UIComponent>(includeInactive: true)
                 .Where(child => child.ParentComponent == this).ToList();
             
-            var noAnimation = animation == null;
-
-            BeforeOpen(noAnimation);
-
             IsOpened = true;
 
-            OpenChildren(UIOpenType.OpenWithParent, noAnimation);
+            var noAnimation = animation == null;
+            
+            BeforeOpen(noAnimation);
 
-            if(noAnimation) {
-                OpenChildren(UIOpenType.OpenAfterParent, true);
-            }
+            OpenChildren(UIOpenType.WithParent, noAnimation);
 
             if(!HasAnimator || noAnimation) {
-                AfterOpen(isEventOrigin);
+                AfterOpen();
                 return;
             }
 
             Animator.ResetToSavedProperties();
 
-            Animator.Play(animation, callback: () => AfterOpen(isEventOrigin));
+            Animator.Play(animation, callback: AfterOpen);
         }
 
         /// <summary>
         /// Called after the object has been opened and all open animations have finished playing (if any)
         /// </summary>
-        /// <param name="isEventOrigin"></param>
-        protected virtual void AfterOpen(bool isEventOrigin) {
-            OpenChildren(UIOpenType.OpenAfterParent, false);
-
-            // send another select event to the selected component; otherwise Unity is likely not to focus it; hack 
-            if(UIManager && UIManager.SelectedObject && UIManager.SelectedObject.transform.IsChildOf(transform)) {
-                UIManager.Select(UIManager.SelectedObject);
-            }
+        protected virtual void AfterOpen() {
+            AfterOpenEvent.Invoke();
+            
+            OpenChildren(UIOpenType.AfterParent, false);
         }
 
-        protected void OpenChildren(UIOpenType openTypeFilter, bool skipAnimation) {
-            foreach(var child in ChildComponents) {
-                
-                if(!child.CanOpen) {
-                    continue;
-                }
-                
-                if(openTypeFilter == UIOpenType.OpenWithParent) {
-                    if(child.OpenType != UIOpenType.OpenWithParent && child.OpenType != UIOpenType.Auto) {
-                        continue;
-                    }
-                } else if(child.OpenType != openTypeFilter) {
-                    continue;
-                }
-                
-                var childAnimation = skipAnimation ? null : child.GetAnimation(UIAnimationType.OnOpen);
-
-                child.OpenInternal(childAnimation, false);
-            }
+        protected virtual void BeforeClose(bool skipAnimation) {
+            BeforeCloseEvent.Invoke(skipAnimation);
         }
-
-        protected virtual void BeforeClose() { }
 
         /// <summary>
         /// Close implementation. Override this to modify the base functionality.
@@ -260,17 +362,13 @@ namespace Elarion.UI {
                 return;
             }
 
-            BeforeClose();
-
             IsOpened = false;
 
             var noAnimation = animation == null;
-
-            foreach(var child in ChildComponents) {
-                var childAnimation = noAnimation ? null : child.GetAnimation(UIAnimationType.OnClose);
-                
-                child.CloseInternal(childAnimation, false);
-            }
+            
+            BeforeClose(noAnimation);
+            
+            CloseChildren(UIOpenType.WithParent, noAnimation);
 
             if(!HasAnimator || noAnimation) {
                 AfterClose();
@@ -284,6 +382,10 @@ namespace Elarion.UI {
         /// Called after the object has been closed and all close animations have finished playing (if any)
         /// </summary>
         protected virtual void AfterClose() {
+            AfterCloseEvent.Invoke();
+            
+            CloseChildren(UIOpenType.AfterParent, true);
+            
             if(HasAnimator) {
                 Animator.ResetToSavedProperties();
                 Renderer.enabled = false; // instantly hide this, the state will update on the next frame
@@ -291,13 +393,7 @@ namespace Elarion.UI {
         }
 
         protected virtual void UpdateComponent() {
-            foreach(var childComponent in ChildComponents) {
-                if(!childComponent) {
-                    Debug.LogWarning("Trying to update a child component that's missing.", gameObject);
-                }
-
-                childComponent.UpdateComponent();
-            }
+            BeforeUpdate();
 
             UpdateState();
         }
@@ -326,6 +422,11 @@ namespace Elarion.UI {
         }
 
         private void UpdateParent() {
+            if(OverrideParentComponent) {
+                ParentComponent = OverrideParentComponent;
+                return;
+            }
+            
             if(Transform.parent != null) {
                 ParentComponent = Transform.parent.GetComponentsInParent<UIComponent>(includeInactive: true)
                     .FirstOrDefault();
@@ -347,8 +448,12 @@ namespace Elarion.UI {
 
             // top level elements
             if(ParentComponent == null) {
-                if(_openType != UIOpenType.OpenManually && _openType != UIOpenType.Auto) {
-                    _openType = UIOpenType.OpenManually;
+                if(_openType != UIOpenType.Manual && _openType != UIOpenType.Auto) {
+                    _openType = UIOpenType.Manual;
+                }
+                
+                if(_closeType != UIOpenType.Manual && _closeType != UIOpenType.Auto) {
+                    _closeType = UIOpenType.Manual;
                 }
             }
         }
@@ -363,13 +468,10 @@ namespace Elarion.UI {
                 stringBuilder.AppendLine("<b>Focused: </b>" + IsFocusedThis);
                 stringBuilder.AppendLine("<b>Disabled: </b>" + IsDisabled);
                 stringBuilder.AppendLine("<b>Interactable: </b>" + IsInteractable);
-                stringBuilder.AppendLine("<b>Visible Child: </b>" + IsRenderingChild);
                 return stringBuilder.ToString();
             }
         }
 
-        protected UIManager UIManager {
-            get { return UIManager.Instance; }
-        }
+        protected static UIManager UIManager => UIManager.Instance;
     }
 }

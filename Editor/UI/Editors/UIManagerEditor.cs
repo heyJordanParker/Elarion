@@ -19,7 +19,6 @@ namespace Elarion.Editor.UI.Editors {
             EGUI.Readonly(() => {
                 var selectedObject = serializedObject.FindProperty("_selectedObject").objectReferenceValue;
                 EditorGUILayout.ObjectField("Selected Object", selectedObject, typeof(GameObject), true);
-                EditorGUILayout.ObjectField("Focused Component", UIFocusableComponent.FocusedComponent, typeof(UIComponent), true);
             });
             
             DrawSingletonValidation();

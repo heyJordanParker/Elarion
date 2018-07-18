@@ -9,6 +9,7 @@ namespace Elarion.UI {
 
     public class UIDialog : UIPanel, ISubmitHandler, ICancelHandler {
 
+        // TODO use Unity events
         public event Action SubmitActions = () => { };
         public event Action CancelActions = () => { };
 
@@ -37,12 +38,6 @@ namespace Elarion.UI {
         
         // TODO scene changed event
 
-        protected override void Awake() {
-            base.Awake();
-
-            Blurred += OnBlurred;
-        }
-
         /// <summary>
         /// OnBlurred callback. Activate it only on the dialog 
         /// </summary>
@@ -67,13 +62,6 @@ namespace Elarion.UI {
 
         protected override void BeforeOpen(bool skipAnimation) {
             base.BeforeOpen(skipAnimation);
-
-            // cache the focused component and selected object before opening the first dialog
-            if(ActiveDialogs.Count == 0) {
-                InitiallyFocusedComponent = FocusedComponent;
-            }
-            
-            InitiallySelectedObject = UIManager.SelectedObject;                
             
             ActiveDialogs.Push(this);
 
@@ -82,29 +70,9 @@ namespace Elarion.UI {
         }
 
         protected override void AfterClose() {
-            Canvas.overrideSorting = false;
-        }
-
-        protected override void SwitchFocusOnClose() {
             ActiveDialogs.Pop();
-            
-            if(ActiveDialogs.Count > 0) {
-                // focus previous active dialog
-                ActiveDialogs.Peek().Focus(false, false);
-            } else {
-                // focus initially focused component
-                if(InitiallyFocusedComponent && InitiallyFocusedComponent.IsOpened && InitiallyFocusedComponent.Focusable &&
-                   InitiallyFocusedComponent.IsInteractable) {
-                    InitiallyFocusedComponent.Focus(false, false);
 
-                    InitiallyFocusedComponent = null;
-                } 
-            }
-            
-            if(InitiallySelectedObject != null) {
-                UIManager.Select(InitiallySelectedObject);
-                InitiallySelectedObject = null;
-            }
+            Canvas.overrideSorting = false;
         }
 
         public virtual void Submit() {
@@ -150,14 +118,5 @@ namespace Elarion.UI {
                 return _activeDialogs;
             }
         }
-        
-        /// <summary>
-        /// The component that was focused before opening the first dialog
-        /// </summary>
-        protected static UIFocusableComponent InitiallyFocusedComponent { get; set; }
-        /// <summary>
-        /// The game object that was selected before opening the first dialog
-        /// </summary>
-        protected GameObject InitiallySelectedObject { get; set; }
     }
 }

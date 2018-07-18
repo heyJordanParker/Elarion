@@ -3,9 +3,9 @@ using System.Linq;
 using Elarion.Attributes;
 using Elarion.Extensions;
 using UnityEngine;
+using UnityEngine.Serialization;
 
 namespace Elarion.UI.Helpers {
-    // TODO parent states -> target states; allow the user to target any state object
     [UIComponentHelper]
     public class UIOpenConditions : BaseUIBehaviour {
         protected const int MaxScreenSize = 2000;
@@ -32,8 +32,6 @@ namespace Elarion.UI.Helpers {
             NotOpened = 1 << 3,
             InTransition = 1 << 4,
             NotInTransition = 1 << 5,
-            Focused = 1 << 6,
-            NotFocused = 1 << 7
         }
 
         [Serializable]
@@ -70,11 +68,13 @@ namespace Elarion.UI.Helpers {
         public Vector2 parentHeight = new Vector2(0, MaxScreenSize);
 
         [HideInInspector]
-        public bool parentStateCondition = false;
+        [FormerlySerializedAs("parentStateCondition")]
+        public bool stateCondition = false;
 
         [HideInInspector]
         [EnumMultipleDropdown]
-        public StateCondition parentState;
+        [FormerlySerializedAs("state")]
+        public StateCondition state;
 
         [HideInInspector]
         [Tooltip(
@@ -90,14 +90,18 @@ namespace Elarion.UI.Helpers {
         protected override void Awake() {
             base.Awake();
 
-            _component = gameObject.GetOrAddComponent<UIComponent>();
+            _component = gameObject.GetComponent<UIComponent>();
+
+            if(!_component) {
+                _component = gameObject.AddComponent<UIPanel>();
+            }
         }
 
         protected void Update() {
             // should be a method in UIComponent
             var componentCanOpen = _component && _component.gameObject.activeSelf && !_component.IsOpened;
             
-            if(componentCanOpen && CanOpen && _component.OpenType != UIOpenType.OpenManually) {
+            if(componentCanOpen && CanOpen && _component.OpenType != UIOpenType.Manual) {
                 _component.Open();
             }
 
@@ -124,12 +128,12 @@ namespace Elarion.UI.Helpers {
                     }
                 }
 
-                if(parentStateCondition) {
-                    if(!_component || !_component.ParentComponent) {
+                if(stateCondition) {
+                    if(!_component) {
                         return false;
                     }
 
-                    if(!ParentStateValid) {
+                    if(!StateValid) {
                         return false;
                     }
                 }
@@ -142,56 +146,41 @@ namespace Elarion.UI.Helpers {
             }
         }
 
-        private bool ParentStateValid {
+        private bool StateValid {
             get {
-                var parent = _component.ParentComponent;
-                var focusableParent = UIFocusableComponent.GetFocusableParentComponent(_component);
-
-                if(parent == null) {
+                if(_component == null) {
                     return false;
                 }
 
-                if(parentState == StateCondition.All) {
+                if(state == StateCondition.All) {
                     return true;
                 }
 
                 foreach(var state in Enum.GetValues(typeof(StateCondition))) {
-                    if(!parentState.HasFlag(state)) continue;
+                    if(!this.state.HasFlag(state)) continue;
 
 
                     switch((StateCondition) state) {
-                        case StateCondition.Focused:
-                            if(focusableParent != null && focusableParent.IsFocused) {
-                                return true;
-                            }
-
-                            break;
-                        case StateCondition.NotFocused:
-                            if(focusableParent != null && !focusableParent.IsFocused) {
-                                return true;
-                            }
-
-                            break;
                         case StateCondition.InTransition:
-                            if(parent.IsInTransition) {
+                            if(_component.IsInTransition) {
                                 return true;
                             }
 
                             break;
                         case StateCondition.NotInTransition:
-                            if(!parent.IsInTransition) {
+                            if(!_component.IsInTransition) {
                                 return true;
                             }
 
                             break;
                         case StateCondition.Opened:
-                            if(parent.IsOpened) {
+                            if(_component.IsOpened) {
                                 return true;
                             }
 
                             break;
                         case StateCondition.NotOpened:
-                            if(!parent.IsOpened) {
+                            if(!_component.IsOpened) {
                                 return true;
                             }
 

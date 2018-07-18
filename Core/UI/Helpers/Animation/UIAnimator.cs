@@ -11,11 +11,9 @@ using UnityEngine.UI;
 
 namespace Elarion.UI.Helpers.Animation {
     // TODO decouple with UIComponent; make the Target a RectTransform (and use GameObject tweeners that fetch the components they need themselves)
-    
-    [UISceneHelper]
+
     [UIComponentHelper]
     public class UIAnimator : MonoBehaviour, IAnimationController {
-
         [Serializable]
         public class TypedAnimation {
             public UIAnimationType type = UIAnimationType.OnOpen;
@@ -24,15 +22,15 @@ namespace Elarion.UI.Helpers.Animation {
 
         [SerializeField, HideInInspector]
         private TypedAnimation[] _animations = {
-            new TypedAnimation {type = UIAnimationType.OnOpen}, 
-            new TypedAnimation {type = UIAnimationType.OnClose}, 
+            new TypedAnimation {type = UIAnimationType.OnOpen},
+            new TypedAnimation {type = UIAnimationType.OnClose},
         };
 
         private UIComponent _target;
 
         [SerializeField, ReadOnly(true)]
         private UIAnimation _currentAnimation = null;
-        
+
         private Canvas _canvas;
         private RectTransform _canvasTransform;
 
@@ -41,7 +39,7 @@ namespace Elarion.UI.Helpers.Animation {
         private RotationTweener _rotationTweener;
         private SizeTweener _sizeTweener;
         private AlphaTweener _alphaTweener;
-        
+
         private RectTransform _targetParent;
 
         public UIComponent Target {
@@ -49,6 +47,7 @@ namespace Elarion.UI.Helpers.Animation {
                 if(_target == null) {
                     _target = gameObject.GetOrAddComponent<UIComponent>();
                 }
+
                 return _target;
             }
         }
@@ -93,7 +92,7 @@ namespace Elarion.UI.Helpers.Animation {
             }
         }
 
-        
+
         internal AlphaTweener AlphaTweener {
             get {
                 if(_alphaTweener == null) {
@@ -110,7 +109,7 @@ namespace Elarion.UI.Helpers.Animation {
                        RotationTweener.Tweening || SizeTweener.Tweening;
             }
         }
-        
+
         protected virtual void OnEnable() {
             if(_currentAnimation != null) {
                 OnAnimationEnd(_currentAnimation);
@@ -121,7 +120,7 @@ namespace Elarion.UI.Helpers.Animation {
             if(_currentAnimation != null) {
                 _currentAnimation.Stop(this);
             }
-            
+
             ResetToSavedProperties();
         }
 
@@ -130,15 +129,23 @@ namespace Elarion.UI.Helpers.Animation {
         }
 
         protected virtual void OnAnimationStart(UIAnimation animation) {
+#if UNITY_EDITOR
+            if(!UnityEditor.EditorApplication.isPlayingOrWillChangePlaymode &&
+               UnityEditor.EditorApplication.isPlaying) {
+                return; // prevents unity from firing errors when exiting play mode
+            }
+#endif
+
             if(_canvas == null) {
-                _canvas = UIHelper.CreateAnimatorCanvas(out _canvasTransform, Target.gameObject.name + " (Animator Canvas)", transform);
+                _canvas = UIHelper.CreateAnimatorCanvas(out _canvasTransform,
+                    Target.gameObject.name + " (Animator Canvas)", transform);
             }
 
             _currentAnimation = animation;
-            
+
             if(Target.Transform.parent != _canvasTransform)
                 if(Target.Transform.parent)
-                    _targetParent = Target.Transform.parent.GetComponent<RectTransform>();
+                    _targetParent = Target.Transform.parent.transform as RectTransform;
                 else
                     _targetParent = null;
 
@@ -148,26 +155,26 @@ namespace Elarion.UI.Helpers.Animation {
 
             _canvasTransform.anchorMin = new Vector2(AnchorsTweener.SavedValue.x, AnchorsTweener.SavedValue.y);
             _canvasTransform.anchorMax = new Vector2(AnchorsTweener.SavedValue.z, AnchorsTweener.SavedValue.w);
-            
+
             _canvasTransform.anchoredPosition = PositionTweener.SavedValue;
             _canvasTransform.sizeDelta = SizeTweener.SavedValue;
             _canvasTransform.localScale = Target.Transform.localScale;
-            
+
             if(animation.overrideParentAnchors) {
                 var cachedPosition = _canvasTransform.position;
                 var cachedWidth = _canvasTransform.rect.width;
                 var cachedHeight = _canvasTransform.rect.height;
-                
+
                 _canvasTransform.anchorMin = animation.overrideParentAnchorMin;
                 _canvasTransform.anchorMax = animation.overrideParentAnchorMax;
-                
+
                 _canvasTransform.position = cachedPosition;
-                _canvasTransform.sizeDelta = new Vector2(_canvasTransform.rect.width + (cachedWidth - _canvasTransform.rect.width),
+                _canvasTransform.sizeDelta = new Vector2(
+                    _canvasTransform.rect.width + (cachedWidth - _canvasTransform.rect.width),
                     _canvasTransform.rect.height + (cachedHeight - _canvasTransform.rect.height));
             }
 
             Target.Transform.SetParent(_canvasTransform, true);
-
         }
 
         protected virtual void OnAnimationEnd(UIAnimation animation) {
@@ -175,7 +182,14 @@ namespace Elarion.UI.Helpers.Animation {
                 // can't do this if the game object is inactive - handle it in OnEnable
                 return;
             }
-            
+
+#if UNITY_EDITOR
+            if(!UnityEditor.EditorApplication.isPlayingOrWillChangePlaymode &&
+               UnityEditor.EditorApplication.isPlaying) {
+                return; // prevents unity from firing errors when exiting play mode
+            }
+#endif
+
             Target.Transform.SetParent(_targetParent, true);
             Target.Transform.SetSiblingIndex(_canvasTransform.GetSiblingIndex());
 
@@ -191,9 +205,10 @@ namespace Elarion.UI.Helpers.Animation {
                 if(callback != null) {
                     callback();
                 }
+
                 return;
             }
-            
+
             // TODO concurrent animations; hover & click at the same time
             // track all animations; some animations stop other animations (e.g. close stops open)
             if(_currentAnimation != null) {
@@ -204,19 +219,17 @@ namespace Elarion.UI.Helpers.Animation {
                     return;
                 }
             }
-            
+
             if(resetToSavedProperties) {
                 ResetToSavedProperties();
             }
-            
+
             OnAnimationStart(animation);
 
             Action animationCallback;
-            
+
             if(callback == null) {
-                animationCallback = () => {
-                    OnAnimationEnd(animation);
-                };
+                animationCallback = () => { OnAnimationEnd(animation); };
             } else {
                 animationCallback = () => {
                     OnAnimationEnd(animation);
@@ -237,7 +250,6 @@ namespace Elarion.UI.Helpers.Animation {
 
         public bool HasAnimation(UIAnimationType animationType) {
             return _animations.Any(typedAnimation => typedAnimation.type == animationType);
-
         }
 
         public UIAnimation GetAnimation(UIAnimationType type) {
@@ -258,27 +270,23 @@ namespace Elarion.UI.Helpers.Animation {
         public void MoveAnchors(Vector2 anchorMin, Vector2 anchorMax,
             UIAnimationDirection animationDirection = UIAnimationDirection.From, Action callback = null,
             UIAnimationOptions animationOptions = null) {
-
             var anchors = new Vector4(anchorMin.x, anchorMin.y, anchorMax.x, anchorMax.y);
-            
+
             AnchorsTweener.Tween(anchors, animationDirection, callback, animationOptions);
         }
 
         public void Rotate(Vector3 rotation, UIAnimationDirection animationDirection = UIAnimationDirection.From,
             Action callback = null, UIAnimationOptions animationOptions = null) {
-
             RotationTweener.Tween(rotation, animationDirection, callback, animationOptions);
         }
 
         public void Resize(Vector2 size, UIAnimationDirection animationDirection = UIAnimationDirection.RelativeTo,
             Action callback = null, UIAnimationOptions animationOptions = null) {
-
             SizeTweener.Tween(size, animationDirection, callback, animationOptions);
         }
-        
+
         public void Fade(float fade, UIAnimationDirection animationDirection = UIAnimationDirection.To,
             Action callback = null, UIAnimationOptions animationOptions = null) {
-            
             AlphaTweener.Tween(fade, animationDirection, callback, animationOptions);
         }
 
@@ -289,7 +297,7 @@ namespace Elarion.UI.Helpers.Animation {
             SizeTweener.SaveProperty();
             AlphaTweener.SaveProperty();
         }
-        
+
         public void ResetToSavedProperties() {
             PositionTweener.ResetProperty();
             AnchorsTweener.ResetProperty();
@@ -297,7 +305,7 @@ namespace Elarion.UI.Helpers.Animation {
             SizeTweener.ResetProperty();
             AlphaTweener.ResetProperty();
         }
-        
+
         public void ResetToSavedPropertiesGraceful(float duration = 0.3f) {
             PositionTweener.ResetPropertyGraceful(duration);
             AnchorsTweener.ResetPropertyGraceful(duration);
@@ -310,12 +318,12 @@ namespace Elarion.UI.Helpers.Animation {
         // Editor-only helper field/logic to add a mask to the game object
         [Tooltip("Prevents child animations from overflowing.")]
         public bool maskChildAnimations = false;
-        
+
         private void OnValidate() {
             if(UnityEditor.EditorApplication.isPlayingOrWillChangePlaymode) {
                 return;
             }
-            
+
             if(maskChildAnimations) {
                 if(gameObject.GetComponent<Mask>()) {
                     return;

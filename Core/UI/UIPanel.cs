@@ -6,7 +6,7 @@ namespace Elarion.UI {
     [RequireComponent(typeof(CanvasGroup))]
     [RequireComponent(typeof(Canvas))]
     [RequireComponent(typeof(GraphicRaycaster))] // to propagate input events
-    public class UIPanel : UIFocusableComponent {
+    public class UIPanel : UIComponent {
         [SerializeField]
         private bool _interactable = true;
 
@@ -14,18 +14,16 @@ namespace Elarion.UI {
         private CanvasGroup _canvasGroup;
 
         public override float Alpha {
-            get { return CanvasGroup.alpha; }
-            set { CanvasGroup.alpha = Mathf.Clamp01(value); }
+            get => CanvasGroup.alpha;
+            set => CanvasGroup.alpha = Mathf.Clamp01(value);
         }
 
         protected override bool InteractableSelf {
-            get { return _interactable; }
-            set { _interactable = value; }
+            get => _interactable;
+            set => _interactable = value;
         }
         
-        protected Canvas Canvas {
-            get { return _canvas; }
-        }
+        protected Canvas Canvas => _canvas;
 
         public override Behaviour Renderer {
             get {

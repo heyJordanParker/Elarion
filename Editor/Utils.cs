@@ -21,12 +21,6 @@ namespace Elarion.Editor {
             if(component.HasComponent<CanvasGroup>()) {
                 component.GetComponent<CanvasGroup>().hideFlags = HideFlags.None;
             }
-            
-            var scene = component as UIScene;
-
-            if(scene) {
-                scene.CanvasGroup.hideFlags = HideFlags.None;
-            }
         }
         
         public static void HideBuiltinHelpers(UIComponent component) {
@@ -38,12 +32,6 @@ namespace Elarion.Editor {
             
             if(component.HasComponent<CanvasGroup>()) {
                 component.GetComponent<CanvasGroup>().hideFlags = HideFlags.HideInInspector;
-            }
-
-            var scene = component as UIScene;
-
-            if(scene) {
-                scene.CanvasGroup.hideFlags = HideFlags.HideInInspector;
             }
         }
 

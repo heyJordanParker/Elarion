@@ -8,7 +8,7 @@ using UnityEngine.UI;
 namespace Elarion.UI.TMP {
     
     [RequireComponent(typeof(TextMeshProUGUI))]
-    public class TextDuplicator : UIBehavior {
+    public class TextDuplicator : BaseUIBehaviour {
 
         private TMP_Text _tmpText;
 
@@ -19,7 +19,7 @@ namespace Elarion.UI.TMP {
             _tmpText = GetComponent<TMP_Text>();
         }
 
-        public void OnEnable() {
+        protected override void OnEnable() {
             if(targetText != null)
                 return;
 

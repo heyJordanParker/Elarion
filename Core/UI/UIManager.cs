@@ -1,6 +1,7 @@
 using System.Linq;
 using Elarion.Extensions;
 using Elarion.Utility;
+using TypeSafe;
 using UnityEngine;
 using UnityEngine.EventSystems;
 using UnityEngine.UI;
@@ -11,24 +12,14 @@ namespace Elarion.UI {
     [CreateAssetMenu(fileName = "UI Manager.asset", menuName = "Manager/UI Manager", order = 81)]
     public class UIManager : Singleton<UIManager> {
         
+        // TODO ui camera configuration - autoCreate, culling mask, hide, background, etc
+        
         public bool enableTabNavigation = true;
 
         [SerializeField, HideInInspector]
         private GameObject _selectedObject;
 
         private BaseEventData _baseEventData;
-
-        public GameObject SelectedObject {
-            get { return _selectedObject; }
-            private set {
-                if(_selectedObject == value) {
-                    return;
-                }
-
-                _selectedObject = value;
-                EventSystem.SetSelectedGameObject(SelectedObject);
-            }
-        }
 
         protected override void Initialize() {
             base.Initialize();
@@ -53,33 +44,6 @@ namespace Elarion.UI {
             }
 
             HandleTabNavigation();
-
-            if(EventSystem.currentSelectedGameObject == SelectedObject) {
-                return;
-            }
-
-            if(EventSystem.currentSelectedGameObject == null) {
-                // generally if the user clicks on a text or another raycastable component without a handler; select the focused component
-                
-                SelectedObject = UIFocusableComponent.FocusedComponent != null ? UIFocusableComponent.FocusedComponent.gameObject : null;
-                
-                return;
-            }
-
-            // Follow the user input
-            SelectedObject = EventSystem.currentSelectedGameObject;
-
-            if(SelectedObject == null) {
-                return;
-            }
-
-            var selectedComponent = SelectedObject.GetComponentInParent<UIFocusableComponent>();
-
-            if(selectedComponent != null) {
-                // Generally when a user clicks something inside another component
-                
-                selectedComponent.Focus(false, false);
-            }
         }
 
         private void HandleTabNavigation() {
@@ -137,42 +101,20 @@ namespace Elarion.UI {
             if(nextSelectable == null || !nextSelectable.IsInteractable() ||
                nextSelectable.navigation.mode == Navigation.Mode.None) return;
 
-            var parentComponent = nextSelectable.GetComponentInParent<UIFocusableComponent>();
-
-            if(parentComponent != null && !parentComponent.IsInteractable) {
-                return;
-            }
-
-            if(parentComponent) {
-                parentComponent.Focus();
-            }
-
             Select(nextSelectable);
         }
 
-        public bool Select(Selectable selectable) {
-            if(!selectable) {
-                return false;
-            }
-
-            return Select(selectable.gameObject);
-        }
-
-        public bool Select(GameObject gameObject) {
+        protected bool Select(Selectable selectable) {
             if(!EventSystem ||
                EventSystem.alreadySelecting ||
-               !gameObject) {
-                return false; // wasn't selected
+               !selectable) {
+                return false;
             }
-
-            SelectedObject = gameObject;
-            ExecuteEvents.Execute(SelectedObject, null, ExecuteEvents.selectHandler);
-
-            return true; // selected
+            
+            ExecuteEvents.Execute(selectable.gameObject, null, ExecuteEvents.selectHandler);
+            return true;
         }
 
-        private static EventSystem EventSystem {
-            get { return EventSystem.current; }
-        }
+        private static EventSystem EventSystem => EventSystem.current;
     }
 }

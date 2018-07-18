@@ -67,10 +67,10 @@ namespace Elarion.Utility {
             camera.useOcclusionCulling = false;
             camera.allowHDR = false;
             camera.allowMSAA = false;
-            camera.clearFlags = CameraClearFlags.Color;
+            camera.clearFlags = CameraClearFlags.Nothing;
             camera.orthographic = true;
-            camera.clearFlags = CameraClearFlags.Color;
             camera.backgroundColor = Color.white;
+            camera.cullingMask = 1 << LayerMask.NameToLayer("UI");
             
             return camera;
         }

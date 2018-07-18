@@ -13,10 +13,8 @@ namespace Elarion.UI.Helpers {
         public event Action Cancel = () => { };
 
         public void OnCancel(BaseEventData eventData) {
-            if(_onCancel != null) {
-                _onCancel.Invoke();
-            }
-            
+            _onCancel?.Invoke();
+
             Cancel();
         }
     }

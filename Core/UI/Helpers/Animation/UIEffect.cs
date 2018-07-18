@@ -6,15 +6,14 @@ using UnityEngine;
 using UnityEngine.UI;
 
 namespace Elarion.UI.Helpers.Animation {
-    [UISceneHelper]
     [UIComponentHelper]
     public class UIEffect : BaseUIBehaviour, IAnimationController {
         private class UIEffectTweener : PropertyTweener<float, UIEffect> {
             public UIEffectTweener(MonoBehaviour owner) : base(owner) { }
 
             public override float CurrentValue {
-                get { return Target.Visibility; }
-                protected set { Target.Visibility = value; }
+                get => Target.Visibility;
+                protected set => Target.Visibility = value;
             }
             
             protected override float UpdateValue(float startingValue, float progress, Ease ease) {
@@ -150,25 +149,29 @@ namespace Elarion.UI.Helpers.Animation {
         protected override void Awake() {
             base.Awake();
             
-            _component = gameObject.GetOrAddComponent<UIComponent>();
+            _component = gameObject.GetComponent<UIComponent>();
+
+            if(!_component) {
+                _component = gameObject.AddComponent<UIPanel>();
+            }
         }
 
         protected override void OnEnable() {
             base.OnEnable();
-            
-            _component.Opened += OnOpened;
-            _component.Closed += OnClosed;
+                
+            _component.BeforeOpenEvent.AddListener(OnOpened);
+            _component.AfterCloseEvent.AddListener(OnClosed);
 
         }
 
         protected override void OnDisable() {
             base.OnDisable();
             
-            _component.Opened -= OnOpened;
-            _component.Closed -= OnClosed;
+            _component.BeforeOpenEvent.RemoveListener(OnOpened);
+            _component.AfterCloseEvent.RemoveListener(OnClosed);
         }
 
-        public void OnOpened() {
+        public void OnOpened(bool skipAnimation) {
             if(Active) {
                 return;
             }

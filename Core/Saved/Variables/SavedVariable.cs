@@ -13,7 +13,8 @@ namespace Elarion.Saved.Variables {
         public TVariable Value {
             get { return _value; }
             set {
-                if(value.Equals(_value)) {
+                if(value != null && value.Equals(_value) ||
+                   value == null && _value == null) {
                     return;
                 }
                 
