@@ -40,6 +40,8 @@ namespace Elarion.Editor {
             foreach(var helperComponent in componentTypes) {
                 helpers.Add(helperComponent, gameObject.GetComponent(helperComponent));
             }
+            
+            helpers.Add(typeof(Mask), gameObject.GetComponent<Mask>());
 
             return helpers;
         }

@@ -313,41 +313,5 @@ namespace Elarion.UI.Helpers.Animation {
             SizeTweener.ResetPropertyGraceful(duration);
             AlphaTweener.ResetPropertyGraceful(duration);
         }
-
-#if UNITY_EDITOR
-        // Editor-only helper field/logic to add a mask to the game object
-        [Tooltip("Prevents child animations from overflowing.")]
-        public bool maskChildAnimations = false;
-
-        private void OnValidate() {
-            if(UnityEditor.EditorApplication.isPlayingOrWillChangePlaymode) {
-                return;
-            }
-
-            if(maskChildAnimations) {
-                if(gameObject.GetComponent<Mask>()) {
-                    return;
-                }
-
-                UnityEditor.EditorApplication.delayCall += () => {
-                    gameObject.AddComponent<Mask>();
-
-                    if(!gameObject.GetComponent<Graphic>()) {
-                        var image = gameObject.AddComponent<Image>();
-                        image.color = new Color(1, 1, 1, 0);
-                    }
-                };
-            } else {
-                if(!gameObject.GetComponent<Mask>()) {
-                    return;
-                }
-
-                UnityEditor.EditorApplication.delayCall += () => {
-                    UnityEditor.SceneManagement.EditorSceneManager.MarkSceneDirty(SceneManager.GetActiveScene());
-                    DestroyImmediate(gameObject.GetComponent<Mask>());
-                };
-            }
-        }
-#endif
     }
 }
