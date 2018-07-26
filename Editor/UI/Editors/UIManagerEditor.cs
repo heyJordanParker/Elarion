@@ -11,14 +11,15 @@ namespace Elarion.Editor.UI.Editors {
         protected override void OnEnable() {
             base.OnEnable();
             autoDrawSingletonValidation = false;
+
+            _selectedObject = serializedObject.FindProperty("_selectedObject");
         }
 
         public override void OnInspectorGUI() {
             base.OnInspectorGUI();
             
             EGUI.Readonly(() => {
-                var selectedObject = serializedObject.FindProperty("_selectedObject").objectReferenceValue;
-                EditorGUILayout.ObjectField("Selected Object", selectedObject, typeof(GameObject), true);
+                EditorGUILayout.ObjectField("Selected Object", _selectedObject.objectReferenceValue, typeof(GameObject), true);
             });
             
             DrawSingletonValidation();

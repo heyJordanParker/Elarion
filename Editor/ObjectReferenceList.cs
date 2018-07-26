@@ -1,7 +1,9 @@
 ﻿using UnityEditor;
 using UnityEngine;
 using System;
+using Elarion.Editor.Extensions;
 using Elarion.Editor.UI;
+using Object = UnityEngine.Object;
 
 namespace Elarion.Editor {
     [Flags]
@@ -9,9 +11,8 @@ namespace Elarion.Editor {
         None = 0,
         ListSize = 1,
         ListLabel = 2,
-        ElementLabels = 4,
         Buttons = 8,
-        Default = ListSize | ListLabel | ElementLabels,
+        Default = ListSize | ListLabel,
         NoElementLabels = ListSize | ListLabel,
         All = Default | Buttons
     }
@@ -39,27 +40,25 @@ namespace Elarion.Editor {
                 EditorGUILayout.HelpBox(list.name + " is neither an array nor a list!", MessageType.Error);
                 return;
             }
-
-            bool
-                showListLabel = (options & EditorListOption.ListLabel) != 0,
-                showListSize = (options & EditorListOption.ListSize) != 0;
+            
+            var showListLabel = (options & EditorListOption.ListLabel) != 0;
+            var showListSize = (options & EditorListOption.ListSize) != 0;
 
             if(showListLabel) {
-                EditorGUILayout.PropertyField(list);
+                EditorGUILayout.LabelField(list.displayName);
                 EditorGUI.indentLevel += 1;
             }
 
-            if(!showListLabel || list.isExpanded) {
-                SerializedProperty size = list.FindPropertyRelative("Array.size");
-                if(showListSize) {
-                    EditorGUILayout.PropertyField(size);
-                }
+            SerializedProperty size = list.FindPropertyRelative("Array.size");
 
-                if(size.hasMultipleDifferentValues) {
-                    EditorGUILayout.HelpBox("Not showing lists with different sizes.", MessageType.Info);
-                } else {
-                    ShowElements(list, options);
-                }
+            if(showListSize) {
+                EditorGUILayout.PropertyField(size);
+            }
+
+            if(size.hasMultipleDifferentValues) {
+                EditorGUILayout.HelpBox("Not showing lists with different sizes.", MessageType.Info);
+            } else {
+                ShowElements(list, options);
             }
 
             if(showListLabel) {
@@ -68,9 +67,7 @@ namespace Elarion.Editor {
         }
 
         private static void ShowElements(SerializedProperty list, EditorListOption options) {
-            bool
-                showElementLabels = (options & EditorListOption.ElementLabels) != 0,
-                showButtons = (options & EditorListOption.Buttons) != 0;
+            bool showButtons = (options & EditorListOption.Buttons) != 0;
 
             Type elementType = null;
 
@@ -79,16 +76,15 @@ namespace Elarion.Editor {
                     EditorGUILayout.BeginHorizontal();
                 }
 
-                var element = list.GetArrayElementAtIndex(i).objectReferenceValue;
+                var element = list.GetArrayElementAtIndex(i);
                 if(elementType == null) {
-                    elementType = element.GetType();
+                    elementType = list.GetUnderlyingType().GetGenericArguments()[0];
                 }
 
-                if(showElementLabels) {
-                    EditorGUILayout.ObjectField(ObjectNames.NicifyVariableName(elementType.Name) + " " + i, element,
-                        elementType, true);
+                if(elementType.IsSubclassOf(typeof(Object))) {
+                    EditorGUILayout.ObjectField(ObjectNames.NicifyVariableName(elementType.Name) + " " + i, element.objectReferenceValue, elementType, true);
                 } else {
-                    EditorGUILayout.ObjectField(GUIContent.none, element, elementType, true);
+                    EditorGUILayout.PropertyField(element, new GUIContent(ObjectNames.NicifyVariableName(elementType.Name) + " " + i), true);
                 }
 
                 if(showButtons) {

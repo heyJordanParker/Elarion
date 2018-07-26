@@ -7,7 +7,7 @@ namespace Elarion.Saved.Variables {
     [SavedVariable]
     public abstract class SavedVariable<TVariable> : SavedEvent<TVariable> {
         
-        [SerializeField, HideInInspector]
+        [SerializeField]
         private TVariable _value;
         
         public TVariable Value {

@@ -71,24 +71,6 @@ namespace Elarion.UI {
                 // rehook
             }
         }
-        
-                  
-        protected void CloseChildren(UIOpenType closeTypeFilter, bool skipAnimation) {
-//            foreach(var child in ChildComponents) {
-//                
-//                if(closeTypeFilter == UIOpenType.WithParent) {
-//                    if(child.CloseType != UIOpenType.WithParent && child.CloseType != UIOpenType.Auto) {
-//                        continue;
-//                    }
-//                } else if(child.CloseType != closeTypeFilter) {
-//                    continue;
-//                }
-//                
-//                var childAnimation = skipAnimation ? null : child.GetAnimation(UIAnimationType.OnClose);
-//
-//                child.CloseInternal(childAnimation, false);
-//            }
-        }
 
         private void OnParentBeforeClose(bool skipAnimation) {
             if(CloseType != UIOpenType.WithParent && CloseType != UIOpenType.Auto) {
@@ -109,28 +91,6 @@ namespace Elarion.UI {
             CloseInternal(null, true);
         }
 
-
-        protected void OpenChildren(UIOpenType openTypeFilter, bool skipAnimation) {
-//            foreach(var child in ChildComponents) {
-//                
-//                if(!child.CanOpen) {
-//                    continue;
-//                }
-//                
-//                if(openTypeFilter == UIOpenType.WithParent) {
-//                    if(child.OpenType != UIOpenType.WithParent && child.OpenType != UIOpenType.Auto) {
-//                        continue;
-//                    }
-//                } else if(child.OpenType != openTypeFilter) {
-//                    continue;
-//                }
-//                
-//                var childAnimation = skipAnimation ? null : child.GetAnimation(UIAnimationType.OnOpen);
-//
-//                child.OpenInternal(childAnimation, false);
-//            }
-        }
-        
         protected virtual void OnParentBeforeOpen(bool skipAnimation) {
             if(!CanOpen) {
                 return;
@@ -326,8 +286,6 @@ namespace Elarion.UI {
             
             BeforeOpen(noAnimation);
 
-            OpenChildren(UIOpenType.WithParent, noAnimation);
-
             if(!HasAnimator || noAnimation) {
                 AfterOpen();
                 return;
@@ -343,8 +301,6 @@ namespace Elarion.UI {
         /// </summary>
         protected virtual void AfterOpen() {
             AfterOpenEvent.Invoke();
-            
-            OpenChildren(UIOpenType.AfterParent, false);
         }
 
         protected virtual void BeforeClose(bool skipAnimation) {
@@ -368,8 +324,6 @@ namespace Elarion.UI {
             
             BeforeClose(noAnimation);
             
-            CloseChildren(UIOpenType.WithParent, noAnimation);
-
             if(!HasAnimator || noAnimation) {
                 AfterClose();
                 return;
@@ -383,8 +337,6 @@ namespace Elarion.UI {
         /// </summary>
         protected virtual void AfterClose() {
             AfterCloseEvent.Invoke();
-            
-            CloseChildren(UIOpenType.AfterParent, true);
             
             if(HasAnimator) {
                 Animator.ResetToSavedProperties();

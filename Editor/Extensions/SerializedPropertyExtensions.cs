@@ -1,6 +1,8 @@
-﻿using System.Linq;
+﻿using System;
+using System.Linq;
 using System.Reflection;
 using UnityEditor;
+using UnityEngine;
 
 namespace Elarion.Editor.Extensions {
     public static class SerializedPropertyExtensions {
@@ -48,6 +50,45 @@ namespace Elarion.Editor.Extensions {
             }
             
             return targetObject;
+        }
+        
+        public static object GetValue(this SerializedProperty property) {
+            var parentType = property.serializedObject.targetObject.GetType();
+            var fi = parentType.GetFieldViaPath(property.propertyPath);
+            return fi.GetValue(property.serializedObject.targetObject);
+        }
+
+        public static void SetValue(this SerializedProperty property, object value) {
+            var parentType = property.serializedObject.targetObject.GetType();
+            var fi = parentType.GetFieldViaPath(property.propertyPath);
+            fi.SetValue(property.serializedObject.targetObject, value);
+        }
+
+        public static Type GetUnderlyingType(this SerializedProperty property) {
+            var parentType = property.serializedObject.targetObject.GetType();
+            var fi = parentType.GetFieldViaPath(property.propertyPath);
+            return fi.FieldType;
+        }
+
+        public static FieldInfo GetFieldViaPath(this Type type, string path) {
+            var containingObjectType = type;
+            var fi = type.GetField(path, BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic);
+            
+            if(!path.Contains('.')) {
+                return fi;
+            }
+            
+            var perDot = path.Split('.');
+            foreach(var fieldName in perDot) {
+                fi = containingObjectType.GetField(fieldName);
+                if(fi != null) {
+                    containingObjectType = fi.FieldType;
+                } else {
+                    return null;
+                }
+            }
+
+            return fi;
         }
 
         private static object GetFieldValue(object source, string name) {

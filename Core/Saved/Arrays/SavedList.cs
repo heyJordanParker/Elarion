@@ -10,7 +10,7 @@ namespace Elarion.Saved.Arrays {
     
     [SavedList]
     public class SavedList<TItem> : SavedEvent<SavedList<TItem>>, IList<TItem>, IList {
-        [SerializeField, HideInInspector]
+        [SerializeField]
         protected List<TItem> values = new List<TItem>();
 
         public event Action<TItem> ItemAdded = v => { };
