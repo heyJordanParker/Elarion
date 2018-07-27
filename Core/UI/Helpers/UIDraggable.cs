@@ -42,8 +42,6 @@ namespace Elarion.UI.Helpers {
         [SerializeField]
         private UnityEvent _onStartDrag = new UnityEvent();
 
-        private Vector2 _dragDelta;
-
         private RectTransform _transform;
 
         public UnityEvent OnStartDragEvent => _onStartDrag;

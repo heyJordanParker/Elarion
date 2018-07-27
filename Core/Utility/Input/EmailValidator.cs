@@ -10,7 +10,7 @@ namespace Elarion.Utility.Input {
                 new MailAddress(input);
                 error = null;
                 return true;
-            } catch(Exception e) {
+            } catch(Exception) {
                 error = this.error;
                 return false;
             }

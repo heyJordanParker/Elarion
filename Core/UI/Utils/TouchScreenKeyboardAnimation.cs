@@ -24,6 +24,7 @@ namespace Elarion.UI.Utils {
             }
         }
 
+        #if UNITY_ANDROID || UNITY_IOS
         private void Awake() {
             _animator = GetComponent<UIAnimator>();
         }
@@ -31,6 +32,7 @@ namespace Elarion.UI.Utils {
         public void Update() {
             KeyboardVisible = TouchScreenKeyboard.visible;
         }
+        #endif
 
     }
 }

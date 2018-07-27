@@ -16,9 +16,6 @@ namespace Elarion.UI {
         
         public bool enableTabNavigation = true;
 
-        [SerializeField, HideInInspector]
-        private GameObject _selectedObject;
-
         private BaseEventData _baseEventData;
 
         protected override void Initialize() {
@@ -26,12 +23,6 @@ namespace Elarion.UI {
             // This is necessary for blur effects - the shader can't work with the main render texture
             var uiCamera = UIHelper.CreateUICamera("UI Root Camera");
             uiCamera.hideFlags = HideFlags.HideAndDontSave;
-        }
-
-        protected override void Deinitialize() {
-            base.Deinitialize();
-
-            _selectedObject = null;
         }
 
         // Update after the event system; Ensure that 

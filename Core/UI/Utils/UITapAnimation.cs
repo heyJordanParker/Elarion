@@ -27,7 +27,6 @@ namespace Elarion.UI.Utils {
         private ECoroutine _pointerUpAnimation;
 
         private Color _tapAnimationOriginalColor;
-        private bool _suspended;
         private Selectable _selectableComponent;
 
         public Transform TapAnimationTransform => tapAnimation.transform;
