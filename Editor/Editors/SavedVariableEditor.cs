@@ -24,7 +24,6 @@ namespace Elarion.Editor.Editors {
         protected bool isSavedListEditor;
 
         private SerializedProperty _valueProperty;
-        private int _valuePropertyDepth;
 
         protected virtual void OnEnable() {
             var type = target.GetType();
@@ -39,7 +38,6 @@ namespace Elarion.Editor.Editors {
                                     type.GetCustomAttributes(typeof(SavedListAttribute), true).Length > 0;
             
             _valueProperty = serializedObject.FindProperty("values");
-            _valuePropertyDepth = _valueProperty.depth;
         }
 
         public override void OnInspectorGUI() {

@@ -108,6 +108,7 @@ namespace Elarion.UI.Helpers {
         
         private void ClampToBounds() {
             var position = _transform.localPosition;
+            var anchoredPosition = _transform.anchoredPosition;
 
             switch(Bounds) {
                 case MovementBounds.Screen: {
@@ -156,11 +157,10 @@ namespace Elarion.UI.Helpers {
                 case MovementBounds.Custom: {
 
                     if(_dragX) {
-                        position.x = Mathf.Clamp(_transform.localPosition.x, _xBounds.x, _xBounds.y);
+                        anchoredPosition.x = Mathf.Clamp(_transform.anchoredPosition.x, _xBounds.x, _xBounds.y);
                     }
-
                     if(_dragY) {
-                        position.y = Mathf.Clamp(_transform.localPosition.y, _yBounds.x, _yBounds.y);
+                        anchoredPosition.y = Mathf.Clamp(_transform.anchoredPosition.y, _yBounds.x, _yBounds.y);
                     }
                     
                     break;
@@ -172,6 +172,7 @@ namespace Elarion.UI.Helpers {
             }
 
             _transform.localPosition = position;
+            _transform.anchoredPosition = anchoredPosition;
         }
 
     }

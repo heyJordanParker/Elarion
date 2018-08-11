@@ -16,8 +16,6 @@ namespace Elarion.UI {
         
         public bool enableTabNavigation = true;
 
-        private BaseEventData _baseEventData;
-
         protected override void Initialize() {
             base.Initialize();
             // This is necessary for blur effects - the shader can't work with the main render texture
