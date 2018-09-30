@@ -30,7 +30,8 @@ namespace Elarion.UI.Helpers.Animation {
             SlideDown,
             PopIn,
             PopOut,
-            Maximize
+            Maximize,
+            Minimize
         }
 
         [Serializable]
@@ -53,6 +54,9 @@ namespace Elarion.UI.Helpers.Animation {
             public bool animateSize = false;
             public bool relativeSizeMovement = true;
             public Vector2 sizeDelta = Vector2.zero;
+            public bool animateScale = false;
+            public bool relativeScaleMovement = true;
+            public Vector2 scaleDelta = Vector2.zero;
             public bool animateRotation = false;
             public bool relativeRotationMovement = true;
             public Vector3 rotationDelta = Vector3.zero;
@@ -101,6 +105,10 @@ namespace Elarion.UI.Helpers.Animation {
                     animateSize = preset.animateSize;
                     sizeAnimationDirection = GetAnimationDirection(preset.relativeSizeMovement);
                     sizeDelta = preset.sizeDelta;
+                    
+                    animateScale = preset.animateScale;
+                    scaleAnimationDirection = GetAnimationDirection(preset.relativeScaleMovement);
+                    scaleDelta = preset.scaleDelta;
 
                     animateRotation = preset.animateRotation;
                     rotationAnimationDirection = GetAnimationDirection(preset.relativeRotationMovement);
@@ -110,7 +118,7 @@ namespace Elarion.UI.Helpers.Animation {
                     overrideParentAnchorMin = preset.overrideParentAnchorMin;
                     overrideParentAnchorMax = preset.overrideParentAnchorMax;
 
-                    if(preset.animatePosition || preset.animateAnchors || preset.animateRotation || preset.animateSize) {
+                    if(preset.animatePosition || preset.animateAnchors || preset.animateRotation || preset.animateSize || preset.animateScale) {
                         overrideParentAnchors = true;
                         overrideParentAnchorMin = new Vector2(0.5f, 0.5f);
                         overrideParentAnchorMax = new Vector2(0.5f, 0.5f);
@@ -189,9 +197,16 @@ namespace Elarion.UI.Helpers.Animation {
                         }, {
                             AnimationMovementPreset.Maximize, 
                             new MovementPreset {
-                                animateSize = true, 
-                                relativeSizeMovement = false, 
-                                sizeDelta = new Vector2(0, 0)
+                                animateScale = true, 
+                                relativeScaleMovement = false, 
+                                scaleDelta = new Vector2(1, 1)
+                            }
+                        }, {
+                            AnimationMovementPreset.Minimize, 
+                            new MovementPreset {
+                                animateScale = true, 
+                                relativeScaleMovement = false, 
+                                scaleDelta = new Vector2(0, 0)
                             }
                         },
                     };
@@ -278,6 +293,15 @@ namespace Elarion.UI.Helpers.Animation {
         
         [ConditionalVisibility("animateSize", "_movementPreset == AnimationMovementPreset.Custom")]
         public Vector2 sizeDelta = Vector2.zero;
+
+        [ConditionalVisibility(enableConditions: "_movementPreset == AnimationMovementPreset.Custom")]
+        public bool animateScale = false;
+        
+        [ConditionalVisibility("animateScale", "_movementPreset == AnimationMovementPreset.Custom")]
+        public UIAnimationDirection scaleAnimationDirection = UIAnimationDirection.RelativeTo;
+        
+        [ConditionalVisibility("animateScale", "_movementPreset == AnimationMovementPreset.Custom")]
+        public Vector2 scaleDelta = Vector2.zero;
 
         [ConditionalVisibility(enableConditions: "_movementPreset == AnimationMovementPreset.Custom")]
         public bool animateRotation = false;
@@ -376,6 +400,11 @@ namespace Elarion.UI.Helpers.Animation {
                 animator.Resize(sizeDelta, sizeAnimationDirection, callback, AnimationOptions);
                 callback = null; // to avoid multiple calls of the callback
             }
+
+            if(animateScale) {
+                animator.Scale(scaleDelta, scaleAnimationDirection, callback, AnimationOptions);
+                callback = null; // to avoid multiple calls of the callback
+            }
             
             if(animateAlpha) {
                 animator.Fade(alphaDelta, alphaAnimationDirection, callback, AnimationOptions);
@@ -397,6 +426,9 @@ namespace Elarion.UI.Helpers.Animation {
             
             if(animateSize)
                 animator.SizeTweener.StopTween(reset);
+            
+            if(animateScale)
+                animator.ScaleTweener.StopTween(reset);
             
             if(animateAlpha)
                 animator.AlphaTweener.StopTween(reset);

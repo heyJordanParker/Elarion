@@ -7,7 +7,7 @@ namespace Elarion.Saved.Variables.References {
         public FloatReference(float value) : base(value) { }
         
         public static implicit operator float(FloatReference reference) {
-            return reference == null ? 0 : reference.Value;
+            return reference?.Value ?? 0;
         }
     }
 }

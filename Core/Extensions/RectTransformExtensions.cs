@@ -20,7 +20,6 @@ namespace Elarion.Extensions {
 
         public static void CopyPosition(this RectTransform toTransform, RectTransform fromTransform,
             bool copySize = false) {
-
             toTransform.position = fromTransform.position;
 
             if(copySize) {
@@ -144,7 +143,6 @@ namespace Elarion.Extensions {
                         result = selectable;
                     }
                 }
-
             }
 
             return result;
@@ -169,7 +167,7 @@ namespace Elarion.Extensions {
 
             var parent = fromTransform;
 
-            int currentDistance = 0;
+            var currentDistance = 0;
 
             while(parent != null) {
                 if(parent.IsParentOf(toTransform)) {

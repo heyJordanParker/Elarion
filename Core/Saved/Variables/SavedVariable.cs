@@ -11,7 +11,7 @@ namespace Elarion.Saved.Variables {
         private TVariable _value;
         
         public TVariable Value {
-            get { return _value; }
+            get => _value;
             set {
                 if(value != null && value.Equals(_value) ||
                    value == null && _value == null) {
@@ -22,6 +22,13 @@ namespace Elarion.Saved.Variables {
                 Raise(_value);
             }
         }
+
+        /// <summary>
+        /// Used by Unity Events
+        /// </summary>
+        public void SetValue(TVariable newValue) {
+            Value = newValue;
+        }
         
         public override void Subscribe(Action<TVariable> onValueChanged) {
             base.Subscribe(onValueChanged);
@@ -31,8 +38,8 @@ namespace Elarion.Saved.Variables {
             base.Unsubscribe(onValueChanged);
         }
         
-        public static implicit operator TVariable(SavedVariable<TVariable> savedFloat) {
-            return savedFloat == null ? default(TVariable) : savedFloat.Value;
+        public static implicit operator TVariable(SavedVariable<TVariable> savedVariable) {
+            return savedVariable == null ? default(TVariable) : savedVariable.Value;
         }
     }
 }

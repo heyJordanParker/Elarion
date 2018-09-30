@@ -17,9 +17,7 @@ namespace Elarion.UI {
         
         private bool _initialized;
         
-        protected bool IsStateDirty {
-            get { return !_initialized  || _currentState != _previousState; }
-        }
+        protected bool IsStateDirty => !_initialized  || _currentState != _previousState;
 
         private States _previousState = States.None;
         private States _currentState = States.None;
@@ -53,33 +51,55 @@ namespace Elarion.UI {
         protected virtual void OnStateChanged(States currentState, States previousState) { }
 
         private States CurrentState {
-            get { return _currentState; }
-            set { _currentState = value; }
+            get => _currentState;
+            set => _currentState = value;
         }
 
         public bool IsOpened {
-            get { return CurrentState.HasFlag(States.Opened); }
-            set { CurrentState = CurrentState.SetFlag(States.Opened, value); }
+            get => HasFlag(CurrentState, States.Opened);
+            set => CurrentState = SetFlag(CurrentState, States.Opened, value);
         }
 
         public bool IsInTransition {
-            get { return CurrentState.HasFlag(States.InTransition); }
-            set { CurrentState = CurrentState.SetFlag(States.InTransition, value); }
+            get => HasFlag(CurrentState, States.InTransition);
+            set => CurrentState = SetFlag(CurrentState, States.InTransition, value);
         }
 
         public bool IsFocusedThis {
-            get { return CurrentState.HasFlag(States.FocusedThis); }
-            set { CurrentState = CurrentState.SetFlag(States.FocusedThis, value); }
+            get => HasFlag(CurrentState, States.FocusedThis);
+            set => CurrentState = SetFlag(CurrentState, States.FocusedThis, value);
         }
 
         public bool IsDisabled {
-            get { return CurrentState.HasFlag(States.Disabled); }
-            set { CurrentState = CurrentState.SetFlag(States.Disabled, value); }
+            get => HasFlag(CurrentState, States.Disabled);
+            set => CurrentState = SetFlag(CurrentState, States.Disabled, value);
         }
 
         public bool IsInteractable {
-            get { return CurrentState.HasFlag(States.Interactable); }
-            set { CurrentState = CurrentState.SetFlag(States.Interactable, value); }
+            get => HasFlag(CurrentState, States.Interactable);
+            set => CurrentState = SetFlag(CurrentState, States.Interactable, value);
+        }
+
+        /// <summary>
+        /// Non allocating version of HasFlag
+        /// </summary>
+        private static bool HasFlag(States state, States flag) {
+            return (state & flag) == flag;
+        }
+
+        /// <summary>
+        /// Non allocating version of SetFlag 
+        /// </summary>
+        private static States SetFlag(States state, States flag, bool value) {
+            if(value) {
+                // Set the flag
+                state |= flag;
+            } else {
+                // Remove the flag
+                state &= ~flag;
+            }
+
+            return state;
         }
     }
 }

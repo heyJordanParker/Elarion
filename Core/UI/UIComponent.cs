@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Runtime.CompilerServices;
 using System.Text;
 using Elarion.Saved.Events.UnityEvents;
 using Elarion.UI.Helpers;
@@ -10,8 +11,6 @@ using UnityEngine.Events;
 using Debug = UnityEngine.Debug;
 
 namespace Elarion.UI {
-    // TODO hook to the parent using events (UpdateChildren, Before/After Open/Close
-
     [DisallowMultipleComponent]
     [RequireComponent(typeof(RectTransform))]
     public abstract class UIComponent : UIState {
@@ -124,17 +123,7 @@ namespace Elarion.UI {
             private set => _overrideParentComponent = value;
         }
 
-        protected List<UIComponent> ChildComponents { get; set; } = new List<UIComponent>();
-
-        public UIAnimator Animator {
-            get {
-                if(_animator == null) {
-                    _animator = GetComponent<UIAnimator>();
-                }
-
-                return _animator;
-            }
-        }
+        public UIAnimator Animator => _animator;
 
         public UIOpenConditions OpenConditions { get; protected set; }
 
@@ -159,8 +148,8 @@ namespace Elarion.UI {
 
         public bool IsAnimating {
             get {
-                foreach(var animationController in _animationControllers) {
-                    if(animationController.Animating) {
+                for(var i = 0; i < _animationControllers.Length; ++i) {
+                    if(_animationControllers[i].Animating) {
                         return true;
                     }
                 }
@@ -204,29 +193,14 @@ namespace Elarion.UI {
         }
 
         protected override void Start() {
-            base.Start();
+            // Update the state before the base.Start() method initializes
+            UpdateComponent();
 
+            base.Start();
+            
             if(ParentComponent == null && OpenType == UIOpenType.Auto) {
                 Open();
             }
-        }
-
-        protected override void OnEnable() {
-            base.OnEnable();
-
-            UpdateParent();
-
-            UpdateState();
-        }
-
-        protected override void OnDisable() {
-            base.OnDisable();
-
-            if(!IsOpened) return;
-
-            Close(true);
-
-            UpdateState();
         }
 
         /// <summary>
@@ -263,6 +237,28 @@ namespace Elarion.UI {
             CloseInternal(animation, true);
         }
 
+        /// <summary>
+        /// For use in Unity events.
+        /// </summary>
+        public void Toggle() {
+            if(IsOpened) {
+                Close();
+            } else {
+                Open();
+            }
+        }
+
+        /// <summary>
+        /// For use in Unity events.
+        /// </summary>
+        public void Toggle(bool open) {
+            if(open) {
+                Open();
+            } else {
+                Close();
+            }
+        }
+
         protected virtual void BeforeOpen(bool skipAnimation) {
             BeforeOpenEvent.Invoke(skipAnimation);
         }
@@ -275,10 +271,6 @@ namespace Elarion.UI {
             if(!CanOpen) {
                 return;
             }
-            
-            // Update children
-            ChildComponents = GetComponentsInChildren<UIComponent>(includeInactive: true)
-                .Where(child => child.ParentComponent == this).ToList();
             
             IsOpened = true;
 
@@ -354,9 +346,13 @@ namespace Elarion.UI {
             IsInteractable = IsOpened && !IsDisabled && !IsInTransition && InteractableSelf &&
                              InteractableParent;
 
-            // Set the state to InTransition if either this is animating or this can't animate and its' parent is animating
-            IsInTransition = IsAnimating ||
-                             !HasAnimator && ParentComponent != null && ParentComponent.IsInTransition;
+            var parentIsAnimating = !HasAnimator && ParentComponent != null && ParentComponent.IsInTransition;
+            // animate if the parent is animating, this should be opened and there's no animator
+            var isOpeningNoAnimation = parentIsAnimating && _openType != UIOpenType.Manual && IsOpened;
+            // animate if the parent is animating, this should bec losed and there's no animator
+            var isClosingNoAnimation = parentIsAnimating && _closeType != UIOpenType.Manual && !IsOpened;
+            
+            IsInTransition = IsAnimating || isOpeningNoAnimation || isClosingNoAnimation;
 
             // Finish updating the state
             base.UpdateState();
@@ -364,7 +360,6 @@ namespace Elarion.UI {
 
         protected UIAnimation GetAnimation(UIAnimationType type) {
             return !HasAnimator ? null : Animator.GetAnimation(type);
-
         }
 
         protected override void OnStateChanged(States currentState, States previousState) {
@@ -386,6 +381,14 @@ namespace Elarion.UI {
             }
 
             ParentComponent = null;
+        }
+
+        /// <summary>
+        /// Called on component added or the reset button pressed.
+        /// </summary>
+        protected override void Reset() {
+            base.Reset();
+            UpdateParent();
         }
 
         protected override void OnTransformParentChanged() {
@@ -413,13 +416,13 @@ namespace Elarion.UI {
         public string Description {
             get {
                 StringBuilder stringBuilder = new StringBuilder();
-                stringBuilder.AppendLine("<b>" + GetType().Name + ": </b>" + name);
-                stringBuilder.AppendLine("<b>Opened: </b>" + IsOpened);
-                stringBuilder.AppendLine("<b>Rendering: </b>" + IsRendering);
-                stringBuilder.AppendLine("<b>In Transition: </b>" + IsInTransition);
-                stringBuilder.AppendLine("<b>Focused: </b>" + IsFocusedThis);
-                stringBuilder.AppendLine("<b>Disabled: </b>" + IsDisabled);
-                stringBuilder.AppendLine("<b>Interactable: </b>" + IsInteractable);
+                stringBuilder.AppendLine($"<b>{GetType().Name}: </b>{name}");
+                stringBuilder.AppendLine($"<b>Opened: </b>{IsOpened}");
+                stringBuilder.AppendLine($"<b>Rendering: </b>{IsRendering}");
+                stringBuilder.AppendLine($"<b>In Transition: </b>{IsInTransition}");
+                stringBuilder.AppendLine($"<b>Focused: </b>{IsFocusedThis}");
+                stringBuilder.AppendLine($"<b>Disabled: </b>{IsDisabled}");
+                stringBuilder.AppendLine($"<b>Interactable: </b>{IsInteractable}");
                 return stringBuilder.ToString();
             }
         }

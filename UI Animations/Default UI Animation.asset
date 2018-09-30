@@ -3,7 +3,7 @@
 --- !u!114 &11400000
 MonoBehaviour:
   m_ObjectHideFlags: 0
-  m_PrefabParentObject: {fileID: 0}
+  m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInternal: {fileID: 0}
   m_GameObject: {fileID: 0}
   m_Enabled: 1
@@ -11,6 +11,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 4ab013877c59463d99bed13bed482803, type: 3}
   m_Name: Default UI Animation
   m_EditorClassIdentifier: 
+  _movementPreset: 0
+  _fadePreset: 1
   _movementDirection: 0
   _delay: 0
   _durationPreset: 34
@@ -27,6 +29,9 @@ MonoBehaviour:
   animateSize: 0
   sizeAnimationDirection: 2
   sizeDelta: {x: 0, y: 0}
+  animateScale: 0
+  scaleAnimationDirection: 2
+  scaleDelta: {x: 0, y: 0}
   animateRotation: 0
   rotationAnimationDirection: 2
   rotationDelta: {x: 0, y: 0, z: 0}
@@ -37,5 +42,3 @@ MonoBehaviour:
   overrideParentAnchorMin: {x: 0.5, y: 0.5}
   overrideParentAnchorMax: {x: 0.5, y: 0.5}
   savePosition: 0
-  _movementPreset: 0
-  _fadePreset: 1

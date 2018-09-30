@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections;
+using Elarion.General;
 using UnityEngine;
 
 namespace Elarion.Managers {
@@ -77,7 +78,7 @@ namespace Elarion.Managers {
                 source.volume = 0;
                 while(source.volume < 1) {
                     yield return null;
-                    source.volume += Time.deltaTime;
+                    source.volume += ETime.DeltaTime;
                 }
                 source.volume = 1;
             }
@@ -89,7 +90,7 @@ namespace Elarion.Managers {
             if((effect & AudioEffect.FadeOut) == AudioEffect.FadeOut) {
                 while(source.volume > 0) {
                     yield return null;
-                    source.volume -= Time.deltaTime;
+                    source.volume -= ETime.DeltaTime;
                 }
             }
 

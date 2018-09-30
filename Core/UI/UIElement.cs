@@ -35,7 +35,6 @@ namespace Elarion.UI {
             }
         }
         
-        
         protected override void OnStateChanged(States currentState, States previousState) {
             base.OnStateChanged(currentState, previousState);
             // disable disabled child's interaction to simplify navigation events

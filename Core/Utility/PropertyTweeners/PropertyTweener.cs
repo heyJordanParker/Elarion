@@ -1,6 +1,8 @@
 ﻿using System;
 using System.Collections;
+using Elarion.Coroutines;
 using Elarion.Extensions;
+using Elarion.General;
 using Elarion.UI;
 using Elarion.UI.Helpers.Animation;
 using UnityEngine;
@@ -115,7 +117,7 @@ namespace Elarion.Utility.PropertyTweeners {
             while(movementProgress <= 1) {
                 CurrentValue = UpdateValue(startingAnchors, movementProgress, ease);
                 
-                movementProgress += Time.deltaTime / duration;
+                movementProgress += ETime.DeltaTime / duration;
                 yield return null;
             }
         }

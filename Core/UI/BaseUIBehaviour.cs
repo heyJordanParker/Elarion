@@ -2,7 +2,7 @@ using UnityEngine;
 
 namespace Elarion.UI {
     [RequireComponent(typeof(RectTransform))]
-    public abstract class BaseUIBehaviour : MonoBehaviour {
+    public abstract class BaseUIBehaviour : ExtendedBehaviour {
         public RectTransform Transform {
             get {
                 if(_transform == null) {
@@ -39,16 +39,6 @@ namespace Elarion.UI {
         ///   <para>See MonoBehaviour.OnDestroy.</para>
         /// </summary>
         protected virtual void OnDestroy() { }
-
-        /// <summary>
-        ///   <para>See MonoBehaviour.OnValidate.</para>
-        /// </summary>
-        protected virtual void OnValidate() { }
-
-        /// <summary>
-        ///   <para>See MonoBehaviour.Reset.</para>
-        /// </summary>
-        protected virtual void Reset() { }
 
         /// <summary>
         ///   <para>This callback is called if an associated RectTransform has its dimensions changed. The call is also made to all child rect transforms, even if the child transform itself doesn't change - as it could have, depending on its anchoring.</para>

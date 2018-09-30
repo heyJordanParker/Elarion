@@ -3,9 +3,6 @@ using Elarion.Attributes;
 using UnityEngine;
 
 namespace Elarion.UI {
-    
-    // TODO use unity events to open/close child components (instead of the parent doing that for them); e.g. register the events in the code
-    
     /// <summary>
     /// Utility class that ensures that only a single group component is active at any one time.
     /// </summary>
@@ -22,6 +19,10 @@ namespace Elarion.UI {
         [Tooltip("Group ID. No two components that share a group ID can be active at the same time.")]
         private int _groupId = 0;
 
+        [SerializeField]
+        [Tooltip("Move to top of render queue to show animations properly.")]
+        private bool _setAsLastChildOnOpen;
+
         [SerializeField, HideInInspector]
         private UIComponent _component;
         
@@ -29,38 +30,14 @@ namespace Elarion.UI {
 
         public UIComponent Component => _component ? _component : (_component = GetComponent<UIComponent>());
 
-        private UIComponent CurrentOpenComponent {
-            get {
-                if(!ComponentGroups.ContainsKey(GroupId)) {
-                    ComponentGroups.Add(GroupId, new GroupData());
-                }
-
-                return ComponentGroups[GroupId].CurrentOpenComponent;
-            }
-            set {
-                if(!ComponentGroups.ContainsKey(GroupId)) {
-                    ComponentGroups.Add(GroupId, new GroupData());
-                }
-                
-                ComponentGroups[GroupId].CurrentOpenComponent = value;
-            }
+        public UIComponent CurrentOpenComponent {
+            get => GetGroup(GroupId).CurrentOpenComponent;
+            private set => GetGroup(GroupId).CurrentOpenComponent = value;
         }
 
         private UIComponent PreviousOpenComponent {
-            get {
-                if(!ComponentGroups.ContainsKey(GroupId)) {
-                    ComponentGroups.Add(GroupId, new GroupData());
-                }
-
-                return ComponentGroups[GroupId].PreviousOpenComponent;
-            }
-            set {
-                if(!ComponentGroups.ContainsKey(GroupId)) {
-                    ComponentGroups.Add(GroupId, new GroupData());
-                }
-                
-                ComponentGroups[GroupId].PreviousOpenComponent = value;
-            }
+            get => GetGroup(GroupId).PreviousOpenComponent;
+            set => GetGroup(GroupId).PreviousOpenComponent = value;
         }
 
         protected override void Awake() {
@@ -77,7 +54,6 @@ namespace Elarion.UI {
             Component.AfterOpenEvent.RemoveListener(AfterOpen);
         }
 
-
         protected void BeforeOpen(bool skipAnimation) {
             if(CurrentOpenComponent != null && CurrentOpenComponent != Component) {
                 if(HasAnimation(CurrentOpenComponent, UIAnimationType.OnClose)) {
@@ -91,8 +67,7 @@ namespace Elarion.UI {
 
             CurrentOpenComponent = Component;
 
-            if(HasAnimation(CurrentOpenComponent, UIAnimationType.OnOpen)) {
-                // set to the top of the render queue if it'll animate
+            if(_setAsLastChildOnOpen) {
                 transform.SetAsLastSibling();
             }
         }
@@ -106,6 +81,14 @@ namespace Elarion.UI {
 
         private bool HasAnimation(UIComponent component, UIAnimationType animation) {
             return component.HasAnimator && component.Animator.GetAnimation(animation) != null;
+        }
+
+        private static GroupData GetGroup(int groupId) {
+            if(!ComponentGroups.ContainsKey(groupId)) {
+                ComponentGroups.Add(groupId, new GroupData());
+            }
+
+            return ComponentGroups[groupId];
         }
 
         private static Dictionary<int, GroupData> ComponentGroups { get; } = new Dictionary<int, GroupData>();

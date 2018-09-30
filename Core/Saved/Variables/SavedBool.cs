@@ -2,5 +2,11 @@
 
 namespace Elarion.Saved.Variables {
     [CreateAssetMenu(menuName = "Saved/Bool", order = 32)]
-    public class SavedBool : SavedVariable<bool> { }
+    public class SavedBool : SavedVariable<bool> {
+
+        public void Toggle() {
+            Value = !Value;
+        }
+        
+    }
 }

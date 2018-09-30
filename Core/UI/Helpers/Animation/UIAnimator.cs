@@ -37,6 +37,7 @@ namespace Elarion.UI.Helpers.Animation {
         private PositionTweener _positionTweener;
         private AnchorsTweener _anchorsTweener;
         private RotationTweener _rotationTweener;
+        private ScaleTweener _scaleTweener;
         private SizeTweener _sizeTweener;
         private AlphaTweener _alphaTweener;
 
@@ -92,6 +93,15 @@ namespace Elarion.UI.Helpers.Animation {
             }
         }
 
+        internal ScaleTweener ScaleTweener {
+            get {
+                if(_scaleTweener == null) {
+                    _scaleTweener = new ScaleTweener(this) {Target = Target.Transform};
+                }
+
+                return _scaleTweener;
+            }
+        }
 
         internal AlphaTweener AlphaTweener {
             get {
@@ -106,7 +116,7 @@ namespace Elarion.UI.Helpers.Animation {
         public bool Animating {
             get {
                 return AlphaTweener.Tweening || AnchorsTweener.Tweening || PositionTweener.Tweening ||
-                       RotationTweener.Tweening || SizeTweener.Tweening;
+                       RotationTweener.Tweening || SizeTweener.Tweening || ScaleTweener.Tweening;
             }
         }
 
@@ -156,9 +166,9 @@ namespace Elarion.UI.Helpers.Animation {
             _canvasTransform.anchorMin = new Vector2(AnchorsTweener.SavedValue.x, AnchorsTweener.SavedValue.y);
             _canvasTransform.anchorMax = new Vector2(AnchorsTweener.SavedValue.z, AnchorsTweener.SavedValue.w);
 
-            _canvasTransform.anchoredPosition = PositionTweener.SavedValue;
+            _canvasTransform.anchoredPosition = Vector2.zero; // PositionTweener.SavedValue;
             _canvasTransform.sizeDelta = SizeTweener.SavedValue;
-            _canvasTransform.localScale = Target.Transform.localScale;
+            _canvasTransform.localScale = ScaleTweener.SavedValue;
 
             if(animation.overrideParentAnchors) {
                 var cachedPosition = _canvasTransform.position;
@@ -245,6 +255,7 @@ namespace Elarion.UI.Helpers.Animation {
             AnchorsTweener.StopTween(reset);
             RotationTweener.StopTween(reset);
             SizeTweener.StopTween(reset);
+            ScaleTweener.StopTween(reset);
             AlphaTweener.StopTween(reset);
         }
 
@@ -284,6 +295,11 @@ namespace Elarion.UI.Helpers.Animation {
             Action callback = null, UIAnimationOptions animationOptions = null) {
             SizeTweener.Tween(size, animationDirection, callback, animationOptions);
         }
+        
+        public void Scale(Vector3 scale, UIAnimationDirection animationDirection = UIAnimationDirection.From,
+            Action callback = null, UIAnimationOptions animationOptions = null) {
+            ScaleTweener.Tween(scale, animationDirection, callback, animationOptions);
+        }
 
         public void Fade(float fade, UIAnimationDirection animationDirection = UIAnimationDirection.To,
             Action callback = null, UIAnimationOptions animationOptions = null) {
@@ -295,6 +311,7 @@ namespace Elarion.UI.Helpers.Animation {
             AnchorsTweener.SaveProperty();
             RotationTweener.SaveProperty();
             SizeTweener.SaveProperty();
+            ScaleTweener.SaveProperty();
             AlphaTweener.SaveProperty();
         }
 
@@ -303,6 +320,7 @@ namespace Elarion.UI.Helpers.Animation {
             AnchorsTweener.ResetProperty();
             RotationTweener.ResetProperty();
             SizeTweener.ResetProperty();
+            ScaleTweener.ResetProperty();
             AlphaTweener.ResetProperty();
         }
 
@@ -311,6 +329,7 @@ namespace Elarion.UI.Helpers.Animation {
             AnchorsTweener.ResetPropertyGraceful(duration);
             RotationTweener.ResetPropertyGraceful(duration);
             SizeTweener.ResetPropertyGraceful(duration);
+            ScaleTweener.ResetPropertyGraceful(duration);
             AlphaTweener.ResetPropertyGraceful(duration);
         }
     }

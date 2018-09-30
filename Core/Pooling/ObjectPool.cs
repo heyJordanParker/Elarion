@@ -1,11 +1,13 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
-using Elarion.Extensions;
+using Elarion.Coroutines;
 using Elarion.Utility;
 using UnityEngine;
 
 namespace Elarion.Pooling {
+    // TODO custom editor with a Repopulate Pool Button
+    // TODO repopulate pool if the prefab changes (maybe use hashcodes or just the reference); editor only
     [CreateAssetMenu(menuName = "Object Pool", order = 33)]
     public class ObjectPool : ScriptableObject {
         [SerializeField]
@@ -20,6 +22,9 @@ namespace Elarion.Pooling {
 
         [SerializeField]
         private int _initializationPriority = 1;
+
+        [SerializeField]
+        private bool _hideObjects;
         
         private Transform PooledObjectsContainer { get; set; }
         
@@ -46,7 +51,21 @@ namespace Elarion.Pooling {
             return spawnedObject;
         }
 
+        public PooledObject[] SpawnMultiple(int count, Transform parent, bool autoInitialize = true) {
+            var results = new PooledObject[count];
+            
+            for(int i = 0; i < count; ++i) {
+                results[i] = Spawn(parent, autoInitialize);
+            }
+
+            return results;
+        }
+
         public void Return(PooledObject pooledObject) {
+            if(pooledObject == null) {
+                return;
+            }
+            
             pooledObject.Deinitialize();
             pooledObject.transform.SetParent(PooledObjectsContainer);
             PooledObjects.Push(pooledObject);
@@ -55,6 +74,11 @@ namespace Elarion.Pooling {
         private void AddObject() {
             var instance = Instantiate(_pooledObject, PooledObjectsContainer);
             instance.Pool = this;
+            
+            if(_hideObjects) {
+                instance.gameObject.hideFlags = HideFlags.HideInHierarchy;
+            }
+            
             PooledObjects.Push(instance);
         }
 

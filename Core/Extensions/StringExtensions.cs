@@ -14,9 +14,5 @@ namespace Elarion.Extensions {
 
             return (T)Enum.Parse(typeof(T), value);
         }
-
-        public static string SFormat(this string value, params object[] parameters) {
-            return string.Format(value, parameters);
-        }
     }
 }

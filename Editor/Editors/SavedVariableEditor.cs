@@ -13,8 +13,6 @@ using UnityEngine;
 using Object = UnityEngine.Object;
 
 namespace Elarion.Editor.Editors {
-    // TODO saved list editor (to avoid the type mismatch error)
-    
     /// <summary>
     /// This fallback editor is used for all SavedVariables. If the application is playing, the editor sends out SavedVariable changed events when the user edits it using the inspector. 
     /// </summary>
@@ -76,6 +74,10 @@ namespace Elarion.Editor.Editors {
                 
                 raiseMethod.Invoke(target, new []{value.GetValue(target, null)});
             }
+        }
+        
+        public override bool RequiresConstantRepaint() {
+            return true;
         }
     }
 }

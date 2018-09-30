@@ -1,4 +1,5 @@
 ﻿using Elarion.Extensions;
+using Elarion.General;
 using UnityEngine;
 
 namespace Elarion {
@@ -31,16 +32,16 @@ namespace Elarion {
 		protected virtual void LateUpdate() {
 			const float epsilon = float.Epsilon;
 			if(Mathf.Abs(distance - targetDistance) > epsilon) {
-				distance = distance.EaseTo(targetDistance, Time.smoothDeltaTime, easeType);
+				distance = distance.EaseTo(targetDistance, ETime.SmoothDeltaTime, easeType);
 			}
 			if(Mathf.Abs(_moveDelta.x) > epsilon || Mathf.Abs(_moveDelta.y) > epsilon) {
-				var value = Time.deltaTime * smoothing;
+				var value = ETime.DeltaTime * smoothing;
 				targetPosition.x = Mathf.Clamp(targetPosition.x + _moveDelta.x, cameraBounds.xMin, cameraBounds.xMax);
 				targetPosition.y = Mathf.Clamp(targetPosition.y + _moveDelta.y, cameraBounds.yMin, cameraBounds.yMax);
 				_moveDelta = _moveDelta.EaseTo(Vector2.zero, value / movementSpeed, Ease.Linear);
 			}
 			if(Vector3.SqrMagnitude(position - targetPosition) > epsilon) {
-				position = position.EaseTo(targetPosition, Time.deltaTime * smoothing, easeType);
+				position = position.EaseTo(targetPosition, ETime.DeltaTime * smoothing, easeType);
 			}
 
 			Camera.transform.position = new Vector3(position.x, 0, position.y) -

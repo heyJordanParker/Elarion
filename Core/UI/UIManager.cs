@@ -1,4 +1,5 @@
 using System.Linq;
+using Elarion.Attributes;
 using Elarion.Extensions;
 using Elarion.Utility;
 using TypeSafe;
@@ -12,15 +13,45 @@ namespace Elarion.UI {
     [CreateAssetMenu(fileName = "UI Manager.asset", menuName = "Manager/UI Manager", order = 81)]
     public class UIManager : Singleton<UIManager> {
         
-        // TODO ui camera configuration - autoCreate, culling mask, hide, background, etc
+        [Range(0.3f, 2)]
+        [SerializeField]
+        private float _doubleTapTimeout = 0.3f;
+        [Range(0.3f, 2)]
+        [SerializeField]
+        private float _longTapTimeout = 0.5f;
         
         public bool enableTabNavigation = true;
 
+        [Tooltip("Generate a camera. Needed for some UI effects.")]
+        public bool createUICamera = false;
+
+        [ConditionalVisibility("createUICamera")]
+        public LayerMask uiCameraLayerMask = -1;
+
+        [ConditionalVisibility("createUICamera")]
+        public Color uiCameraBackgroundColor = Color.white;
+
+        [ConditionalVisibility("createUICamera")]
+        public bool hideUICamera = false;
+        
+        public float DoubleTapTimeout {
+            get => _doubleTapTimeout;
+        }
+
+        public float LongTapTimeout {
+            get => _longTapTimeout;
+        }
+
         protected override void Initialize() {
             base.Initialize();
-            // This is necessary for blur effects - the shader can't work with the main render texture
-            var uiCamera = UIHelper.CreateUICamera("UI Root Camera");
-            uiCamera.hideFlags = HideFlags.HideAndDontSave;
+
+            if(createUICamera) {
+                var uiCamera = UIHelper.CreateUICamera("UI Root Camera");
+                uiCamera.hideFlags = hideUICamera ? HideFlags.HideAndDontSave : HideFlags.DontSave;
+            
+                uiCamera.cullingMask = uiCameraLayerMask.value;
+                uiCamera.backgroundColor = uiCameraBackgroundColor;       
+            }
         }
 
         // Update after the event system; Ensure that 

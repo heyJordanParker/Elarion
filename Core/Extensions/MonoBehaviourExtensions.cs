@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections;
+using Elarion.Coroutines;
 using UnityEngine;
 
 namespace Elarion.Extensions {

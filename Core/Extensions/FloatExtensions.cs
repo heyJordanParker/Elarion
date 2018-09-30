@@ -16,5 +16,13 @@ namespace Elarion.Extensions {
 		public static bool Approximately(this float value, float otherValue) {
 			return Mathf.Approximately(value, otherValue);
 		}
+
+		public static bool InRange(this float value, float min, float max) {
+			return value <= max && value >= min;
+		}
+
+		public static bool InRange(this float value, Vector2 minMaxVector) {
+			return value.InRange(minMaxVector.x, minMaxVector.y);
+		}
 	}
 }

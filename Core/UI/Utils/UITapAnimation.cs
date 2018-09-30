@@ -1,44 +1,33 @@
 using System.Collections;
+using Elarion.Attributes;
+using Elarion.Coroutines;
 using Elarion.Extensions;
+using Elarion.General;
+using Elarion.Pooling;
 using UnityEngine;
 using UnityEngine.EventSystems;
 using UnityEngine.UI;
 
 namespace Elarion.UI.Utils {
-    // TODO dynamically instantiate tap animation prefab when I have pooling available
-    
-    [RequireComponent(typeof(Mask))]
-    public class UITapAnimation : BaseUIBehaviour, IPointerDownHandler, IPointerUpHandler {
-        
-        public Graphic tapAnimation;
-        
-        [Header("Pointer Down")]
-        public float pointerDownAnimationDuration = 2f;
-        public Ease pointerDownAnimationEase = Ease.InOutQuad;
+    public class UITapAnimation : BaseUIBehaviour, IPointerDownHandler, IPointerUpHandler, IBeginDragHandler {
 
-        [Header("Pointer Down")]
-        public float pointerUpAnimationDuration = 1f;
-        public Ease pointerUpAnimationEase = Ease.InQuad;
+        public ObjectPool tapIndicatorPool;
 
-        [Header("Animation Size")]
-        public Vector2 maxSize = new Vector2(10, 10);
+        public Camera overrideCamera = null;
 
         private ECoroutine _pointerDownAnimation;
         private ECoroutine _pointerUpAnimation;
 
-        private Color _tapAnimationOriginalColor;
+        [SerializeField, GetComponent]
         private Selectable _selectableComponent;
-
-        public Transform TapAnimationTransform => tapAnimation.transform;
-
-        protected override void Awake() {
-            base.Awake();
-            TapAnimationTransform.SetActive(false);
-            _tapAnimationOriginalColor = tapAnimation.color;
-            _selectableComponent = GetComponent<Selectable>();
-        }
+        
+        private UITapIndicator _tapIndicator;
 
         public void OnPointerDown(PointerEventData eventData) {
+            if(_tapIndicator != null) {
+                return; // can't have two
+            }
+            
             if(_selectableComponent && !_selectableComponent.interactable) {
                 return;
             }
@@ -48,7 +37,7 @@ namespace Elarion.UI.Utils {
             }
 
             if(!RectTransformUtility.ScreenPointToLocalPointInRectangle(transform as RectTransform, eventData.position,
-                null,
+                overrideCamera,
                 out var localPosition)) {
                 return;
             }
@@ -57,60 +46,39 @@ namespace Elarion.UI.Utils {
                 _pointerUpAnimation.Stop();
                 _pointerUpAnimation = null;
             }
-            
-            TapAnimationTransform.localPosition = localPosition;
-            tapAnimation.color = _tapAnimationOriginalColor;
 
-            _pointerDownAnimation = this.CreateCoroutine(OnPointerDownAnimation());
+            _tapIndicator = tapIndicatorPool.Spawn(transform, true) as UITapIndicator;
+            
+            if(_tapIndicator == null) {
+                Debug.LogError("Invalid tap indicator prefab", tapIndicatorPool);
+                return;
+            }
+            
+            _tapIndicator.graphic.transform.localPosition = localPosition;
+            
+            _pointerDownAnimation = this.CreateCoroutine(_tapIndicator.OnPointerDownAnimation());
         }
 
-        private IEnumerator OnPointerDownAnimation() {
-            TapAnimationTransform.SetActive(true);
-
-            TapAnimationTransform.localScale = Vector3.one;
-            
-            var size = TapAnimationTransform.localScale;
-
-            var time = 0f;
-            
-            while(time <= pointerDownAnimationDuration) {
-                size = size.EaseTo(maxSize, time / pointerDownAnimationDuration, pointerDownAnimationEase);
-
-                TapAnimationTransform.localScale = size;
-
-                time += Time.deltaTime;
-                yield return null;
-            }
+        public void OnBeginDrag(PointerEventData eventData) {
+            OnPointerUp(eventData);
         }
 
         public void OnPointerUp(PointerEventData eventData) {
+            if(!_tapIndicator || (_pointerUpAnimation != null && _pointerUpAnimation.Running)) {
+                return; // can't animate if it didn't spawn for some reason
+            }
+            
             if(_pointerDownAnimation != null && _pointerDownAnimation.Running) {
                 _pointerDownAnimation.Stop();
                 _pointerDownAnimation = null;
             }
 
-            _pointerUpAnimation = this.CreateCoroutine(OnPointerUpAnimation());
+            _pointerUpAnimation = this.CreateCoroutine(_tapIndicator.OnPointerUpAnimation());
             
-            _pointerUpAnimation.OnFinished += stopped =>             TapAnimationTransform.SetActive(false);
-        }
-        
-        private IEnumerator OnPointerUpAnimation() {
-            var alpha = tapAnimation.color.a;
-
-            var time = 0f;
-            
-            while(time <= pointerUpAnimationDuration) {
-                var progress = time / pointerUpAnimationDuration;
-                
-                alpha = alpha.EaseTo(0, progress, pointerUpAnimationEase);
-
-                var color = tapAnimation.color;
-                color.a = alpha;
-                tapAnimation.color = color;
-
-                time += Time.deltaTime;
-                yield return null;
-            }
+            _pointerUpAnimation.OnFinished += stopped => {
+                tapIndicatorPool.Return(_tapIndicator);
+                _tapIndicator = null;
+            };
         }
     }
 }

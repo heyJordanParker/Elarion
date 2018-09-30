@@ -5,11 +5,13 @@ using GameSparks.Api.Responses;
 using UnityEngine;
 using UnityEngine.Events;
 using UnityEngine.EventSystems;
+using UnityEngine.Jobs;
 
 namespace Elarion.UI.Helpers {
     
     [UIComponentHelper]
     [RequireComponent(typeof(RectTransform))]
+    [DisallowMultipleComponent]
     public class UIDraggable : MonoBehaviour, IDragHandler, IBeginDragHandler, IEndDragHandler {
         public enum MovementBounds {
             None,
@@ -17,6 +19,9 @@ namespace Elarion.UI.Helpers {
             Screen,
             Custom
         }
+        
+        [SerializeField]
+        private RectTransform _target;
 
         [SerializeField]
         private MovementBounds _bounds = MovementBounds.None;
@@ -42,10 +47,16 @@ namespace Elarion.UI.Helpers {
         [SerializeField]
         private UnityEvent _onStartDrag = new UnityEvent();
 
-        private RectTransform _transform;
+        public bool DragX => _dragX;
+        public bool DragY => _dragY;
 
         public UnityEvent OnStartDragEvent => _onStartDrag;
         public UnityEvent OnEndDragEvent => _onEndDrag;
+        
+        public RectTransform Target {
+            get => _target;
+            private set => _target = value;
+        }
         
         /// <summary>
         /// Bounds to the movement. Can be restricted to Parent, Screen, or custom values.
@@ -74,7 +85,9 @@ namespace Elarion.UI.Helpers {
         }
 
         protected void Awake() {
-            _transform = transform as RectTransform;
+            if(Target == null) {
+                Target = transform as RectTransform;
+            }
         }
 
         private void OnEnable() {
@@ -98,7 +111,7 @@ namespace Elarion.UI.Helpers {
                 }
             }
             
-            transform.Translate(delta);
+            Target.Translate(delta);
             ClampToBounds();
         }
 
@@ -107,19 +120,19 @@ namespace Elarion.UI.Helpers {
         }
         
         private void ClampToBounds() {
-            var position = _transform.localPosition;
-            var anchoredPosition = _transform.anchoredPosition;
+            var position = Target.localPosition;
+            var anchoredPosition = Target.anchoredPosition;
 
             switch(Bounds) {
                 case MovementBounds.Screen: {
                     Vector2 screenSWCorner;
                     Vector2 screenNECorner;
             
-                    RectTransformUtility.ScreenPointToLocalPointInRectangle(_transform, Vector2.zero, null, out screenSWCorner);
+                    RectTransformUtility.ScreenPointToLocalPointInRectangle(Target, Vector2.zero, null, out screenSWCorner);
 
-                    RectTransformUtility.ScreenPointToLocalPointInRectangle(_transform, new Vector2(Screen.width, Screen.height), null, out screenNECorner);
+                    RectTransformUtility.ScreenPointToLocalPointInRectangle(Target, new Vector2(Screen.width, Screen.height), null, out screenNECorner);
 
-                    screenNECorner -= _transform.sizeDelta;
+                    screenNECorner -= Target.sizeDelta;
             
                     var deltaX = Mathf.Clamp(screenSWCorner.x, 0, Mathf.Infinity);
             
@@ -140,27 +153,27 @@ namespace Elarion.UI.Helpers {
                     break;
                 }
                 case MovementBounds.Parent: {
-                    var parentTransform = transform.parent as RectTransform;
+                    var parentTransform = Target.parent as RectTransform;
 
                     if(!parentTransform) {
                         break;
                     }
                     
-                    Vector3 minPosition = parentTransform.rect.min - _transform.rect.min;
-                    Vector3 maxPosition = parentTransform.rect.max - _transform.rect.max;
+                    Vector3 minPosition = parentTransform.rect.min - Target.rect.min;
+                    Vector3 maxPosition = parentTransform.rect.max - Target.rect.max;
  
-                    position.x = Mathf.Clamp(_transform.localPosition.x, minPosition.x, maxPosition.x);
-                    position.y = Mathf.Clamp(_transform.localPosition.y, minPosition.y, maxPosition.y);
+                    position.x = Mathf.Clamp(Target.localPosition.x, minPosition.x, maxPosition.x);
+                    position.y = Mathf.Clamp(Target.localPosition.y, minPosition.y, maxPosition.y);
                     
                     break;
                 }
                 case MovementBounds.Custom: {
 
                     if(_dragX) {
-                        anchoredPosition.x = Mathf.Clamp(_transform.anchoredPosition.x, _xBounds.x, _xBounds.y);
+                        anchoredPosition.x = Mathf.Clamp(Target.anchoredPosition.x, _xBounds.x, _xBounds.y);
                     }
                     if(_dragY) {
-                        anchoredPosition.y = Mathf.Clamp(_transform.anchoredPosition.y, _yBounds.x, _yBounds.y);
+                        anchoredPosition.y = Mathf.Clamp(Target.anchoredPosition.y, _yBounds.x, _yBounds.y);
                     }
                     
                     break;
@@ -171,9 +184,14 @@ namespace Elarion.UI.Helpers {
                     goto case MovementBounds.None;
             }
 
-            _transform.localPosition = position;
-            _transform.anchoredPosition = anchoredPosition;
+            Target.localPosition = position;
+            Target.anchoredPosition = anchoredPosition;
         }
 
+        private void OnValidate() {
+            if(Target == null) {
+                Target = transform as RectTransform;
+            }
+        }
     }
 }
