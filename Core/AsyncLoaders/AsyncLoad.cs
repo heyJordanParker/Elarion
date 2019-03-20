@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using Elarion.Extensions;
 using UnityEngine;
 
-namespace Elarion {
+namespace Elarion.AsyncLoaders {
 
 	public class AsyncLoad : MonoBehaviour {
 

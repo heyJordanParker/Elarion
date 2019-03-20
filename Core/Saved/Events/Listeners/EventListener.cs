@@ -26,7 +26,7 @@ namespace Elarion.Saved.Events.Listeners {
             _event.Unsubscribe(OnEventRaised);
         }
 
-        private void OnEventRaised(TParameter value) {
+        protected virtual void OnEventRaised(TParameter value) {
             _onEventRaised.Invoke(value);
         }
 

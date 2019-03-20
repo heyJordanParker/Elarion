@@ -25,7 +25,7 @@ namespace Elarion.Saved.Arrays {
         }
 
         public IEnumerator<TItem> GetEnumerator() {
-            return values.GetEnumerator();
+            return (values as IEnumerable<TItem>).GetEnumerator();
         }
 
         IEnumerator IEnumerable.GetEnumerator() {

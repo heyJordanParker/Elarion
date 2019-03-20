@@ -2,7 +2,6 @@ using System;
 using System.Collections;
 using Elarion.Coroutines;
 using Elarion.Extensions;
-using Elarion.General;
 using UnityEngine;
 using UnityEngine.Events;
 using UnityEngine.EventSystems;
@@ -115,7 +114,7 @@ namespace Elarion.UI {
             var elapsedTime = 0f;
 
             while(elapsedTime < fadeTime) {
-                elapsedTime += ETime.UnscaledDeltaTime;
+                elapsedTime += Time.unscaledDeltaTime;
                 yield return null;
             }
 
@@ -127,7 +126,7 @@ namespace Elarion.UI {
                 return;
 
             if(type == TapType.Single &&
-               ETime.Time - _lastTapTime <= UIManager.DoubleTapTimeout) {
+               UnityEngine.Time.time - _lastTapTime <= UIManager.DoubleTapTimeout) {
                 type = TapType.Double;
             }
 
@@ -136,7 +135,7 @@ namespace Elarion.UI {
             switch(type) {
                 case TapType.Single:
                     OnTap.Invoke();
-                    _lastTapTime = ETime.Time;
+                    _lastTapTime = UnityEngine.Time.time;
                     break;
                 case TapType.Long:
                     OnLongTap.Invoke();
@@ -150,10 +149,10 @@ namespace Elarion.UI {
         }
 
         private IEnumerator LongTapCheck() {
-            var startingTime = ETime.Time;
+            var startingTime = UnityEngine.Time.time;
 
             while(_pointerDown && !_dragged) {
-                if(ETime.Time - startingTime >= UIManager.LongTapTimeout) {
+                if(Time.time - startingTime >= UIManager.LongTapTimeout) {
                     Tap(TapType.Long);
                     break;
                 }

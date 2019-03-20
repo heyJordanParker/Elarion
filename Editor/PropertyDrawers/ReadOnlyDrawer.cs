@@ -30,7 +30,5 @@ namespace Elarion.Editor.PropertyDrawers {
             EditorGUI.PropertyField(position, property, label, true);
             GUI.enabled = true;
         }
-        
-        
     }
 }

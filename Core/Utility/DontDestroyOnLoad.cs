@@ -1,16 +1,9 @@
 ﻿using UnityEngine;
 
-namespace Elarion {
-
-	public class DontDestroyOnLoad : MonoBehaviour {
-
-		public int originatingLevel = -1;
-
-		protected void Awake() {
-			originatingLevel = UnityEngine.SceneManagement.SceneManager.GetActiveScene().buildIndex;
+namespace Elarion.Utility {
+	public sealed class DontDestroyOnLoad : MonoBehaviour {
+		private void Awake() {
 			DontDestroyOnLoad(gameObject);
 		}
-
 	}
-
 }

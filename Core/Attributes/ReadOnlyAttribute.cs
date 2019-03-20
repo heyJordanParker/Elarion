@@ -7,6 +7,5 @@ namespace Elarion.Attributes {
         public ReadOnlyAttribute(bool showOnlyWhenPlaying = false) {
             this.showOnlyWhenPlaying = showOnlyWhenPlaying;
         }
-        
     }
 }

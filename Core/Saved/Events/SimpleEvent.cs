@@ -5,7 +5,7 @@ using UnityEngine;
 
 namespace Elarion.Saved.Events {
      
-    [CreateAssetMenu(menuName = "Saved/Event", order = 21)]
+    [CreateAssetMenu(menuName = "Saved/Events/Simple Event", order = 21)]
     public class SimpleEvent : EScriptableObject {
         
         private readonly List<SimpleEventListener> _eventListeners =

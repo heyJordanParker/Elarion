@@ -1,7 +1,6 @@
 using System.Collections;
 using Elarion.Attributes;
 using Elarion.Extensions;
-using Elarion.General;
 using Elarion.Pooling;
 using UnityEngine;
 using UnityEngine.UI;
@@ -33,13 +32,14 @@ namespace Elarion.UI.Utils {
         protected Color graphicOriginalColor;
 
         protected override void OnInitialize() {
-            base.OnInitialize();
             transform.anchorMin = Vector2.zero;
             transform.anchorMax = Vector2.one;
             transform.sizeDelta = Vector2.zero;
             transform.anchoredPosition = Vector2.zero;
             graphic.color = graphicOriginalColor;
             graphicTransform.localScale = Vector3.one;
+            
+            base.OnInitialize();
         }
 
         public IEnumerator OnPointerDownAnimation() {
@@ -54,7 +54,7 @@ namespace Elarion.UI.Utils {
 
                 graphicTransform.localScale = size;
 
-                time += ETime.DeltaTime;
+                time += Time.deltaTime;
                 yield return null;
             }
         }
@@ -73,7 +73,7 @@ namespace Elarion.UI.Utils {
                 color.a = alpha;
                 graphic.color = color;
 
-                time += ETime.DeltaTime;
+                time += Time.deltaTime;
                 yield return null;
             }
         }

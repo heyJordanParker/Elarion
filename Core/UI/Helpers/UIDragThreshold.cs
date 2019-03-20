@@ -13,7 +13,7 @@ namespace Elarion.UI.Helpers {
         
         [ConditionalVisibility("DragY")]
         public Vector2 yThreshold;
-        
+
         // bool unity event; already inside parameter
         public UnityEvent onEnterThreshold;
         public UnityEvent onExitThreshold;

@@ -10,6 +10,21 @@ namespace Elarion.Extensions {
             return screenContainer.Overlaps(screenTransform);
         }
 
+        public static bool Overlaps(this RectTransform transform, RectTransform other) {
+            var rect1 = transform.GetRectInParent();
+            var rect2 = other.GetRectInParent();
+            
+            return rect1.Overlaps(rect2);
+        }
+        
+        public static Rect GetRectInParent(this RectTransform transform) {
+            Vector2 rect1Position = transform.localPosition;
+            var rect1Size = new Vector2(transform.rect.width, transform.rect.height);
+            rect1Position =  rect1Position - rect1Size * transform.pivot;
+            return new Rect(rect1Position.x, rect1Position.y, rect1Size.x,
+                rect1Size.y);
+        }
+
         public static Rect ToScreenSpace(this RectTransform transform) {
             var size = Vector2.Scale(transform.rect.size, transform.lossyScale);
             var rect = new Rect(transform.position.x, Screen.height - transform.position.y, size.x, size.y);

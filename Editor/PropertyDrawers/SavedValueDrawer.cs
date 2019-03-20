@@ -1,4 +1,5 @@
-﻿using Elarion.Saved.Variables.References;
+﻿using Elarion.Editor.UI;
+using Elarion.Saved.Variables.References;
 using UnityEditor;
 using UnityEngine;
 
@@ -45,7 +46,7 @@ namespace Elarion.Editor.PropertyDrawers {
             // Store old indent level and set it to 0, the PrefixLabel takes care of it
             var indent = EditorGUI.indentLevel;
             EditorGUI.indentLevel = 0;
-
+            
             GUI.enabled = !EditorApplication.isPlayingOrWillChangePlaymode;
                 
             var result = EditorGUI.Popup(buttonRect, useConstant.boolValue ? 0 : 1, _popupOptions, PopupStyle);

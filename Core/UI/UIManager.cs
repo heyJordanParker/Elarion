@@ -2,7 +2,6 @@ using System.Linq;
 using Elarion.Attributes;
 using Elarion.Extensions;
 using Elarion.Utility;
-using TypeSafe;
 using UnityEngine;
 using UnityEngine.EventSystems;
 using UnityEngine.UI;

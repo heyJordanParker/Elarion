@@ -48,7 +48,8 @@ namespace Elarion.Editor.Editors {
             }
             
             if(isSavedVariableEditor || 
-               (isSavedListEditor && !_valueProperty.GetUnderlyingType().GetGenericArguments().First().IsSubclassOf(typeof(Object)))) {
+               isSavedListEditor && !_valueProperty.GetObjectType().GetGenericArguments().First().IsSubclassOf(typeof(Object))
+               ) {
                 base.OnInspectorGUI();
             } else { 
                 this.DrawDefaultScriptField();

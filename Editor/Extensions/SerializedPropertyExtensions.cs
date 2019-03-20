@@ -6,19 +6,26 @@ using UnityEngine;
 
 namespace Elarion.Editor.Extensions {
     public static class SerializedPropertyExtensions {
+        private const BindingFlags SerializedPropertyBindingFlags = BindingFlags.GetField
+                                                                    | BindingFlags.GetProperty
+                                                                    | BindingFlags.Instance
+                                                                    | BindingFlags.NonPublic
+                                                                    | BindingFlags.Public;
+
+        private const string ArrayPathSignature = ".Array.data[";
+
         public static T GetBaseProperty<T>(this SerializedProperty prop) {
             // Separate the steps it takes to get to this property
-            var path = prop.propertyPath.Replace(".Array.data[", "[");
+            var path = prop.propertyPath.Replace(ArrayPathSignature, "[");
             object targetObject = prop.serializedObject.targetObject;
             var separatedPaths = path.Split('.');
-            
+
             // Go down to the root of this serialized property
             foreach(var element in separatedPaths) {
-                
                 if(element.Contains("[")) {
                     // Array
                     var elementName = element.Substring(0, element.IndexOf("["));
-                    var index = System.Convert.ToInt32(element.Substring(element.IndexOf("[")).Replace("[", "")
+                    var index = Convert.ToInt32(element.Substring(element.IndexOf("[")).Replace("[", "")
                         .Replace("]", ""));
                     targetObject = GetArrayFieldValue(targetObject, elementName, index);
                 } else {
@@ -29,14 +36,23 @@ namespace Elarion.Editor.Extensions {
 
             return (T) targetObject;
         }
+        
+        public static string GetBaseObjectPath(this SerializedProperty property) {
+            var parent = property.propertyPath;
+            var firstDot = property.propertyPath.IndexOf('.');
+            if(firstDot > 0) {
+                parent = property.propertyPath.Substring(0, firstDot);
+            }
 
-        public static object GetTargetObject(this SerializedProperty prop) {
-            var path = prop.propertyPath.Replace(".Array.data[", "[");
+            return parent;
+        }
+
+        public static object GetObject(this SerializedProperty prop) {
+            var path = prop.propertyPath.Replace(ArrayPathSignature, "[");
             object targetObject = prop.serializedObject.targetObject;
             var separatedPaths = path.Split('.');
-            
+
             foreach(var element in separatedPaths.Take(separatedPaths.Length - 1)) {
-                
                 if(element.Contains("[")) {
                     // Array
                     var elementName = element.Substring(0, element.IndexOf("["));
@@ -48,10 +64,10 @@ namespace Elarion.Editor.Extensions {
                     targetObject = GetFieldValue(targetObject, element);
                 }
             }
-            
+
             return targetObject;
         }
-        
+
         public static object GetValue(this SerializedProperty property) {
             var parentType = property.serializedObject.targetObject.GetType();
             var fi = parentType.GetFieldViaPath(property.propertyPath);
@@ -64,20 +80,42 @@ namespace Elarion.Editor.Extensions {
             fi.SetValue(property.serializedObject.targetObject, value);
         }
 
-        public static Type GetUnderlyingType(this SerializedProperty property) {
-            var parentType = property.serializedObject.targetObject.GetType();
-            var fi = parentType.GetFieldViaPath(property.propertyPath);
-            return fi.FieldType;
+        public static Type GetObjectType(this SerializedProperty property) {
+            var field = property?.GetObject()?.GetType().GetField(property.name, SerializedPropertyBindingFlags);
+
+            return field == null ? null : field.FieldType;
+        }
+
+        public static object[] GetAttributes<T>(this SerializedProperty property) where T : Attribute {
+            var attributeType = typeof(T);
+
+            var field = property?.GetObject()?.GetType().GetField(property.name, SerializedPropertyBindingFlags);
+
+            return field != null ? field.GetCustomAttributes(attributeType, true) : null;
+        }
+
+        public static T GetAttribute<T>(this SerializedProperty property) where T : Attribute {
+            var attributes = GetAttributes<T>(property);
+            if(attributes != null && attributes.Length > 0) {
+                return attributes[0] as T;
+            }
+
+            return null;
+        }
+
+        public static bool HasAttribute<T>(this SerializedProperty property) where T : Attribute {
+            var attributes = GetAttributes<T>(property);
+            return attributes != null && attributes.Length > 0;
         }
 
         public static FieldInfo GetFieldViaPath(this Type type, string path) {
             var containingObjectType = type;
             var fi = type.GetField(path, BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic);
-            
+
             if(!path.Contains('.')) {
                 return fi;
             }
-            
+
             var perDot = path.Split('.');
             foreach(var fieldName in perDot) {
                 fi = containingObjectType.GetField(fieldName);
@@ -89,6 +127,28 @@ namespace Elarion.Editor.Extensions {
             }
 
             return fi;
+        }
+
+        public static bool IsInArray(this SerializedProperty property) {
+            return property.ArrayIndex() != -1;
+        }
+
+        public static int ArrayIndex(this SerializedProperty property) {
+            if(property == null) {
+                return -1;
+            }
+            var path = property.propertyPath;
+
+            var startIndex = path.LastIndexOf(ArrayPathSignature, StringComparison.Ordinal);
+            var endIndex = path.LastIndexOf("]", StringComparison.Ordinal);
+            
+            if(startIndex == -1 || endIndex == -1 || startIndex >= endIndex) {
+                return -1;
+            }
+
+            int.TryParse(path.Substring(startIndex + ArrayPathSignature.Length).Replace("]", ""), out var result);
+            
+            return result;
         }
 
         private static object GetFieldValue(object source, string name) {
@@ -108,19 +168,20 @@ namespace Elarion.Editor.Extensions {
 
                 type = type.BaseType;
             }
+
             return null;
         }
 
         private static object GetArrayFieldValue(object source, string name, int index) {
             var enumerable = GetFieldValue(source, name) as System.Collections.IEnumerable;
-            
+
             if(enumerable == null) return null;
             var enm = enumerable.GetEnumerator();
 
             for(int i = 0; i <= index; i++) {
                 if(!enm.MoveNext()) return null;
             }
-            
+
             return enm.Current;
         }
     }

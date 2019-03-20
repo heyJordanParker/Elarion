@@ -3,8 +3,10 @@ using UnityEngine;
 
 namespace Elarion.Saved.Variables.References {
     // Used for the custom inspector
+    [Serializable]
     public abstract class SavedValueReferenceBase { }
     
+    [Serializable]
     public abstract class SavedValueReference<TSavedType, TType> : SavedValueReferenceBase where TSavedType : SavedVariable<TType> {
         
         [SerializeField]

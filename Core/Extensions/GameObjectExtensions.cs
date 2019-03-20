@@ -56,7 +56,6 @@ namespace Elarion.Extensions {
 		public static Selectable GetFirstSelectableChild(this GameObject go) {
 			return go.GetSelectableChildren().FirstOrDefault();
 		}
-
 	}
 }
 

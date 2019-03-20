@@ -2,7 +2,6 @@ using Elarion.UI;
 using UnityEngine;
 
 namespace Elarion.Saved.Actions.UI {
-    
     [CreateAssetMenu(menuName = "Actions/UI/Close Parent", order = 32)]
     public class CloseParentAction : ScriptableObject {
 

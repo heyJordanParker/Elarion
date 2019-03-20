@@ -1,12 +1,18 @@
 {
-    "name": "ElarionEditor",
+    "name": "Elarion.Editor",
     "references": [
         "Elarion",
         "yaSingleton",
         "yaSingletonEditor"
     ],
+    "optionalUnityReferences": [],
     "includePlatforms": [
         "Editor"
     ],
-    "excludePlatforms": []
+    "excludePlatforms": [],
+    "allowUnsafeCode": false,
+    "overrideReferences": false,
+    "precompiledReferences": [],
+    "autoReferenced": true,
+    "defineConstraints": []
 }

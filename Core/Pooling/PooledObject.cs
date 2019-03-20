@@ -33,8 +33,6 @@ namespace Elarion.Pooling {
             }
             OnInitialize();
             _onInitialize.Invoke();
-            gameObject.SetActive(true);
-            _initialized = true;
         }
 
         public void ReturnToPool() {
@@ -43,13 +41,17 @@ namespace Elarion.Pooling {
 
         internal void Deinitialize() {
             OnDeinitialize();
-            gameObject.SetActive(false);
             _onDeinitialize.Invoke();
-            _initialized = false;
         }
 
-        protected virtual void OnInitialize() { }
+        protected virtual void OnInitialize() {
+            gameObject.SetActive(true);
+            _initialized = true;
+        }
 
-        protected virtual void OnDeinitialize() { }
+        protected virtual void OnDeinitialize() {
+            gameObject.SetActive(false);
+            _initialized = false;
+        }
     }
 }

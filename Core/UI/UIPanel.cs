@@ -2,11 +2,12 @@ using UnityEngine;
 using UnityEngine.UI;
 
 namespace Elarion.UI {
-    
     [RequireComponent(typeof(CanvasGroup))]
     [RequireComponent(typeof(Canvas))]
     [RequireComponent(typeof(GraphicRaycaster))] // to propagate input events
     public class UIPanel : UIComponent {
+        // TODO update parent (and everything else) when the hierarchy changes, but allow this to be static (either an advanced option or just the static GameObject flag)
+        
         [SerializeField]
         private bool _interactable = true;
 

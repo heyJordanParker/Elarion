@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using Elarion.Attributes;
+using Elarion.Editor.Extensions;
 using Elarion.Editor.UI;
 using Elarion.UI;
 using Elarion.UI.Helpers.Animation;
@@ -84,17 +85,21 @@ namespace Elarion.Editor.Editors {
         public override void OnInspectorGUI() {
             base.OnInspectorGUI();
 
-            if(Target.ParentComponent) {
+            if(Target.ParentComponent || Target.IsPrefab()) {
                 EditorGUILayout.PropertyField(_openType, new GUIContent("Open Type"));
                 EditorGUILayout.PropertyField(_closeType, new GUIContent("Close Type"));
             } else {
-                var toggle = EditorGUILayout.Toggle(new GUIContent("Auto Open"), Target.OpenType == UIOpenType.Auto);
+                var toggle = EditorGUILayout.Toggle(new GUIContent("Auto Open"), Target.OpenType != UIOpenType.Manual);
 
                 if(toggle) {
-                    _openType.intValue = (int) UIOpenType.Auto;
-                    var group = Target.GetComponent<UIComponentGroup>();
-                    if(group) {
-                        UIComponentGroupEditor.SetGroupToAutoOpen(group);
+                    var openType = (UIOpenType) _openType.intValue;
+
+                    if(openType == UIOpenType.Manual) {
+                        _openType.intValue = (int) UIOpenType.Auto;
+                        var group = Target.GetComponent<UIComponentGroup>();
+                        if(group) {
+                            UIComponentGroupEditor.SetGroupToAutoOpen(group);
+                        }
                     }
                 } else {
                     _openType.intValue = (int) UIOpenType.Manual;

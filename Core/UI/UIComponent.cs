@@ -71,6 +71,16 @@ namespace Elarion.UI {
             }
         }
 
+        protected override void OnEnable() {
+            base.OnEnable();
+            UpdateParent();
+        }
+
+        protected override void OnDisable() {
+            base.OnDisable();
+            ParentComponent = null;
+        }
+
         private void OnParentBeforeClose(bool skipAnimation) {
             if(CloseType != UIOpenType.WithParent && CloseType != UIOpenType.Auto) {
                 return;
@@ -198,7 +208,7 @@ namespace Elarion.UI {
 
             base.Start();
             
-            if(ParentComponent == null && OpenType == UIOpenType.Auto) {
+            if(ParentComponent == null && OpenType != UIOpenType.Manual) {
                 Open();
             }
         }
@@ -391,26 +401,10 @@ namespace Elarion.UI {
             UpdateParent();
         }
 
-        protected override void OnTransformParentChanged() {
-            base.OnTransformParentChanged();
-            UpdateParent();
-        }
-
         protected override void OnValidate() {
             base.OnValidate();
 
             UpdateParent();
-
-            // top level elements
-            if(ParentComponent == null) {
-                if(_openType != UIOpenType.Manual && _openType != UIOpenType.Auto) {
-                    _openType = UIOpenType.Manual;
-                }
-                
-                if(_closeType != UIOpenType.Manual && _closeType != UIOpenType.Auto) {
-                    _closeType = UIOpenType.Manual;
-                }
-            }
         }
 
         public string Description {
@@ -426,7 +420,5 @@ namespace Elarion.UI {
                 return stringBuilder.ToString();
             }
         }
-
-        protected static UIManager UIManager => UIManager.Instance;
     }
 }

@@ -2,14 +2,35 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Reflection;
+using Elarion.Editor.Extensions;
 using Elarion.Extensions;
 using Elarion.UI;
 using UnityEditor;
 using UnityEngine;
 using UnityEngine.UI;
+using Object = UnityEngine.Object;
 
 namespace Elarion.Editor {
     internal static class Utils {
+        private const string LastAssetSavePathKey = "LastAssetSavePath";
+
+        private static string _lastAssetSavePath;
+
+        public static string LastAssetSavePath {
+            get {
+                if(_lastAssetSavePath == null) {
+                    _lastAssetSavePath = EditorPrefs.GetString(LastAssetSavePathKey, "/Assets/");
+                }
+
+                return _lastAssetSavePath;
+            }
+            set {
+                _lastAssetSavePath = value;
+                EditorPrefs.SetString(LastAssetSavePathKey, _lastAssetSavePath);
+            }
+        }
+
         public static void ShowBuiltinHelpers(UIComponent component) {
             component.Renderer.hideFlags = HideFlags.None;
             component.GetComponent<GraphicRaycaster>().hideFlags = HideFlags.None;
@@ -64,32 +85,80 @@ namespace Elarion.Editor {
             AsyncProgressBar.Clear();
         }
 
-        public static T CreateScriptableObject<T>() where T : ScriptableObject {
-            var path = AssetDatabase.GetAssetPath(Selection.activeObject);
-            var name = "New " + ObjectNames.NicifyVariableName(typeof(T).Name) + ".asset";
-            var separator = Path.DirectorySeparatorChar;
+        public static void SetIconForObject(Object obj, Texture2D icon) {
+            var assetPath = AssetDatabase.GetAssetPath(obj);
 
-            if(path == "") {
-                path = "Assets" + separator + name;
-            } else {
-                if(Directory.Exists(path)) {
-                    path += separator;
-                } else {
-                    path = path.Substring(0, path.Length - Path.GetFileName(path).Length);
+            if(string.IsNullOrEmpty(assetPath)) {
+                return;
+            }
+            
+            var guiUtility = typeof(EditorGUIUtility);
+            var methodInfo = guiUtility.GetMethod("SetIconForObject", BindingFlags.NonPublic | BindingFlags.Static);
+            methodInfo.Invoke(null, new object[] {obj, icon});
+
+            EditorUtility.SetDirty(obj);
+        }
+
+        public static Texture2D GetIconForObject(Object obj) {
+            var guiUtility = typeof(EditorGUIUtility);
+            var methodInfo = guiUtility.GetMethod("GetIconForObject", BindingFlags.NonPublic | BindingFlags.Static);
+            return methodInfo.Invoke(null, new object[] {obj}) as Texture2D;
+        }
+
+        public static T CreateScriptableObject<T>(bool showSaveFilePopup = false, bool selectObject = true)
+            where T : ScriptableObject {
+            return CreateScriptableObject(typeof(T), showSaveFilePopup, selectObject) as T;
+        }
+
+        public static ScriptableObject CreateScriptableObject(Type type, bool showSaveFilePopup = false,
+            bool selectObject = true) {
+            string path = String.Empty;
+            string typeName = ObjectNames.NicifyVariableName(type.Name);
+
+            if(showSaveFilePopup) {
+                path = EditorUtility.SaveFilePanelInProject($"Create new {typeName} asset.", $"New {typeName}.asset",
+                    "asset",
+                    $"Choose a location to save the new {typeName}.", LastAssetSavePath);
+
+                LastAssetSavePath = path.RemoveExtension();
+
+                if(string.IsNullOrEmpty(path)) {
+                    return null;
                 }
+            } else {
+                path = AssetDatabase.GetAssetPath(Selection.activeObject);
+                var name = $"New {typeName}.asset";
+                var separator = Path.DirectorySeparatorChar;
 
-                path += name;
+                if(path == "") {
+                    path = "Assets" + separator + name;
+                } else {
+                    if(Directory.Exists(path)) {
+                        path += separator;
+                    } else {
+                        path = path.Substring(0, path.Length - Path.GetFileName(path).Length);
+                    }
+
+                    path += name;
+                }
             }
 
-            var savedObject = ScriptableObject.CreateInstance(typeof(T));
+            var savedObject = ScriptableObject.CreateInstance(type);
 
             var savePath = AssetDatabase.GenerateUniqueAssetPath(path);
             AssetDatabase.CreateAsset(savedObject, savePath);
-            Selection.activeObject = savedObject;
 
-            Undo.RegisterCreatedObjectUndo(savedObject, "Creating " + name);
+            AssetDatabase.SaveAssets();
 
-            return savedObject as T;
+            if(selectObject) {
+                Selection.activeObject = savedObject;
+            } else {
+                EditorGUIUtility.PingObject(savedObject);
+            }
+
+            Undo.RegisterCreatedObjectUndo(savedObject, $"Creating {typeName}.");
+
+            return savedObject;
         }
     }
 }

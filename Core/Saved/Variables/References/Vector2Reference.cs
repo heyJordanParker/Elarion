@@ -10,5 +10,9 @@ namespace Elarion.Saved.Variables.References {
         public static implicit operator Vector2(Vector2Reference reference) {
             return reference == null ? Vector2.zero : reference.Value;
         }
+        
+        public static implicit operator Vector3(Vector2Reference reference) {
+            return reference == null ? Vector2.zero : reference.Value;
+        }
     }
 }

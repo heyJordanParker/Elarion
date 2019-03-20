@@ -2,7 +2,7 @@
 using System.Collections;
 using USceneManager = UnityEngine.SceneManagement.SceneManager;
 
-namespace Elarion {
+namespace Elarion.AsyncLoaders {
 
 	public class AsyncSceneLoader : AsyncLoad {
 

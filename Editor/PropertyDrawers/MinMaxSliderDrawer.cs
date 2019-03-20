@@ -8,12 +8,10 @@ namespace Elarion.Editor.PropertyDrawers {
         
         private static readonly GUIStyle LabelStyle = new GUIStyle("label");
         
-        private MinMaxSliderAttribute Attribute {
-            get { return (MinMaxSliderAttribute) attribute; }
-        }
+        private MinMaxSliderAttribute Attribute => (MinMaxSliderAttribute) attribute;
 
         public override float GetPropertyHeight(SerializedProperty property, GUIContent label) {
-            return base.GetPropertyHeight(property, label) + EditorGUIUtility.singleLineHeight + 2;
+            return base.GetPropertyHeight(property, label) + EditorGUIUtility.singleLineHeight + EditorGUIUtility.standardVerticalSpacing;
         }
 
         public override void OnGUI(Rect rect, SerializedProperty property, GUIContent label) {

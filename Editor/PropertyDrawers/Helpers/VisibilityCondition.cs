@@ -85,7 +85,7 @@ namespace Elarion.Editor.PropertyDrawers.Helpers {
         internal static bool CheckConditions(VisibilityCondition[] visibilityConditions,
             SerializedProperty property) {
             
-            var targetObject = property.GetTargetObject();
+            var targetObject = property.GetObject();
 
             if(targetObject == null) {
                 return true;

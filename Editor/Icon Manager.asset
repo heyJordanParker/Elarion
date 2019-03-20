@@ -1,0 +1,70 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 3629adf406304ac79acb94fc29c31fca, type: 3}
+  m_Name: Icon Manager
+  m_EditorClassIdentifier: 
+  _autoUpdate: 1
+  _inheritableIcons:
+  - baseType:
+      _assemblyQualifiedName: Elarion.Saved.Variables.SavedVariable`1, Elarion, Version=0.0.0.0,
+        Culture=neutral, PublicKeyToken=null
+    icon: {fileID: 2800000, guid: 98ce96d8666bd3948aeb31a02a42d556, type: 3}
+  - baseType:
+      _assemblyQualifiedName: Elarion.Saved.EScriptableObject, Elarion, Version=0.0.0.0,
+        Culture=neutral, PublicKeyToken=null
+    icon: {fileID: 2800000, guid: 97d33899c079473498eb3439266d03c7, type: 3}
+  - baseType:
+      _assemblyQualifiedName: Elarion.Saved.Variables.SavedBool, Elarion, Version=0.0.0.0,
+        Culture=neutral, PublicKeyToken=null
+    icon: {fileID: 2800000, guid: d45a03dfc744f664599b296922164eee, type: 3}
+  - baseType:
+      _assemblyQualifiedName: Elarion.Saved.EScriptableObject, Elarion, Version=0.0.0.0,
+        Culture=neutral, PublicKeyToken=null
+    icon: {fileID: 2800000, guid: 666225bfb2ed9f948bf3cba1d378abc2, type: 3}
+  - baseType:
+      _assemblyQualifiedName: Elarion.Saved.Variables.SavedBool, Elarion, Version=0.0.0.0,
+        Culture=neutral, PublicKeyToken=null
+    icon: {fileID: 2800000, guid: 15a720f5a887e6447896786906590061, type: 3}
+  - baseType:
+      _assemblyQualifiedName: Elarion.Saved.Variables.SavedEase, Elarion, Version=0.0.0.0,
+        Culture=neutral, PublicKeyToken=null
+    icon: {fileID: 2800000, guid: c2b9fe4e847723a468201721871b299d, type: 3}
+  - baseType:
+      _assemblyQualifiedName: Elarion.Saved.Variables.SavedFloat, Elarion, Version=0.0.0.0,
+        Culture=neutral, PublicKeyToken=null
+    icon: {fileID: 2800000, guid: b76a54562c958ca4f89b3163efa288ce, type: 3}
+  - baseType:
+      _assemblyQualifiedName: Elarion.Saved.Variables.SavedInt, Elarion, Version=0.0.0.0,
+        Culture=neutral, PublicKeyToken=null
+    icon: {fileID: 2800000, guid: db1091fe897fdc445bfea52b9a95c025, type: 3}
+  - baseType:
+      _assemblyQualifiedName: Elarion.Saved.Variables.SavedString, Elarion, Version=0.0.0.0,
+        Culture=neutral, PublicKeyToken=null
+    icon: {fileID: 2800000, guid: 49048345d5d11224ab9418ffc360aa8d, type: 3}
+  - baseType:
+      _assemblyQualifiedName: Elarion.Saved.Variables.SavedString, Elarion, Version=0.0.0.0,
+        Culture=neutral, PublicKeyToken=null
+    icon: {fileID: 2800000, guid: 49048345d5d11224ab9418ffc360aa8d, type: 3}
+  _scriptsInheritingIcons:
+  - {fileID: 11500000, guid: c1e259e6d8084d38a70661dc06cf4a96, type: 3}
+  - {fileID: 11500000, guid: 869ef57af10b4f629e48533499e75302, type: 3}
+  - {fileID: 11500000, guid: b2eb2b8876094625bc5868e3ddcd4683, type: 3}
+  - {fileID: 11500000, guid: a4b56cebe0464c35917abbc844cfd528, type: 3}
+  - {fileID: 11500000, guid: 4204459ae74141e396087d298a5ca664, type: 3}
+  - {fileID: 11500000, guid: 5037a618102e405a9fb0b60298fae318, type: 3}
+  - {fileID: 11500000, guid: c13bf9557a72498d9f76f85b6c384ac6, type: 3}
+  - {fileID: 11500000, guid: 13537eb575074941b770cae54e5253f1, type: 3}
+  - {fileID: 11500000, guid: 69c81ffbdd6140da8fbccecb9e26836b, type: 3}
+  - {fileID: 11500000, guid: 7d4d8ae53e244e44979f64366ecacc53, type: 3}
+  - {fileID: 11500000, guid: 012e9cbd7caf425094d5beebcb61db1a, type: 3}
+  - {fileID: 11500000, guid: 40f56eb20d2e44828a88d50dd47cda02, type: 3}
+  - {fileID: 11500000, guid: 79957efa13d349e8a349824fb9fb329a, type: 3}

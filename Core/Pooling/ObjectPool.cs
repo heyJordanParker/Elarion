@@ -51,6 +51,10 @@ namespace Elarion.Pooling {
             return spawnedObject;
         }
 
+        public TPooledObject Spawn<TPooledObject>(Transform parent, bool autoInitialize = true) where TPooledObject : PooledObject {
+            return Spawn(parent, autoInitialize) as TPooledObject;
+        }
+
         public PooledObject[] SpawnMultiple(int count, Transform parent, bool autoInitialize = true) {
             var results = new PooledObject[count];
             

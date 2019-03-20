@@ -2,13 +2,13 @@ using System.Collections;
 using Elarion.Attributes;
 using Elarion.Coroutines;
 using Elarion.Extensions;
-using Elarion.General;
 using Elarion.Pooling;
 using UnityEngine;
 using UnityEngine.EventSystems;
 using UnityEngine.UI;
 
 namespace Elarion.UI.Utils {
+    [RequireComponent(typeof(Selectable))]
     public class UITapAnimation : BaseUIBehaviour, IPointerDownHandler, IPointerUpHandler, IBeginDragHandler {
 
         public ObjectPool tapIndicatorPool;

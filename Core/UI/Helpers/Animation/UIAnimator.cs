@@ -210,6 +210,12 @@ namespace Elarion.UI.Helpers.Animation {
             Play(GetAnimation(animationType), resetToSavedProperties, callback);
         }
 
+        // Simple method for calling in Unity Events
+        // ReSharper disable once RedundantOverload.Global
+        public void Play(UIAnimation animation) {
+            Play(animation, false, null);
+        }
+
         public void Play(UIAnimation animation, bool resetToSavedProperties = false, Action callback = null) {
             if(animation == null) {
                 if(callback != null) {

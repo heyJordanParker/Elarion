@@ -30,7 +30,7 @@ namespace Elarion.UI.TMP {
         public void Update() {
             _tmpText.text = targetText.text;
         }
-    } 
+    }
 }
 
 #endif
