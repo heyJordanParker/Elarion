@@ -54,8 +54,9 @@ namespace Elarion.UI {
         }
 
         public override void OnPointerDown(PointerEventData eventData) {
-            if(eventData.button != PointerEventData.InputButton.Left)
+            if(eventData.button != PointerEventData.InputButton.Left || Input.touchCount > 1)
                 return;
+            
             if(IsInteractable() && (navigation.mode != Navigation.Mode.None && EventSystem.current != null))
                 EventSystem.current.SetSelectedGameObject(gameObject, eventData);
 
@@ -73,7 +74,7 @@ namespace Elarion.UI {
         }
 
         public override void OnPointerUp(PointerEventData eventData) {
-            if(eventData.button != PointerEventData.InputButton.Left)
+            if(eventData.button != PointerEventData.InputButton.Left || Input.touchCount > 1)
                 return;
 
             base.OnPointerUp(eventData);
@@ -87,7 +88,7 @@ namespace Elarion.UI {
 
 
         public virtual void OnBeginDrag(PointerEventData eventData) {
-            if(!IsActive() || !IsInteractable() || eventData.button != PointerEventData.InputButton.Left) {
+            if(!MayDrag(eventData)) {
                 return;
             }
 
@@ -106,7 +107,7 @@ namespace Elarion.UI {
         }
 
         private bool MayDrag(PointerEventData eventData) {
-            return IsActive() && IsInteractable() && eventData.button == PointerEventData.InputButton.Left;
+            return IsActive() && IsInteractable() && eventData.button == PointerEventData.InputButton.Left && Input.touchCount <= 1;
         }
 
         private IEnumerator OnFinishSubmit() {
@@ -126,7 +127,7 @@ namespace Elarion.UI {
                 return;
 
             if(type == TapType.Single &&
-               UnityEngine.Time.time - _lastTapTime <= UIManager.DoubleTapTimeout) {
+               Time.time - _lastTapTime <= UIManager.DoubleTapTimeout) {
                 type = TapType.Double;
             }
 
@@ -135,7 +136,7 @@ namespace Elarion.UI {
             switch(type) {
                 case TapType.Single:
                     OnTap.Invoke();
-                    _lastTapTime = UnityEngine.Time.time;
+                    _lastTapTime = Time.time;
                     break;
                 case TapType.Long:
                     OnLongTap.Invoke();
@@ -149,9 +150,9 @@ namespace Elarion.UI {
         }
 
         private IEnumerator LongTapCheck() {
-            var startingTime = UnityEngine.Time.time;
+            var startingTime = Time.time;
 
-            while(_pointerDown && !_dragged) {
+            while(_pointerDown && !_dragged && Input.touchCount <= 1) {
                 if(Time.time - startingTime >= UIManager.LongTapTimeout) {
                     Tap(TapType.Long);
                     break;

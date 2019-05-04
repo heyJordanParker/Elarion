@@ -2,25 +2,21 @@ namespace Elarion.UI.Helpers.Animation {
     public class UIAnimationOptions {
         private readonly bool _savePosition;
         private readonly bool _instant;
-        private readonly Ease? _easeFunction;
+        private readonly Ease? _ease;
         private readonly float _duration;
         private readonly float _delay;
 
-        public bool SavePosition {
-            get { return _savePosition; }
-        }
+        public bool SavePosition => _savePosition;
 
-        public bool Instant {
-            get { return _instant; }
-        }
+        public bool Instant => _instant;
 
-        public Ease EaseFunction {
+        public Ease Ease {
             get {
-                if(!_easeFunction.HasValue) {
+                if(!_ease.HasValue) {
                     return Ease.Linear;
                 }
 
-                return _easeFunction.Value;
+                return _ease.Value;
             }
         }
 
@@ -34,16 +30,14 @@ namespace Elarion.UI.Helpers.Animation {
             }
         }
 
-        public float Delay {
-            get { return _delay; }
-        }
+        public float Delay => _delay;
 
-        public UIAnimationOptions(bool savePosition = false, bool instant = false, Ease? easeFunction = null,
+        public UIAnimationOptions(bool savePosition = false, bool instant = false, Ease? ease = null,
             float duration = 1, float delay = 0) {
             _savePosition = savePosition;
             _instant = instant;
             _duration = duration;
-            _easeFunction = easeFunction;
+            _ease = ease;
             _delay = delay;
         }
     }

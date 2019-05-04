@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using Elarion.Saved.Events.Listeners;
 
 namespace Elarion.Saved.Events {
-    public abstract class SavedEvent<TParameter> : EScriptableObject {
+    public abstract class SavedEvent<TParameter> : SavedObject {
         
         private event Action<TParameter> Event = v => { };
 

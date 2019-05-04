@@ -18,9 +18,9 @@ namespace Elarion.Saved.Variables.References {
                 
         private event Action<TType> Event = v => { };
 
-        protected SavedValueReference(TType value = default(TType)) {
-            useConstant = true;
+        protected SavedValueReference(TType value = default) {
             constantValue = value;
+            useConstant = true;
         }
 
         public TType Value {

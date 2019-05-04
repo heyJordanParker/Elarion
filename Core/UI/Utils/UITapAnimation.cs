@@ -32,7 +32,7 @@ namespace Elarion.UI.Utils {
                 return;
             }
             
-            if(eventData.button != PointerEventData.InputButton.Left) {
+            if(eventData.button != PointerEventData.InputButton.Left || Input.touchCount > 1) {
                 return;
             }
 

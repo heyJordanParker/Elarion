@@ -33,13 +33,9 @@ namespace Elarion.UI {
         [ConditionalVisibility("createUICamera")]
         public bool hideUICamera = false;
         
-        public float DoubleTapTimeout {
-            get => _doubleTapTimeout;
-        }
+        public float DoubleTapTimeout => _doubleTapTimeout;
 
-        public float LongTapTimeout {
-            get => _longTapTimeout;
-        }
+        public float LongTapTimeout => _longTapTimeout;
 
         protected override void Initialize() {
             base.Initialize();
@@ -73,10 +69,12 @@ namespace Elarion.UI {
                 return;
             }
 
-            var startingTransform = EventSystem.currentSelectedGameObject
-                ? EventSystem.currentSelectedGameObject.transform as RectTransform
+            var currentSelectedGameObject = EventSystem.currentSelectedGameObject;
+            
+            var startingTransform = currentSelectedGameObject
+                ? currentSelectedGameObject.transform as RectTransform
                 : null;
-            var selectable = EventSystem.currentSelectedGameObject
+            var selectable = currentSelectedGameObject
                 ? EventSystem.currentSelectedGameObject.GetComponent<Selectable>()
                 : null;
             Selectable nextSelectable = null;

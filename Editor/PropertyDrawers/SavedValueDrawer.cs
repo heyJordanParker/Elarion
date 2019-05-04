@@ -25,10 +25,11 @@ namespace Elarion.Editor.PropertyDrawers {
                 return _popupStyle;
             }
         }
-
+        
         public override void OnGUI(Rect position, SerializedProperty property, GUIContent label) {
             // Get properties
             var useConstant = property.FindPropertyRelative("useConstant");
+            
             var constantValue = property.FindPropertyRelative("constantValue");
             var variable = property.FindPropertyRelative("variable");
             

@@ -43,7 +43,7 @@ namespace Elarion.Editor.GenericInspector.Drawers {
                     continue;
                 }
 
-                var propertyType = propertyIterator.GetObjectType();
+                var propertyType = propertyIterator.GetFieldType();
                 if(propertyType == null || !propertyType.IsSubclassOf(typeof(ScriptableObject)))
                     continue;
 
@@ -90,7 +90,7 @@ namespace Elarion.Editor.GenericInspector.Drawers {
                     using(new EditorGUILayout.VerticalScope(GUILayout.ExpandWidth(false), GUILayout.ExpandHeight(false),
                         GUILayout.Width(7f))) {
                         GUILayout.Space(height - EditorGUIUtility.singleLineHeight);
-                        var propertyType = property.GetObjectType();
+                        var propertyType = property.GetFieldType();
                         if(GUILayout.Button(PlusIcon, PlusIconStyle)) {
                             var createdAsset = Utils.CreateScriptableObject(propertyType, true, false);
 

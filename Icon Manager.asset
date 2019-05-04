@@ -19,7 +19,7 @@ MonoBehaviour:
         Culture=neutral, PublicKeyToken=null
     icon: {fileID: 2800000, guid: 98ce96d8666bd3948aeb31a02a42d556, type: 3}
   - baseType:
-      _assemblyQualifiedName: Elarion.Saved.EScriptableObject, Elarion, Version=0.0.0.0,
+      _assemblyQualifiedName: Elarion.Saved.SavedObject, Elarion, Version=0.0.0.0,
         Culture=neutral, PublicKeyToken=null
     icon: {fileID: 2800000, guid: 97d33899c079473498eb3439266d03c7, type: 3}
   - baseType:
@@ -27,31 +27,27 @@ MonoBehaviour:
         Culture=neutral, PublicKeyToken=null
     icon: {fileID: 2800000, guid: d45a03dfc744f664599b296922164eee, type: 3}
   - baseType:
-      _assemblyQualifiedName: Elarion.Saved.EScriptableObject, Elarion, Version=0.0.0.0,
+      _assemblyQualifiedName: Elarion.Saved.Variables.SavedEase, Elarion, Version=0.0.0.0,
         Culture=neutral, PublicKeyToken=null
     icon: {fileID: 2800000, guid: 666225bfb2ed9f948bf3cba1d378abc2, type: 3}
   - baseType:
-      _assemblyQualifiedName: Elarion.Saved.Variables.SavedBool, Elarion, Version=0.0.0.0,
+      _assemblyQualifiedName: Elarion.Saved.Variables.SavedFloat, Elarion, Version=0.0.0.0,
         Culture=neutral, PublicKeyToken=null
     icon: {fileID: 2800000, guid: 15a720f5a887e6447896786906590061, type: 3}
   - baseType:
-      _assemblyQualifiedName: Elarion.Saved.Variables.SavedEase, Elarion, Version=0.0.0.0,
+      _assemblyQualifiedName: Elarion.Saved.Variables.SavedInt, Elarion, Version=0.0.0.0,
         Culture=neutral, PublicKeyToken=null
     icon: {fileID: 2800000, guid: c2b9fe4e847723a468201721871b299d, type: 3}
   - baseType:
-      _assemblyQualifiedName: Elarion.Saved.Variables.SavedFloat, Elarion, Version=0.0.0.0,
+      _assemblyQualifiedName: Elarion.Saved.Variables.SavedString, Elarion, Version=0.0.0.0,
         Culture=neutral, PublicKeyToken=null
     icon: {fileID: 2800000, guid: b76a54562c958ca4f89b3163efa288ce, type: 3}
   - baseType:
-      _assemblyQualifiedName: Elarion.Saved.Variables.SavedInt, Elarion, Version=0.0.0.0,
+      _assemblyQualifiedName: Elarion.Saved.Variables.SavedVector2, Elarion, Version=0.0.0.0,
         Culture=neutral, PublicKeyToken=null
     icon: {fileID: 2800000, guid: db1091fe897fdc445bfea52b9a95c025, type: 3}
   - baseType:
-      _assemblyQualifiedName: Elarion.Saved.Variables.SavedString, Elarion, Version=0.0.0.0,
-        Culture=neutral, PublicKeyToken=null
-    icon: {fileID: 2800000, guid: 49048345d5d11224ab9418ffc360aa8d, type: 3}
-  - baseType:
-      _assemblyQualifiedName: Elarion.Saved.Variables.SavedString, Elarion, Version=0.0.0.0,
+      _assemblyQualifiedName: Elarion.Saved.Variables.SavedVector3, Elarion, Version=0.0.0.0,
         Culture=neutral, PublicKeyToken=null
     icon: {fileID: 2800000, guid: 49048345d5d11224ab9418ffc360aa8d, type: 3}
   _scriptsInheritingIcons:

@@ -312,7 +312,7 @@ namespace Elarion.UI {
         /// <summary>
         /// Close implementation. Override this to modify the base functionality.
         /// </summary>
-        /// <param name="animation">The aimation to play while closing (can be null).</param>
+        /// <param name="animation">The animation to play while closing (can be null).</param>
         /// <param name="isEventOrigin">The initial closed element has isEventOrigin set to true.
         /// Its' child objects (that also get closed) have isEventOrigin set to false.</param>
         protected virtual void CloseInternal(UIAnimation animation, bool isEventOrigin) {

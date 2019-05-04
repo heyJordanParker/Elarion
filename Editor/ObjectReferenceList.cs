@@ -78,7 +78,7 @@ namespace Elarion.Editor {
 
                 var element = list.GetArrayElementAtIndex(i);
                 if(elementType == null) {
-                    elementType = list.GetObjectType().GetGenericArguments()[0];
+                    elementType = list.GetFieldType().GetGenericArguments()[0];
                 }
 
                 if(elementType.IsSubclassOf(typeof(Object))) {

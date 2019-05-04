@@ -23,9 +23,10 @@ namespace Elarion.Editor.GenericInspector {
         private readonly List<GenericInspectorDrawer> _drawers = new List<GenericInspectorDrawer>();
         
         protected virtual void OnEnable() {
-            if(!serializedObject.targetObject) {
+            if(!target || !serializedObject.targetObject) {
                 return;
             }
+            
             _drawers.Add(new ButtonDrawer(this, target, serializedObject));
             _drawers.Add(new ScriptableObjectDrawer(this, target, serializedObject));
             _drawers.Add(new ReorderableListDrawer(this, target, serializedObject));
@@ -62,7 +63,7 @@ namespace Elarion.Editor.GenericInspector {
             }
         }
 
-        public virtual void DrawInspector(SerializedProperty iterator) {
+        protected virtual void DrawInspector(SerializedProperty iterator) {
             for(var enterChildren = true; iterator.NextVisible(enterChildren); enterChildren = false) {
                 DrawProperty(iterator);
             }
@@ -80,7 +81,7 @@ namespace Elarion.Editor.GenericInspector {
             }
         }
 
-        public void DrawProperty(SerializedProperty property) {
+        protected virtual void DrawProperty(SerializedProperty property) {
             for(var i = 0; i < _drawers.Count; ++i) {
                 var inspectorDrawer = _drawers[i];
                 if(!inspectorDrawer.CanDrawProperty(property)) {

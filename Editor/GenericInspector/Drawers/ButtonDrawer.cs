@@ -33,6 +33,14 @@ namespace Elarion.Editor.GenericInspector.Drawers {
             foreach(var method in methods) {
                 foreach(InspectorButtonAttribute buttonAttribute in method.GetCustomAttributes(
                     typeof(InspectorButtonAttribute), false)) {
+                    if(!buttonAttribute.DrawInPlayMode && EditorApplication.isPlaying) {
+                        continue;
+                    }
+
+                    if(!buttonAttribute.DrawInEditorMode && !EditorApplication.isPlaying) {
+                        continue;
+                    }
+                    
                     if(string.IsNullOrEmpty(buttonAttribute.Title)) {
                         buttonAttribute.Title = method.Name;
                     }
@@ -94,8 +102,9 @@ namespace Elarion.Editor.GenericInspector.Drawers {
                     var isEnabled = true;
                     var hasLabel = _labels.ContainsKey(buttonTitle);
 
-                    if(_validators.ContainsKey(buttonTitle))
+                    if(_validators.ContainsKey(buttonTitle)) {
                         isEnabled = (bool) _validators[buttonTitle].Invoke(Target, null);
+                    }
 
                     GUI.enabled = isEnabled;
 

@@ -69,17 +69,15 @@ namespace Elarion.Utility.PropertyTweeners {
 
             Tweening = true;
 
-            tweenerCoroutine = _owner.CreateCoroutine(TweenCoroutine(animationOptions.EaseFunction, animationOptions.Duration, animationOptions.Delay));
+            tweenerCoroutine = _owner.CreateCoroutine(TweenCoroutine(animationOptions.Ease, animationOptions.Duration, animationOptions.Delay));
             tweenerCoroutine.OnFinished += stopped => {
                 if(!stopped) {
                     CurrentValue = TargetValue;
                 }
 
                 Tweening = false;
-                
-                if(callback != null) {
-                    callback();
-                }
+
+                callback?.Invoke();
             };
         }
 
@@ -105,27 +103,27 @@ namespace Elarion.Utility.PropertyTweeners {
             Tween(SavedValue, UIAnimationDirection.To, ResetProperty, new UIAnimationOptions(duration: duration));
         }
         
-        protected IEnumerator TweenCoroutine(Ease ease, float duration, float delay) {
+        protected virtual IEnumerator TweenCoroutine(Ease ease, float duration, float delay) {
             var movementProgress = 0.0f;
-            var startingAnchors = CurrentValue;
+            var startingValue = CurrentValue;
 
             if(delay > 0) {
                 yield return new WaitForSeconds(delay);
             }
-            
+
             while(movementProgress <= 1) {
-                CurrentValue = UpdateValue(startingAnchors, movementProgress, ease);
-                
+                CurrentValue = UpdateValue(startingValue, movementProgress, ease);
+
                 movementProgress += Time.smoothDeltaTime / duration;
                 yield return null;
             }
-            
-            CurrentValue = UpdateValue(startingAnchors, 1, ease);
+
+            CurrentValue = UpdateValue(startingValue, 1, ease);
         }
         
         protected abstract TProperty UpdateValue(TProperty startingValue, float progress, Ease ease);
 
-        // this is needed because generics do not support addition and the dynamic keyword isn't available in Unity
+        // this is needed because the dynamic keyword isn't available in Unity IL2CPP compilation
         protected abstract TProperty AddValues(TProperty value1, TProperty value2);
         
     }

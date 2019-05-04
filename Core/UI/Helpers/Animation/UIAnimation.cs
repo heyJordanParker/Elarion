@@ -324,7 +324,7 @@ namespace Elarion.UI.Helpers.Animation {
         public float alphaDelta = 0;
         
         [Space(10)]
-        [Header("Advanced Options")]
+        [Header("Advanced Options (Movement)")]
         [ConditionalVisibility(enableConditions: "_movementPreset == AnimationMovementPreset.Custom")]
         public bool overrideParentAnchors = false;
         
@@ -362,53 +362,47 @@ namespace Elarion.UI.Helpers.Animation {
             }
         }
 
-        private UIAnimationOptions AnimationOptions {
-            get {
-                return new UIAnimationOptions(savePosition, Duration == 0, _customEasingFunction, Duration, Delay);
-            }
-        }
-        
         private UIAnimationDirection GetAnimationDirection(bool isRelative) {
             if(!isRelative) {
                 return (UIAnimationDirection) _movementDirection;
             }
 
-            if(_movementDirection == AnimationDirection.To) {
-                return UIAnimationDirection.RelativeTo;
-            }
-
-            return UIAnimationDirection.RelativeFrom;
+            return _movementDirection == AnimationDirection.To ? UIAnimationDirection.RelativeTo : UIAnimationDirection.RelativeFrom;
         }
         
-        public void Animate(UIAnimator animator, Action callback = null) {
+        public void Animate(UIAnimator animator, Action callback = null, UIAnimationOptions animationOptions = null) {
+            if(animationOptions == null) {
+                animationOptions = new UIAnimationOptions(savePosition, Duration == 0, _customEasingFunction, Duration, Delay);
+            }
+            
             if(animatePosition) {
-                animator.Move(positionDelta, positionAnimationDirection, callback, AnimationOptions);
-                callback = null; // to avoid multiple calls of the callback
+                animator.Move(positionDelta, positionAnimationDirection, callback, animationOptions);
+                callback = null;
             }
             
             if(animateAnchors) {
-                animator.MoveAnchors(minAnchorDelta, maxAnchorDelta, anchorsAnimationDirection, callback, AnimationOptions);
-                callback = null; // to avoid multiple calls of the callback
+                animator.MoveAnchors(minAnchorDelta, maxAnchorDelta, anchorsAnimationDirection, callback, animationOptions);
+                callback = null;
             }
             
             if(animateRotation) {
-                animator.Rotate(rotationDelta, rotationAnimationDirection, callback, AnimationOptions);
-                callback = null; // to avoid multiple calls of the callback
+                animator.Rotate(rotationDelta, rotationAnimationDirection, callback, animationOptions);
+                callback = null;
             }
             
             if(animateSize) {
-                animator.Resize(sizeDelta, sizeAnimationDirection, callback, AnimationOptions);
-                callback = null; // to avoid multiple calls of the callback
+                animator.Resize(sizeDelta, sizeAnimationDirection, callback, animationOptions);
+                callback = null;
             }
 
             if(animateScale) {
-                animator.Scale(scaleDelta, scaleAnimationDirection, callback, AnimationOptions);
-                callback = null; // to avoid multiple calls of the callback
+                animator.Scale(scaleDelta, scaleAnimationDirection, callback, animationOptions);
+                callback = null;
             }
             
             if(animateAlpha) {
-                animator.Fade(alphaDelta, alphaAnimationDirection, callback, AnimationOptions);
-                callback = null; // to avoid multiple calls of the callback
+                animator.Fade(alphaDelta, alphaAnimationDirection, callback, animationOptions);
+                callback = null;
             }
 
             callback?.Invoke();

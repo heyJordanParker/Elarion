@@ -11,7 +11,6 @@ using UnityEngine.UI;
 
 namespace Elarion.UI.Helpers.Animation {
     // TODO decouple with UIComponent; make the Target a RectTransform (and use GameObject tweeners that fetch the components they need themselves)
-
     [UIComponentHelper]
     public class UIAnimator : MonoBehaviour, IAnimationController {
         [Serializable]
@@ -212,15 +211,14 @@ namespace Elarion.UI.Helpers.Animation {
 
         // Simple method for calling in Unity Events
         // ReSharper disable once RedundantOverload.Global
-        public void Play(UIAnimation animation) {
-            Play(animation, false, null);
+        public void Play(UIAnimation uiAnimation) {
+            Play(uiAnimation, false, null);
         }
 
-        public void Play(UIAnimation animation, bool resetToSavedProperties = false, Action callback = null) {
-            if(animation == null) {
-                if(callback != null) {
-                    callback();
-                }
+        // ReSharper disable once MethodOverloadWithOptionalParameter
+        public void Play(UIAnimation uiAnimation, bool resetToSavedProperties = false, Action callback = null, UIAnimationOptions animationOptions = null) {
+            if(uiAnimation == null) {
+                callback?.Invoke();
 
                 return;
             }
@@ -228,8 +226,8 @@ namespace Elarion.UI.Helpers.Animation {
             // TODO concurrent animations; hover & click at the same time
             // track all animations; some animations stop other animations (e.g. close stops open)
             if(_currentAnimation != null) {
-                if(animation == GetAnimation(UIAnimationType.OnOpen) ||
-                   animation == GetAnimation(UIAnimationType.OnClose)) {
+                if(uiAnimation == GetAnimation(UIAnimationType.OnOpen) ||
+                   uiAnimation == GetAnimation(UIAnimationType.OnClose)) {
                     _currentAnimation.Stop(this);
                 } else {
                     return;
@@ -240,20 +238,20 @@ namespace Elarion.UI.Helpers.Animation {
                 ResetToSavedProperties();
             }
 
-            OnAnimationStart(animation);
+            OnAnimationStart(uiAnimation);
 
             Action animationCallback;
 
             if(callback == null) {
-                animationCallback = () => { OnAnimationEnd(animation); };
+                animationCallback = () => { OnAnimationEnd(uiAnimation); };
             } else {
                 animationCallback = () => {
-                    OnAnimationEnd(animation);
+                    OnAnimationEnd(uiAnimation);
                     callback();
                 };
             }
 
-            animation.Animate(this, animationCallback);
+            uiAnimation.Animate(this, animationCallback, animationOptions);
         }
 
         public void Stop(bool reset = false) {
@@ -270,13 +268,7 @@ namespace Elarion.UI.Helpers.Animation {
         }
 
         public UIAnimation GetAnimation(UIAnimationType type) {
-            foreach(var typedAnimation in _animations) {
-                if(typedAnimation.type == type) {
-                    return typedAnimation.animation;
-                }
-            }
-
-            return null;
+            return _animations.FirstOrDefault(typedAnimation => typedAnimation.type == type)?.animation;
         }
 
         public void Move(Vector3 position, UIAnimationDirection animationDirection = UIAnimationDirection.To,

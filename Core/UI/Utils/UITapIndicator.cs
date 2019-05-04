@@ -78,15 +78,16 @@ namespace Elarion.UI.Utils {
             }
         }
 
-
         protected override void OnValidate() {
             base.OnValidate();
 
             if(!graphic) {
                 return;
             }
-            
-            graphicOriginalColor = graphic.color;
+
+            if(graphicOriginalColor != graphic.color) {
+                graphicOriginalColor = graphic.color;
+            }
                 
             if(!graphicTransform) {
                 graphicTransform = graphic.transform;

@@ -3,10 +3,11 @@ using System.Linq;
 using System.Reflection;
 using UnityEditor;
 using UnityEngine;
+using UnityEngine.UI;
 
 namespace Elarion.Editor.Extensions {
     public static class SerializedPropertyExtensions {
-        private const BindingFlags SerializedPropertyBindingFlags = BindingFlags.GetField
+        public const BindingFlags SerializedPropertyBindingFlags = BindingFlags.GetField
                                                                     | BindingFlags.GetProperty
                                                                     | BindingFlags.Instance
                                                                     | BindingFlags.NonPublic
@@ -80,10 +81,30 @@ namespace Elarion.Editor.Extensions {
             fi.SetValue(property.serializedObject.targetObject, value);
         }
 
-        public static Type GetObjectType(this SerializedProperty property) {
-            var field = property?.GetObject()?.GetType().GetField(property.name, SerializedPropertyBindingFlags);
+        public static Type GetFieldType(this SerializedProperty property) {
+            if(property == null) {
+                return null;
+            }
+            
+            var type = property?.GetObject()?.GetType();
+            
+            return GetFieldTypeRecursive(type, property.name);
+        }
 
-            return field == null ? null : field.FieldType;
+        private static Type GetFieldTypeRecursive(Type type, string fieldName) {
+            while(true) {
+                if(type == null) {
+                    return null;
+                }
+
+                var field = type.GetField(fieldName, SerializedPropertyBindingFlags);
+
+                if(field != null) {
+                    return field.FieldType;
+                }
+                
+                type = type.BaseType;
+            }
         }
 
         public static object[] GetAttributes<T>(this SerializedProperty property) where T : Attribute {

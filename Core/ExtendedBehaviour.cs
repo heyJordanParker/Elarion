@@ -43,7 +43,7 @@ namespace Elarion {
             OnWriteDefaults();
 
             #if UNITY_EDITOR
-            if(UnityEditor.PrefabUtility.GetPrefabType(this) == UnityEditor.PrefabType.Prefab) {
+            if(UnityEditor.PrefabUtility.IsPartOfPrefabAsset(this)) {
                 return;
             }
             #endif

@@ -1,0 +1,45 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 4ab013877c59463d99bed13bed482803, type: 3}
+  m_Name: Fade Out
+  m_EditorClassIdentifier: 
+  _movementPreset: 0
+  _fadePreset: 2
+  _movementDirection: 0
+  _delay: 0
+  _durationPreset: 20
+  _customDuration: 0.75
+  _easingFunctionPreset: 18
+  _customEasingFunction: 0
+  animatePosition: 0
+  positionAnimationDirection: 2
+  positionDelta: {x: 0, y: 0}
+  animateAnchors: 0
+  anchorsAnimationDirection: 0
+  minAnchorDelta: {x: 0, y: 0}
+  maxAnchorDelta: {x: 0, y: 0}
+  animateSize: 0
+  sizeAnimationDirection: 2
+  sizeDelta: {x: 0, y: 0}
+  animateScale: 0
+  scaleAnimationDirection: 2
+  scaleDelta: {x: 0, y: 0}
+  animateRotation: 0
+  rotationAnimationDirection: 2
+  rotationDelta: {x: 0, y: 0, z: 0}
+  animateAlpha: 1
+  alphaAnimationDirection: 1
+  alphaDelta: 0
+  overrideParentAnchors: 0
+  overrideParentAnchorMin: {x: 0.5, y: 0.5}
+  overrideParentAnchorMax: {x: 0.5, y: 0.5}
+  savePosition: 0

@@ -7,6 +7,7 @@ using Elarion.Utility.Tuples;
 using UnityEngine;
 
 namespace Elarion.Saved.Utils {
+    // TODO a localizer class that associates a language code with translators and can resolve words as well  
     [CreateAssetMenu(menuName = "Utils/Translator", order = 51)]
     public class Translator : ScriptableObject {
 

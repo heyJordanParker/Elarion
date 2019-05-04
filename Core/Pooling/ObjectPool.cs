@@ -50,7 +50,7 @@ namespace Elarion.Pooling {
             
             return spawnedObject;
         }
-
+        
         public TPooledObject Spawn<TPooledObject>(Transform parent, bool autoInitialize = true) where TPooledObject : PooledObject {
             return Spawn(parent, autoInitialize) as TPooledObject;
         }
