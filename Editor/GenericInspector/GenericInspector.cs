@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
-using Elarion.Attributes;
+using Elarion.Common.Attributes;
 using Elarion.Editor.Extensions;
 using Elarion.Editor.GenericInspector.Drawers;
 using UnityEditor;

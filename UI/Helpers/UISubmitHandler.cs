@@ -1,0 +1,23 @@
+using System;
+using Elarion.Common.Attributes;
+using UnityEngine;
+using UnityEngine.Events;
+using UnityEngine.EventSystems;
+
+namespace Elarion.UI.Helpers {
+    [UIComponentHelper]
+    public class UISubmitHandler : BaseUIBehaviour, ISubmitHandler {
+        [SerializeField]
+        private UnityEvent _onSubmit;
+        
+        public event Action Submit = () => { };
+
+        public void OnSubmit(BaseEventData eventData) {
+            if(_onSubmit != null) {
+                _onSubmit.Invoke();
+            }
+            
+            Submit();
+        }
+    }
+}

@@ -1,3 +1,3 @@
-[submodule "Core/yaSingleton"]
-	path = Core/yaSingleton
+[submodule "yaSingleton"]
+	path = yaSingleton
 	url = git@github.com:jedybg/yaSingleton.git

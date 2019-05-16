@@ -1,5 +1,5 @@
-﻿using Elarion.Editor.UI;
-using Elarion.Saved.Variables.References;
+﻿using Elarion.DataBinding.Variables.References;
+using Elarion.Editor.UI;
 using UnityEditor;
 using UnityEngine;
 

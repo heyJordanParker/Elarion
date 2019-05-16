@@ -1,4 +1,4 @@
-﻿using Elarion.Attributes;
+﻿using Elarion.Common.Attributes;
 using Elarion.Editor.PropertyDrawers.Helpers;
 using UnityEditor;
 using UnityEngine;
@@ -11,7 +11,7 @@ namespace Elarion.Editor.PropertyDrawers {
         }
 
         public override void OnGUI(Rect position, SerializedProperty property, GUIContent label) {
-            foreach(var conditionalLabel in ConditionalAttribute.conditionalLables) {
+            foreach(var conditionalLabel in ConditionalAttribute.conditionalLabels) {
                 var conditions = VisibilityCondition.ParseFromString(conditionalLabel.Value);
 
                 var isVisible = VisibilityCondition.CheckConditions(conditions, property);

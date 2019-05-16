@@ -1,5 +1,5 @@
 using System.Collections.Generic;
-using Elarion.Attributes;
+using Elarion.Common.Attributes;
 using Elarion.Editor.Extensions;
 using Elarion.Editor.GenericInspector.Drawers.ReorderableList;
 using UnityEditor;
