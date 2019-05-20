@@ -1,6 +1,3 @@
-
-using TMPro;
-using UnityEngine;
 #if TMP_ENABLED
 using Elarion.Common.Attributes;
 

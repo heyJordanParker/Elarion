@@ -1,7 +1,6 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
-using System.Runtime.CompilerServices;
 using UnityEngine;
 
 namespace Elarion.Common.Tuples {
@@ -11,18 +10,19 @@ namespace Elarion.Common.Tuples {
     /// <typeparam name="T1">Key Type</typeparam>
     /// <typeparam name="T2">Value Type</typeparam>
     [Serializable]
-    public class KeyValueTuple<T1, T2> : IStructuralEquatable, IStructuralComparable, IComparable, ITuple,
+    public class KeyValueTuple<T1, T2> : IStructuralEquatable, IStructuralComparable, IComparable,
         IEquatable<KeyValueTuple<T1, T2>> where T1 : IComparable where T2 : IComparable {
         [SerializeField]
         private T1 _key;
 
         [SerializeField]
         private T2 _value;
-        
+
         public T1 Key {
             get => _key;
             set => _key = value;
         }
+
         public T2 Value {
             get => _value;
             set => _value = value;

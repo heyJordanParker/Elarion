@@ -1,5 +1,4 @@
 ﻿using Elarion.DataBinding.Variables.References;
-using Elarion.Editor.UI;
 using UnityEditor;
 using UnityEngine;
 

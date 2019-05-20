@@ -1,4 +1,3 @@
-using System.Collections;
 using Elarion.Common.Attributes;
 using Elarion.Common.Coroutines;
 using Elarion.Common.Extensions;

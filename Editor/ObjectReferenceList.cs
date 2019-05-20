@@ -2,7 +2,6 @@
 using UnityEngine;
 using System;
 using Elarion.Editor.Extensions;
-using Elarion.Editor.UI;
 using Object = UnityEngine.Object;
 
 namespace Elarion.Editor {

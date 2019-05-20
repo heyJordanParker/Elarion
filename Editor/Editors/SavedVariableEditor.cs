@@ -1,14 +1,9 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
+﻿using System.Linq;
 using System.Reflection;
 using Elarion.Common.Attributes;
 using Elarion.DataBinding;
 using Elarion.Editor.Extensions;
-using Elarion.Editor.UI;
 using UnityEditor;
-using UnityEditor.AnimatedValues;
-using UnityEditorInternal;
 using UnityEngine;
 using Object = UnityEngine.Object;
 

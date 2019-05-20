@@ -1,6 +1,5 @@
 ﻿
 
-using Elarion.Common.Extensions;
 #if TMP_ENABLED
 using TMPro;
 using UnityEngine;

@@ -6,8 +6,6 @@ using Elarion.UI.PropertyTweeners.RectTransform;
 using Elarion.UI.PropertyTweeners.UIComponent;
 using Elarion.UI.Utils;
 using UnityEngine;
-using UnityEngine.SceneManagement;
-using UnityEngine.UI;
 
 namespace Elarion.UI.Helpers.Animation {
     // TODO decouple with UIComponent; make the Target a RectTransform (and use GameObject tweeners that fetch the components they need themselves)

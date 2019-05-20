@@ -1,14 +1,11 @@
 using System;
-using System.Collections.Generic;
 using System.Linq;
-using System.Runtime.CompilerServices;
 using System.Text;
 using Elarion.DataBinding.Events.UnityEvents;
 using Elarion.UI.Helpers;
 using Elarion.UI.Helpers.Animation;
 using UnityEngine;
 using UnityEngine.Events;
-using Debug = UnityEngine.Debug;
 
 namespace Elarion.UI {
     [DisallowMultipleComponent]

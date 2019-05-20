@@ -2,8 +2,6 @@
 using System.Linq;
 using System.Reflection;
 using UnityEditor;
-using UnityEngine;
-using UnityEngine.UI;
 
 namespace Elarion.Editor.Extensions {
     public static class SerializedPropertyExtensions {
