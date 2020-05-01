@@ -27,9 +27,9 @@ namespace Elarion.Editor.PropertyDrawers {
             var max = property.vector2Value.y;
 
             EditorGUI.BeginChangeCheck();
-
+            
             EditorGUI.MinMaxSlider(rect, label, ref min, ref max, Attribute.minValue, Attribute.maxValue);
-
+            
             rect.y += EditorGUIUtility.singleLineHeight + 2;
             
             rect.x += EditorGUIUtility.labelWidth;
@@ -72,6 +72,12 @@ namespace Elarion.Editor.PropertyDrawers {
             }
 
             if(EditorGUI.EndChangeCheck()) {
+                
+                if(Attribute.roundValues) {
+                    min = Mathf.Round(min);
+                    max = Mathf.Round(max);
+                }
+                
                 property.vector2Value = new Vector2(min, max);
             }
         }

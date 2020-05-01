@@ -114,7 +114,7 @@ namespace Elarion.UI.PropertyTweeners {
             while(movementProgress <= 1) {
                 CurrentValue = UpdateValue(startingValue, movementProgress, ease);
 
-                movementProgress += Time.smoothDeltaTime / duration;
+                movementProgress += Time.unscaledDeltaTime / duration;
                 yield return null;
             }
 

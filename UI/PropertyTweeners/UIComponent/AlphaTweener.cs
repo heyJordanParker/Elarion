@@ -8,6 +8,8 @@ namespace Elarion.UI.PropertyTweeners.UIComponent {
     // TODO try getting a canvasgroup and if that's not present, a Graphic to perform the tweening on
     // think of an interface to simplify the couple of proxy methods that have 6-7 tweener calls in the UIAnimator
     
+    
+    // TODO create a separate component that handles the alpha; get tweeners to work with gameobjects
     public class AlphaTweener : PropertyTweener<float, UI.UIComponent> {
         
         public AlphaTweener(MonoBehaviour owner) : base(owner) { }

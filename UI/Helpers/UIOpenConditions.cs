@@ -52,19 +52,19 @@ namespace Elarion.UI.Helpers {
         public bool screenSizeCondition = false;
 
         [HideInInspector]
-        [MinMaxSlider(0, MaxScreenSize, "Unrestricted", "Unrestricted", order = 2)]
+        [MinMaxSlider(0, MaxScreenSize, false, "Unrestricted", "Unrestricted", order = 2)]
         public Vector2 screenWidth = new Vector2(0, MaxScreenSize);
 
         [HideInInspector]
-        [MinMaxSlider(0, MaxScreenSize, "Unrestricted", "Unrestricted", order = 0)]
+        [MinMaxSlider(0, MaxScreenSize, false, "Unrestricted", "Unrestricted", order = 0)]
         public Vector2 screenHeight = new Vector2(0, MaxScreenSize);
 
         [HideInInspector]
-        [MinMaxSlider(0, MaxScreenSize, "Unrestricted", "Unrestricted")]
+        [MinMaxSlider(0, MaxScreenSize, false, "Unrestricted", "Unrestricted")]
         public Vector2 parentWidth = new Vector2(0, MaxScreenSize);
 
         [HideInInspector]
-        [MinMaxSlider(0, MaxScreenSize, "Unrestricted", "Unrestricted")]
+        [MinMaxSlider(0, MaxScreenSize, false, "Unrestricted", "Unrestricted")]
         public Vector2 parentHeight = new Vector2(0, MaxScreenSize);
 
         [HideInInspector]
