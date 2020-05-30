@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Reflection;
-using Elarion.Common.Extensions;
+using Elarion.Extensions;
 using Elarion.Editor.Extensions;
 using Elarion.UI;
 using UnityEditor;

@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace Elarion.Common.Attributes {
+namespace Elarion.Attributes {
     [AttributeUsage(AttributeTargets.Class)]
     public class UIComponentHelperAttribute : Attribute {}
 }

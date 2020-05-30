@@ -1,7 +1,7 @@
 ﻿using UnityEngine.Events;
 using UnityEngine.EventSystems;
 
-namespace Elarion.Common.Extensions {
+namespace Elarion.Extensions {
     public static class EventTriggerExtensions {
         public static void AddEventTrigger(this EventTrigger eventTrigger, UnityAction<BaseEventData> action,
             EventTriggerType eventType) {

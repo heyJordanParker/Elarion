@@ -1,6 +1,6 @@
 ﻿using UnityEngine;
 
-namespace Elarion.Common.Attributes {
+namespace Elarion.Attributes {
     public class MinMaxSliderAttribute : PropertyAttribute {
         public readonly float minValue;
         public readonly float maxValue;

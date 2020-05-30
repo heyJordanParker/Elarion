@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace Elarion.Common.Extensions {
+namespace Elarion.Extensions {
     public static class StringExtensions {
         public static T ToEnum<T>(this string value) {
             //Null check

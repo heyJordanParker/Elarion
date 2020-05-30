@@ -1,6 +1,6 @@
 ﻿using UnityEngine;
 
-namespace Elarion.Common.Extensions {
+namespace Elarion.Extensions {
     public static class IntegerExtensions {
 		 
         public static float Abs(this int value) {

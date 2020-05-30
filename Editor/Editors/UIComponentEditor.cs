@@ -1,6 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
-using Elarion.Common.Attributes;
+using Elarion.Attributes;
 using Elarion.Editor.Extensions;
 using Elarion.Editor.UI;
 using Elarion.UI;

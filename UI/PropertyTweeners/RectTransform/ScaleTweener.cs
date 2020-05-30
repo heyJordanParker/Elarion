@@ -1,5 +1,5 @@
-﻿using Elarion.Common;
-using Elarion.Common.Extensions;
+﻿using Elarion;
+using Elarion.Extensions;
 using UnityEngine;
 
 namespace Elarion.UI.PropertyTweeners.RectTransform {

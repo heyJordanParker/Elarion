@@ -7,7 +7,7 @@
 using System;
 using UnityEngine;
 
-namespace Elarion.Common {
+namespace Elarion {
     [Serializable]
     public class SerializableType {
         [SerializeField]

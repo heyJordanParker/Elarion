@@ -1,5 +1,5 @@
 using System;
-using Elarion.Common;
+using Elarion;
 
 namespace Elarion.UI {
 

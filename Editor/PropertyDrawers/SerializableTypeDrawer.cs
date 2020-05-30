@@ -2,7 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
-using Elarion.Common;
+using Elarion;
 using Elarion.Editor.Plugins.AutocompleteSearchField;
 using UnityEditor;
 using UnityEngine;

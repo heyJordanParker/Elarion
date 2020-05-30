@@ -1,6 +1,6 @@
 ﻿using UnityEngine;
 
-namespace Elarion.Common.Extensions {
+namespace Elarion.Extensions {
     public static class VectorExtensions {
 
         public static Vector2 EaseTo(this Vector2 start, Vector2 end, float value, Ease easeType = Ease.Linear) {

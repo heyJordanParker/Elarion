@@ -1,6 +1,6 @@
 using System;
 
-namespace Elarion.Common.Tuples {
+namespace Elarion.Tuples {
     [Serializable]
     public class StringTuple : KeyValueTuple<string, string> { }
 }

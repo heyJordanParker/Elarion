@@ -3,7 +3,7 @@ using System.Linq;
 using UnityEngine;
 using UnityEngine.UI;
 
-namespace Elarion.Common.Extensions {
+namespace Elarion.Extensions {
 	public static class GameObjectExtensions {
 
 		public static bool HasComponent<T>(this GameObject gameObject) where T : Component {

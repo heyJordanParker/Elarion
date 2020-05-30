@@ -1,5 +1,5 @@
-using Elarion.Common;
-using Elarion.Common.Attributes;
+using Elarion;
+using Elarion.Attributes;
 using Elarion.DataBinding.Variables;
 using UnityEngine;
 using UnityEngine.UI;

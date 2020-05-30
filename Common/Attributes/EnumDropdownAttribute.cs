@@ -1,7 +1,7 @@
 ﻿using System;
 using UnityEngine;
 
-namespace Elarion.Common.Attributes {
+namespace Elarion.Attributes {
     public class EnumDropdownAttribute : PropertyAttribute {
         public readonly Type type;
         public readonly string name;

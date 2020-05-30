@@ -1,6 +1,6 @@
 ﻿using UnityEngine;
 
-namespace Elarion.Common.Attributes {
+namespace Elarion.Attributes {
     public class ReadOnlyAttribute : PropertyAttribute {
         public readonly bool showOnlyWhenPlaying;
 

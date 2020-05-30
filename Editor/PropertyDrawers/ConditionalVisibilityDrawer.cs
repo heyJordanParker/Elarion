@@ -1,4 +1,4 @@
-﻿using Elarion.Common.Attributes;
+﻿using Elarion.Attributes;
 using Elarion.Editor.PropertyDrawers.Helpers;
 using UnityEditor;
 using UnityEngine;

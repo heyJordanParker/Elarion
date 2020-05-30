@@ -1,8 +1,8 @@
 ﻿using System;
 using System.Collections;
-using Elarion.Common;
-using Elarion.Common.Coroutines;
-using Elarion.Common.Extensions;
+using Elarion;
+using Elarion.Coroutines;
+using Elarion.Extensions;
 using Elarion.UI.Helpers.Animation;
 using UnityEngine;
 

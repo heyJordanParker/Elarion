@@ -1,6 +1,6 @@
 ﻿using UnityEngine;
 
-namespace Elarion.Common.Attributes {
+namespace Elarion.Attributes {
     public class RegexAttribute : PropertyAttribute {
         public readonly string helpMessage;
 

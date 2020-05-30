@@ -1,7 +1,7 @@
 using System;
 using System.Collections.Generic;
-using Elarion.Common;
-using Elarion.Common.Attributes;
+using Elarion;
+using Elarion.Attributes;
 using UnityEngine;
 using UnityEngine.Serialization;
 

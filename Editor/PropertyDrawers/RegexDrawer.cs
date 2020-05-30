@@ -1,5 +1,5 @@
 ﻿using System.Text.RegularExpressions;
-using Elarion.Common.Attributes;
+using Elarion.Attributes;
 using UnityEditor;
 using UnityEngine;
 

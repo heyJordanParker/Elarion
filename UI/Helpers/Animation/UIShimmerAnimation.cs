@@ -1,8 +1,8 @@
 using System.Collections;
-using Elarion.Common;
-using Elarion.Common.Attributes;
-using Elarion.Common.Coroutines;
-using Elarion.Common.Extensions;
+using Elarion;
+using Elarion.Attributes;
+using Elarion.Coroutines;
+using Elarion.Extensions;
 using UnityEngine;
 
 namespace Elarion.UI.Helpers.Animation {

@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Reflection;
-using Elarion.Common.Attributes;
+using Elarion.Attributes;
 using Elarion.Editor.GenericInspector.Drawers;
 using UnityEditor;
 using Object = UnityEngine.Object;

@@ -1,6 +1,6 @@
-using Elarion.Common;
-using Elarion.Common.Attributes;
-using Elarion.Common.Extensions;
+using Elarion;
+using Elarion.Attributes;
+using Elarion.Extensions;
 using Elarion.UI.PropertyTweeners;
 using Elarion.UI.Utils;
 using UnityEngine;

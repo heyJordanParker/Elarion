@@ -1,7 +1,7 @@
 ﻿using UnityEngine;
 using UnityEngine.UI;
 
-namespace Elarion.Common.Extensions {
+namespace Elarion.Extensions {
     public static class RectTransformExtensions {
         public static bool IsInside(this RectTransform transform, RectTransform container) {
             var screenTransform = transform.ToScreenSpace();

@@ -17,7 +17,7 @@
  * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-namespace Elarion.Common {
+namespace Elarion {
 
 	public static class Easing {
 
@@ -26,69 +26,69 @@ namespace Elarion.Common {
 		/// </summary>
 		public static float Ease(float start, float end, float value, Ease easeType) {
 			switch(easeType) {
-				case Common.Ease.InQuad:
+				case Elarion.Ease.InQuad:
 					return EaseInQuad(start, end, value);
-				case Common.Ease.OutQuad:
+				case Elarion.Ease.OutQuad:
 					return EaseOutQuad(start, end, value);
-				case Common.Ease.InOutQuad:
+				case Elarion.Ease.InOutQuad:
 					return EaseInOutQuad(start, end, value);
-				case Common.Ease.InCubic:
+				case Elarion.Ease.InCubic:
 					return EaseInCubic(start, end, value);
-				case Common.Ease.OutCubic:
+				case Elarion.Ease.OutCubic:
 					return EaseOutCubic(start, end, value);
-				case Common.Ease.InOutCubic:
+				case Elarion.Ease.InOutCubic:
 					return EaseInOutCubic(start, end, value);
-				case Common.Ease.InQuart:
+				case Elarion.Ease.InQuart:
 					return EaseInQuart(start, end, value);
-				case Common.Ease.OutQuart:
+				case Elarion.Ease.OutQuart:
 					return EaseOutQuart(start, end, value);
-				case Common.Ease.InOutQuart:
+				case Elarion.Ease.InOutQuart:
 					return EaseInOutQuart(start, end, value);
-				case Common.Ease.InQuint:
+				case Elarion.Ease.InQuint:
 					return EaseInQuint(start, end, value);
-				case Common.Ease.OutQuint:
+				case Elarion.Ease.OutQuint:
 					return EaseOutQuint(start, end, value);
-				case Common.Ease.InOutQuint:
+				case Elarion.Ease.InOutQuint:
 					return EaseInOutQuint(start, end, value);
-				case Common.Ease.InSine:
+				case Elarion.Ease.InSine:
 					return EaseInSine(start, end, value);
-				case Common.Ease.OutSine:
+				case Elarion.Ease.OutSine:
 					return EaseOutSine(start, end, value);
-				case Common.Ease.InOutSine:
+				case Elarion.Ease.InOutSine:
 					return EaseInOutSine(start, end, value);
-				case Common.Ease.InExpo:
+				case Elarion.Ease.InExpo:
 					return EaseInExpo(start, end, value);
-				case Common.Ease.OutExpo:
+				case Elarion.Ease.OutExpo:
 					return EaseOutExpo(start, end, value);
-				case Common.Ease.InOutExpo:
+				case Elarion.Ease.InOutExpo:
 					return EaseInOutExpo(start, end, value);
-				case Common.Ease.InCirc:
+				case Elarion.Ease.InCirc:
 					return EaseInCirc(start, end, value);
-				case Common.Ease.OutCirc:
+				case Elarion.Ease.OutCirc:
 					return EaseOutCirc(start, end, value);
-				case Common.Ease.InOutCirc:
+				case Elarion.Ease.InOutCirc:
 					return EaseInOutCirc(start, end, value);
-				case Common.Ease.Linear:
+				case Elarion.Ease.Linear:
 					return Linear(start, end, value);
-				case Common.Ease.Spring:
+				case Elarion.Ease.Spring:
 					return Spring(start, end, value);
-				case Common.Ease.InBounce:
+				case Elarion.Ease.InBounce:
 					return EaseInBounce(start, end, value);
-				case Common.Ease.OutBounce:
+				case Elarion.Ease.OutBounce:
 					return EaseOutBounce(start, end, value);
-				case Common.Ease.InOutBounce:
+				case Elarion.Ease.InOutBounce:
 					return EaseInOutBounce(start, end, value);
-				case Common.Ease.InBack:
+				case Elarion.Ease.InBack:
 					return EaseInBack(start, end, value);
-				case Common.Ease.OutBack:
+				case Elarion.Ease.OutBack:
 					return EaseOutBack(start, end, value);
-				case Common.Ease.InOutBack:
+				case Elarion.Ease.InOutBack:
 					return EaseInOutBack(start, end, value);
-				case Common.Ease.InElastic:
+				case Elarion.Ease.InElastic:
 					return EaseInElastic(start, end, value);
-				case Common.Ease.OutElastic:
+				case Elarion.Ease.OutElastic:
 					return EaseOutElastic(start, end, value);
-				case Common.Ease.InOutElastic:
+				case Elarion.Ease.InOutElastic:
 					return EaseInOutElastic(start, end, value);
 				default:
 					return Linear(start, end, value);
@@ -101,69 +101,69 @@ namespace Elarion.Common {
 		/// </summary>
 		public static float EaseDerivative(float start, float end, float value, Ease easeType) {
 			switch(easeType) {
-				case Common.Ease.InQuad:
+				case Elarion.Ease.InQuad:
 					return EaseInQuadD(start, end, value);
-				case Common.Ease.OutQuad:
+				case Elarion.Ease.OutQuad:
 					return EaseOutQuadD(start, end, value);
-				case Common.Ease.InOutQuad:
+				case Elarion.Ease.InOutQuad:
 					return EaseInOutQuadD(start, end, value);
-				case Common.Ease.InCubic:
+				case Elarion.Ease.InCubic:
 					return EaseInCubicD(start, end, value);
-				case Common.Ease.OutCubic:
+				case Elarion.Ease.OutCubic:
 					return EaseOutCubicD(start, end, value);
-				case Common.Ease.InOutCubic:
+				case Elarion.Ease.InOutCubic:
 					return EaseInOutCubicD(start, end, value);
-				case Common.Ease.InQuart:
+				case Elarion.Ease.InQuart:
 					return EaseInQuartD(start, end, value);
-				case Common.Ease.OutQuart:
+				case Elarion.Ease.OutQuart:
 					return EaseOutQuartD(start, end, value);
-				case Common.Ease.InOutQuart:
+				case Elarion.Ease.InOutQuart:
 					return EaseInOutQuartD(start, end, value);
-				case Common.Ease.InQuint:
+				case Elarion.Ease.InQuint:
 					return EaseInQuintD(start, end, value);
-				case Common.Ease.OutQuint:
+				case Elarion.Ease.OutQuint:
 					return EaseOutQuintD(start, end, value);
-				case Common.Ease.InOutQuint:
+				case Elarion.Ease.InOutQuint:
 					return EaseInOutQuintD(start, end, value);
-				case Common.Ease.InSine:
+				case Elarion.Ease.InSine:
 					return EaseInSineD(start, end, value);
-				case Common.Ease.OutSine:
+				case Elarion.Ease.OutSine:
 					return EaseOutSineD(start, end, value);
-				case Common.Ease.InOutSine:
+				case Elarion.Ease.InOutSine:
 					return EaseInOutSineD(start, end, value);
-				case Common.Ease.InExpo:
+				case Elarion.Ease.InExpo:
 					return EaseInExpoD(start, end, value);
-				case Common.Ease.OutExpo:
+				case Elarion.Ease.OutExpo:
 					return EaseOutExpoD(start, end, value);
-				case Common.Ease.InOutExpo:
+				case Elarion.Ease.InOutExpo:
 					return EaseInOutExpoD(start, end, value);
-				case Common.Ease.InCirc:
+				case Elarion.Ease.InCirc:
 					return EaseInCircD(start, end, value);
-				case Common.Ease.OutCirc:
+				case Elarion.Ease.OutCirc:
 					return EaseOutCircD(start, end, value);
-				case Common.Ease.InOutCirc:
+				case Elarion.Ease.InOutCirc:
 					return EaseInOutCircD(start, end, value);
-				case Common.Ease.Linear:
+				case Elarion.Ease.Linear:
 					return LinearD(start, end, value);
-				case Common.Ease.Spring:
+				case Elarion.Ease.Spring:
 					return SpringD(start, end, value);
-				case Common.Ease.InBounce:
+				case Elarion.Ease.InBounce:
 					return EaseInBounceD(start, end, value);
-				case Common.Ease.OutBounce:
+				case Elarion.Ease.OutBounce:
 					return EaseOutBounceD(start, end, value);
-				case Common.Ease.InOutBounce:
+				case Elarion.Ease.InOutBounce:
 					return EaseInOutBounceD(start, end, value);
-				case Common.Ease.InBack:
+				case Elarion.Ease.InBack:
 					return EaseInBackD(start, end, value);
-				case Common.Ease.OutBack:
+				case Elarion.Ease.OutBack:
 					return EaseOutBackD(start, end, value);
-				case Common.Ease.InOutBack:
+				case Elarion.Ease.InOutBack:
 					return EaseInOutBackD(start, end, value);
-				case Common.Ease.InElastic:
+				case Elarion.Ease.InElastic:
 					return EaseInElasticD(start, end, value);
-				case Common.Ease.OutElastic:
+				case Elarion.Ease.OutElastic:
 					return EaseOutElasticD(start, end, value);
-				case Common.Ease.InOutElastic:
+				case Elarion.Ease.InOutElastic:
 					return EaseInOutElasticD(start, end, value);
 				default:
 					return LinearD(start, end, value);
@@ -175,46 +175,46 @@ namespace Elarion.Common {
 		/// </summary>
 		public static Ease Mirror(this Ease ease) {
 			switch(ease) {
-				case Common.Ease.InQuad:
-					return Common.Ease.OutQuad;
-				case Common.Ease.OutQuad:
-					return Common.Ease.InQuad;
-				case Common.Ease.InCubic:
-					return Common.Ease.OutCubic;
-				case Common.Ease.OutCubic:
-					return Common.Ease.InCubic;
-				case Common.Ease.InQuart:
-					return Common.Ease.OutQuart;
-				case Common.Ease.OutQuart:
-					return Common.Ease.InQuart;
-				case Common.Ease.InQuint:
-					return Common.Ease.OutQuint;
-				case Common.Ease.OutQuint:
-					return Common.Ease.InQuint;
-				case Common.Ease.InSine:
-					return Common.Ease.OutSine;
-				case Common.Ease.OutSine:
-					return Common.Ease.InSine;
-				case Common.Ease.InExpo:
-					return Common.Ease.OutExpo;
-				case Common.Ease.OutExpo:
-					return Common.Ease.InExpo;
-				case Common.Ease.InCirc:
-					return Common.Ease.OutCirc;
-				case Common.Ease.OutCirc:
-					return Common.Ease.InCirc;
-				case Common.Ease.InBounce:
-					return Common.Ease.OutBounce;
-				case Common.Ease.OutBounce:
-					return Common.Ease.InBounce;
-				case Common.Ease.InBack:
-					return Common.Ease.OutBack;
-				case Common.Ease.OutBack:
-					return Common.Ease.InBack;
-				case Common.Ease.InElastic:
-					return Common.Ease.OutElastic;
-				case Common.Ease.OutElastic:
-					return Common.Ease.InElastic;
+				case Elarion.Ease.InQuad:
+					return Elarion.Ease.OutQuad;
+				case Elarion.Ease.OutQuad:
+					return Elarion.Ease.InQuad;
+				case Elarion.Ease.InCubic:
+					return Elarion.Ease.OutCubic;
+				case Elarion.Ease.OutCubic:
+					return Elarion.Ease.InCubic;
+				case Elarion.Ease.InQuart:
+					return Elarion.Ease.OutQuart;
+				case Elarion.Ease.OutQuart:
+					return Elarion.Ease.InQuart;
+				case Elarion.Ease.InQuint:
+					return Elarion.Ease.OutQuint;
+				case Elarion.Ease.OutQuint:
+					return Elarion.Ease.InQuint;
+				case Elarion.Ease.InSine:
+					return Elarion.Ease.OutSine;
+				case Elarion.Ease.OutSine:
+					return Elarion.Ease.InSine;
+				case Elarion.Ease.InExpo:
+					return Elarion.Ease.OutExpo;
+				case Elarion.Ease.OutExpo:
+					return Elarion.Ease.InExpo;
+				case Elarion.Ease.InCirc:
+					return Elarion.Ease.OutCirc;
+				case Elarion.Ease.OutCirc:
+					return Elarion.Ease.InCirc;
+				case Elarion.Ease.InBounce:
+					return Elarion.Ease.OutBounce;
+				case Elarion.Ease.OutBounce:
+					return Elarion.Ease.InBounce;
+				case Elarion.Ease.InBack:
+					return Elarion.Ease.OutBack;
+				case Elarion.Ease.OutBack:
+					return Elarion.Ease.InBack;
+				case Elarion.Ease.InElastic:
+					return Elarion.Ease.OutElastic;
+				case Elarion.Ease.OutElastic:
+					return Elarion.Ease.InElastic;
 				default:
 					return ease;
 			}

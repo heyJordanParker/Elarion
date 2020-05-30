@@ -1,10 +1,10 @@
 ﻿using System.Diagnostics;
 using System.Reflection;
-using Elarion.Common.Attributes;
+using Elarion.Attributes;
 using UnityEngine;
 using Debug = UnityEngine.Debug;
 
-namespace Elarion.Common {
+namespace Elarion {
     public abstract class ExtendedBehaviour : MonoBehaviour {
         
         /// <summary>

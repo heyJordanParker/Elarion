@@ -2,7 +2,7 @@
 using UnityEngine;
 using UnityEngine.UI;
 
-namespace Elarion.Common.Extensions {
+namespace Elarion.Extensions {
     public static class ScrollRectExtensions {
 
         public static void ScrollToTop(this ScrollRect scrollRect) {

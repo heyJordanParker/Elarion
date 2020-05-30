@@ -3,7 +3,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-namespace Elarion.Common.Tuples {
+namespace Elarion.Tuples {
     /// <summary>
     /// Serializable KeyValue Tuple
     /// </summary>

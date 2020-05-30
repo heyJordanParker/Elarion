@@ -1,4 +1,4 @@
-using Elarion.Common.Attributes;
+using Elarion.Attributes;
 using UnityEngine;
 using UnityEngine.UI;
 

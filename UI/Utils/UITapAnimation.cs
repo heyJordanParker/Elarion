@@ -1,6 +1,6 @@
-using Elarion.Common.Attributes;
-using Elarion.Common.Coroutines;
-using Elarion.Common.Extensions;
+using Elarion.Attributes;
+using Elarion.Coroutines;
+using Elarion.Extensions;
 using Elarion.Tools.Pooling;
 using UnityEngine;
 using UnityEngine.EventSystems;

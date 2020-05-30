@@ -1,5 +1,5 @@
-﻿using Elarion.Common.Attributes;
-using Elarion.Common.Extensions;
+﻿using Elarion.Attributes;
+using Elarion.Extensions;
 using UnityEngine;
 using UnityEngine.Events;
 

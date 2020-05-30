@@ -1,6 +1,6 @@
 using System;
 
-namespace Elarion.Common.Attributes {
+namespace Elarion.Attributes {
     [AttributeUsage(AttributeTargets.Class, Inherited = true)]
     public sealed class RequiresConstantRepaintAttribute : Attribute { }
 }

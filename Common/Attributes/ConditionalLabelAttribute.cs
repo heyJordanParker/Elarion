@@ -1,7 +1,7 @@
 ﻿using System.Collections.Generic;
 using UnityEngine;
 
-namespace Elarion.Common.Attributes {
+namespace Elarion.Attributes {
     public class ConditionalLabelAttribute : PropertyAttribute {
 
         public readonly Dictionary<string, string> conditionalLabels;

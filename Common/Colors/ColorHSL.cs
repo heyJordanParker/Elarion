@@ -1,7 +1,7 @@
 ﻿using System;
 using UnityEngine;
 
-namespace Elarion.Common.Colors {
+namespace Elarion.Colors {
     [Serializable]
     public struct ColorHSL {
         [SerializeField]

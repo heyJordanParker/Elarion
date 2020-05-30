@@ -1,4 +1,4 @@
-using Elarion.Common;
+using Elarion;
 
 namespace Elarion.UI.Helpers.Animation {
     public class UIAnimationOptions {

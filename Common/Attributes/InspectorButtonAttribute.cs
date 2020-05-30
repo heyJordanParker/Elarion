@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace Elarion.Common.Attributes {
+namespace Elarion.Attributes {
     [AttributeUsage(AttributeTargets.Method)]
     public sealed class InspectorButtonAttribute : Attribute {
 

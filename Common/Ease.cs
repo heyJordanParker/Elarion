@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace Elarion.Common {
+namespace Elarion {
 	[Serializable]
 	public enum Ease {
 		Linear = 0,

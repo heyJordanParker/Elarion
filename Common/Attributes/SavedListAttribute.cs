@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace Elarion.Common.Attributes {
+namespace Elarion.Attributes {
     /// <summary>
     /// Internal attribute used instead of GetGenericTypeDefinition() which throws an exception.
     /// </summary>

@@ -1,5 +1,5 @@
 using System.Collections.Generic;
-using Elarion.Common.Attributes;
+using Elarion.Attributes;
 using UnityEngine;
 
 namespace Elarion.UI {

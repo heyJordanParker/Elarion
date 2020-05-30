@@ -1,7 +1,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-namespace Elarion.Common.Coroutines {
+namespace Elarion.Coroutines {
     /// <summary>
     /// Cache for coroutine wait instructions. Doesn't generate as much garbage.
     /// </summary>

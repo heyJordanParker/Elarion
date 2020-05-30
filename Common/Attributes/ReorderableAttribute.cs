@@ -23,7 +23,7 @@ SOFTWARE.*/
 using System;
 using UnityEngine;
 
-namespace Elarion.Common.Attributes {
+namespace Elarion.Attributes {
     /// <summary>
     /// Use on arrays to make them easily reorderable in the inspector.
     /// </summary>

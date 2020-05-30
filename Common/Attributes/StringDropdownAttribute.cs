@@ -1,6 +1,6 @@
 ﻿using UnityEngine;
 
-namespace Elarion.Common.Attributes {
+namespace Elarion.Attributes {
     public class StringDropdownAttribute : PropertyAttribute {
         public string[] choices;
         public string name;

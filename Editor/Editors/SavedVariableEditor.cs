@@ -1,6 +1,6 @@
 ﻿using System.Linq;
 using System.Reflection;
-using Elarion.Common.Attributes;
+using Elarion.Attributes;
 using Elarion.DataBinding;
 using Elarion.Editor.Extensions;
 using UnityEditor;

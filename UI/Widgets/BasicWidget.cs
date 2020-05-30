@@ -1,6 +1,6 @@
 ﻿using System.Collections;
-using Elarion.Common.Coroutines;
-using Elarion.Common.Extensions;
+using Elarion.Coroutines;
+using Elarion.Extensions;
 using Elarion.DataBinding.Events;
 using TMPro;
 using UnityEngine;

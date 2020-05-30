@@ -1,6 +1,6 @@
 using UnityEngine;
 
-namespace Elarion.Common.Attributes {
+namespace Elarion.Attributes {
     /// <summary>
     /// Draw the selected field in the inspector only in play mode or only outside of play mode.
     /// </summary>

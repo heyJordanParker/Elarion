@@ -2,7 +2,7 @@
 using System.Collections;
 using UnityEngine;
 
-namespace Elarion.Common.Extensions {
+namespace Elarion.Extensions {
     public static class ActionExtensions {
         public static IEnumerator ToIEnumerator(this Action action) {
             action(); 

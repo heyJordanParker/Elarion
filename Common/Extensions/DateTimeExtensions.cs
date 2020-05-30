@@ -2,7 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 
-namespace Elarion.Common.Extensions {
+namespace Elarion.Extensions {
     public static class DateTimeExtensions {
 
         // Time in minutes

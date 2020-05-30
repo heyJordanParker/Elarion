@@ -1,9 +1,9 @@
 ﻿using System;
 using System.Collections;
-using Elarion.Common.Coroutines;
+using Elarion.Coroutines;
 using UnityEngine;
 
-namespace Elarion.Common.Extensions {
+namespace Elarion.Extensions {
     public static class MonoBehaviourExtensions {
         public static ECoroutine CreateCoroutine(this MonoBehaviour monoBehaviour, IEnumerator routine,
             bool autoStart = true) {

@@ -1,7 +1,7 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
-using Elarion.Common.Attributes;
-using Elarion.Common.Tuples;
+using Elarion.Attributes;
+using Elarion.Tuples;
 using Elarion.DataBinding.Variables.References;
 using UnityEngine;
 

@@ -1,7 +1,7 @@
 using System;
 using System.Collections;
-using Elarion.Common.Coroutines;
-using Elarion.Common.Extensions;
+using Elarion.Coroutines;
+using Elarion.Extensions;
 using UnityEngine;
 using UnityEngine.Events;
 using UnityEngine.EventSystems;

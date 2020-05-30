@@ -1,7 +1,7 @@
 using System;
 using System.Linq;
-using Elarion.Common.Attributes;
-using Elarion.Common.Extensions;
+using Elarion.Attributes;
+using Elarion.Extensions;
 using Elarion.UI.PropertyTweeners.RectTransform;
 using Elarion.UI.PropertyTweeners.UIComponent;
 using Elarion.UI.Utils;

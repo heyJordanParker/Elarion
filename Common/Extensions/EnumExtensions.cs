@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace Elarion.Common.Extensions {
+namespace Elarion.Extensions {
     public static class EnumExtensions {
 
         public static T AddFlag<T>(this Enum type, T enumFlag) {

@@ -1,6 +1,6 @@
 using System.Linq;
-using Elarion.Common.Attributes;
-using Elarion.Common.Extensions;
+using Elarion.Attributes;
+using Elarion.Extensions;
 using Elarion.UI.Utils;
 using UnityEngine;
 using UnityEngine.EventSystems;

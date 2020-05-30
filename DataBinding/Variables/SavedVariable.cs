@@ -1,5 +1,5 @@
 ﻿using System;
-using Elarion.Common.Attributes;
+using Elarion.Attributes;
 using Elarion.DataBinding.Events;
 using UnityEngine;
 using UnityEngine.Serialization;
