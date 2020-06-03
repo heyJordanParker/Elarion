@@ -13,6 +13,14 @@ namespace Elarion.Extensions {
 			return Mathf.Sign(value);
 		}
 
+		public static float Round(this float value) {
+			return Mathf.Round(value);
+		}
+		
+		public static int RoundToInt(this float value) {
+			return Mathf.RoundToInt(value);
+		}
+
 		public static bool Approximately(this float value, float otherValue) {
 			return Mathf.Approximately(value, otherValue);
 		}

@@ -111,7 +111,7 @@ namespace Elarion.Extensions {
 
             Selectable result = null;
 
-            var selectables = Selectable.allSelectables.ToArray();
+            var selectables = Selectable.allSelectablesArray;
 
             foreach(var selectable in selectables) {
                 if(selectable == null ||

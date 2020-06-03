@@ -1,6 +1,6 @@
-﻿
+﻿#if TMP_ENABLED
 
-#if TMP_ENABLED
+using Elarion.Extensions;
 using TMPro;
 using UnityEngine;
 using UnityEngine.UI;

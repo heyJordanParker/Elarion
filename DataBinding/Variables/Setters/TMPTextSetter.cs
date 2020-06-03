@@ -1,5 +1,8 @@
 #if TMP_ENABLED
-using Elarion.Common.Attributes;
+
+using Elarion.Attributes;
+using TMPro;
+using UnityEngine;
 
 namespace Elarion.DataBinding.Variables.Setters {
     [RequireComponent(typeof(TextMeshProUGUI))]

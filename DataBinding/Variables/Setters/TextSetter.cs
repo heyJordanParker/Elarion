@@ -11,7 +11,6 @@ namespace Elarion.DataBinding.Variables.Setters {
 
         protected override void UpdateText() {  
             _text.text = Text;
-        
         }
     }
 }
