@@ -1,4 +1,4 @@
-﻿using Elarion.DataBinding.Variables;
+﻿using Elarion.Workflows.Variables;
 using UnityEngine;
 
 namespace Elarion.UI.Utils {
@@ -28,8 +28,8 @@ namespace Elarion.UI.Utils {
             toggle.Unsubscribe(OnToggleChanged);
         }
 
-        private void OnToggleChanged(bool value) {
-            if(value) {
+        private void OnToggleChanged(bool newValue) {
+            if(newValue) {
                 _component.Toggle(!inverted);
             } else {
                 _component.Toggle(inverted);

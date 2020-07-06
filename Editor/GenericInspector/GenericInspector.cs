@@ -7,10 +7,13 @@ using UnityEditor;
 using Object = UnityEngine.Object;
 
 namespace Elarion.Editor.GenericInspector {
+    // TODO Info Drawer - draws an infobox below the inspector similar to the ButtonsDrawer
     [CanEditMultipleObjects]
     [CustomEditor(typeof(Object), true, isFallback = true)]
     public class GenericInspector : UnityEditor.Editor {
 
+        public static GenericInspector CurrentInspector { get; private set; }
+        
         public static event Action DrawAfterGUI;
         
         private bool _requiresConstantRepaint;
@@ -21,16 +24,18 @@ namespace Elarion.Editor.GenericInspector {
             if(!target || !serializedObject.targetObject) {
                 return;
             }
-            
+
             _drawers.Add(new ButtonDrawer(this, target, serializedObject));
             _drawers.Add(new ScriptableObjectDrawer(this, target, serializedObject));
             _drawers.Add(new ReorderableListDrawer(this, target, serializedObject));
 
             _requiresConstantRepaint =
-                serializedObject.targetObject.GetType().GetCustomAttribute<RequiresConstantRepaintAttribute>() != null;
+                serializedObject.targetObject.GetType().GetCustomAttribute<RequiresConstantRepaintAttribute>(true) != null;
         }
 
         public override void OnInspectorGUI() {
+            CurrentInspector = this;
+
             EditorGUI.BeginChangeCheck();
             serializedObject.Update();
             

@@ -1,5 +1,4 @@
 using System;
-using Elarion;
 
 namespace Elarion.UI {
 

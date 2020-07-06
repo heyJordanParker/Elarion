@@ -3,6 +3,7 @@ using Elarion.Attributes;
 using Elarion.Editor.Extensions;
 using Elarion.Editor.GenericInspector.Drawers.ReorderableList;
 using UnityEditor;
+using UnityEngine;
 using Object = UnityEngine.Object;
 
 namespace Elarion.Editor.GenericInspector.Drawers {

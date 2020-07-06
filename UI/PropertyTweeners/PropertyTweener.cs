@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections;
-using Elarion;
 using Elarion.Coroutines;
 using Elarion.Extensions;
 using Elarion.UI.Helpers.Animation;

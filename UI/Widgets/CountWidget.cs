@@ -1,4 +1,4 @@
-﻿using Elarion.DataBinding.Arrays;
+﻿using Elarion.Workflows.Arrays;
 
 namespace Elarion.UI.Widgets {
     public abstract class CountWidget<TSavedList, TSavedListItem> : BasicWidget<TSavedList, SavedList<TSavedListItem>>

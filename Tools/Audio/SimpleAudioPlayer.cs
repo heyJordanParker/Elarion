@@ -3,7 +3,7 @@ using UnityEngine;
 using Random = UnityEngine.Random;
 
 namespace Elarion.Tools.Audio {
-    [CreateAssetMenu(menuName = "Audio/Audio Player", order = 51)]
+    [CreateAssetMenu(menuName = "Utils/Audio Player", order = 51)]
     public class SimpleAudioPlayer : AudioPlayer {
         public AudioClip[] clips;
 

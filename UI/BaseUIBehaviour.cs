@@ -1,4 +1,3 @@
-using Elarion;
 using UnityEngine;
 
 namespace Elarion.UI {

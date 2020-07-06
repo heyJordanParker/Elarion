@@ -1,4 +1,3 @@
-using Elarion;
 using Elarion.Attributes;
 using Elarion.Extensions;
 using Elarion.UI.PropertyTweeners;

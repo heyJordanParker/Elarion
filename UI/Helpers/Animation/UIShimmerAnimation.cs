@@ -1,5 +1,4 @@
 using System.Collections;
-using Elarion;
 using Elarion.Attributes;
 using Elarion.Coroutines;
 using Elarion.Extensions;

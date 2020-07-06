@@ -25,7 +25,7 @@ namespace Elarion.Editor.GenericInspector.Drawers {
 
         private static GUIStyle PlusIconStyle => _plusIconStyle ?? (_plusIconStyle = new GUIStyle {
             stretchHeight = false, stretchWidth = false, imagePosition = ImagePosition.ImageOnly,
-            padding = new RectOffset(0, 0, 1, 0)
+            padding = new RectOffset(0, 0, 2, 0)
         });
         
         #endregion
@@ -91,7 +91,8 @@ namespace Elarion.Editor.GenericInspector.Drawers {
                         GUILayout.Width(7f))) {
                         GUILayout.Space(height - EditorGUIUtility.singleLineHeight);
                         var propertyType = property.GetFieldType();
-                        if(GUILayout.Button(PlusIcon, PlusIconStyle)) {
+                        
+                        if(!propertyType.IsAbstract && GUILayout.Button(PlusIcon, PlusIconStyle)) {
                             var createdAsset = Utils.CreateScriptableObject(propertyType, true, false);
 
                             if(createdAsset == null) {
@@ -115,6 +116,8 @@ namespace Elarion.Editor.GenericInspector.Drawers {
                 }
 
                 EditorGUI.indentLevel++;
+                
+                EditorGUILayout.Separator();
 
                 using(new EditorGUILayout.VerticalScope(StyleEditBox)) {
                     EditorGUILayout.Space();
@@ -131,6 +134,8 @@ namespace Elarion.Editor.GenericInspector.Drawers {
 
                 EditorGUI.indentLevel--;
             }
+            
+            EditorGUILayout.Separator();
         }
     }
 }

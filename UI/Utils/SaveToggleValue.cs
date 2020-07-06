@@ -1,6 +1,5 @@
-using Elarion;
 using Elarion.Attributes;
-using Elarion.DataBinding.Variables;
+using Elarion.Workflows.Variables;
 using UnityEngine;
 using UnityEngine.UI;
 
@@ -25,8 +24,8 @@ namespace Elarion.UI.Utils {
             _toggle.isOn = newValue;
         }
 
-        private void OnToggleChanged(bool state) {
-            _savedValue.Value = state;
+        private void OnToggleChanged(bool newState) {
+            _savedValue.Value = newState;
         }
     }
 }

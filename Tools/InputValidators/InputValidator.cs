@@ -1,4 +1,4 @@
-﻿using Elarion.DataBinding.Variables.References;
+﻿using Elarion.Workflows.Variables.References;
 using UnityEngine;
 
 namespace Elarion.Tools.InputValidators {

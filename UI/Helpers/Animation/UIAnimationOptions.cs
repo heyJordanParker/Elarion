@@ -1,5 +1,3 @@
-using Elarion;
-
 namespace Elarion.UI.Helpers.Animation {
     public class UIAnimationOptions {
         private readonly bool _savePosition;

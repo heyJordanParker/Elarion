@@ -1,7 +1,7 @@
 ﻿using System.Collections;
 using Elarion.Coroutines;
 using Elarion.Extensions;
-using Elarion.DataBinding.Events;
+using Elarion.Workflows.Events;
 using TMPro;
 using UnityEngine;
 
@@ -17,7 +17,7 @@ namespace Elarion.UI.Widgets {
 
         private ECoroutine _updateCoroutine;
 
-        protected virtual string StringifiedVariable => savedVariable.name;
+        protected abstract string StringifiedVariable { get; }
 
         protected virtual void OnEnable() {
             savedVariable.Subscribe(OnVariableChanged);
@@ -40,10 +40,6 @@ namespace Elarion.UI.Widgets {
         }
         
         private void OnVariableChanged(TVariableType newValue) {
-            TryStartUpdateCoroutine();
-        }
-
-        protected void TryStartUpdateCoroutine() {
             if(_updateCoroutine == null) {
                 _updateCoroutine = this.CreateCoroutine(UpdateVisibility());
             }

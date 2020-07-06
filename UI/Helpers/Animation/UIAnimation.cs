@@ -1,6 +1,5 @@
 using System;
 using System.Collections.Generic;
-using Elarion;
 using Elarion.Attributes;
 using UnityEngine;
 using UnityEngine.Serialization;

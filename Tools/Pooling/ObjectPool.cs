@@ -7,7 +7,7 @@ using UnityEngine;
 namespace Elarion.Tools.Pooling {
     // TODO custom editor with a Repopulate Pool Button
     // TODO repopulate pool if the prefab changes (maybe use hashcodes or just the reference); editor only
-    [CreateAssetMenu(menuName = "Object Pool", order = 33)]
+    [CreateAssetMenu(menuName = "Pooling/Object Pool", order = 52)]
     public class ObjectPool : ScriptableObject {
         [SerializeField]
         private PooledObject _pooledObject;
