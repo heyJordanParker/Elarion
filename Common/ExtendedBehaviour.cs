@@ -1,4 +1,5 @@
 ﻿using System.Diagnostics;
+using System.Linq;
 using System.Reflection;
 using Elarion.Attributes;
 using UnityEngine;
@@ -53,8 +54,10 @@ namespace Elarion {
 
             for(int i = 0; i < fields.Length; ++i) {
                 var field = fields[i];
+                var getComponentAttribute =
+                    field.GetCustomAttributes(typeof(GetComponentAttribute), false).FirstOrDefault() as GetComponentAttribute; 
 
-                if(field.GetCustomAttributes(typeof(GetComponentAttribute), false).Length < 1) {
+                if(getComponentAttribute == null) {
                     continue;
                 }
 
@@ -81,7 +84,7 @@ namespace Elarion {
                     }
                 }
 
-                var component = GetComponent(field.FieldType);
+                var component = getComponentAttribute.GetInChildren ? GetComponentInChildren(field.FieldType) : GetComponent(field.FieldType);
 
                 if(component == null) {
                     Debug.LogError(
